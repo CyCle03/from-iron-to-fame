@@ -131,6 +131,15 @@ export function migrateGameSave(raw: unknown): Game | null {
 
 export const serializeGameSave = (game: Game) => JSON.stringify(game, null, 2);
 
+export const getSavePreview = (game: Game) => ({
+  name: game.name,
+  season: game.season,
+  rank: game.rank,
+  main: game.main,
+  teamName: game.teamName,
+  version: game.version,
+});
+
 export function parseGameSave(contents: string): Game | null {
   try {
     return migrateGameSave(JSON.parse(contents));

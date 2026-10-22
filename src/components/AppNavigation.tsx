@@ -38,7 +38,7 @@ export function AppNavigation({ game, activeTab, onNavigate, onImport, onReset }
         ))}
       </div>
       <details className="save-menu">
-        <summary>저장 관리</summary>
+        <summary>더보기</summary>
         <div>
           <button className="mobile-secondary" onClick={() => onNavigate('장비 상점')}>
             장비 상점

@@ -11,7 +11,7 @@
 - `src/engine/careerRules.ts`: 대회·팀 진입 조건을 계산하는 순수 정책
 - `src/components/CreateCareer.tsx`: 신규 커리어 생성 마법사
 - `src/components/CareerPanels.tsx`: 계약·로스터·실험체 풀·기록 패널
-- `src/components/SaveControls.tsx`: JSON 저장 내보내기·불러오기·초기화 확인
+- `src/components/SaveControls.tsx`: 저장 관리 모달·JSON 가져오기 미리보기·초기화 확인·토스트 피드백
 - `src/components/SecondaryViews.tsx`: 장비 상점·선수 기록·게임 안내 화면
 - `src/components/SeasonCenter.tsx`: 마스터즈·KEL 시즌 일정과 누적 순위 화면
 - `src/components/SeasonPlanner.tsx`: 시즌 방향 비교·확인과 직전 시즌 결과 요약
@@ -33,7 +33,7 @@ UI는 게임 규칙을 직접 계산하지 않고 엔진 함수를 호출한다.
 
 브라우저 키는 `iron-to-fame-save-v1`을 유지하고 내부 `version`으로 스키마를 관리한다. `migrateGameSave`는 알 수 없는 입력을 검증하고 현재 버전의 필수 필드를 보완한다. 파싱 불가능하거나 복구할 수 없는 데이터는 새 커리어 화면으로 안전하게 복귀시킨다.
 
-사용자는 현재 저장을 JSON 파일로 내보내거나 다시 불러올 수 있다. 가져온 파일도 동일한 마이그레이션을 통과하며, 새 커리어 초기화는 확인 후 수행한다.
+사용자는 저장 관리 모달에서 현재 진행을 확인하고 JSON 파일로 내보내거나 다시 불러올 수 있다. 가져온 파일은 동일한 마이그레이션을 통과한 뒤 선수·시즌·랭크·주 실험체·팀·버전 요약을 먼저 표시하며, 사용자가 적용을 선택해야 현재 커리어를 교체한다. 새 커리어 초기화도 모달 안의 2단계 확인 후 수행한다.
 
 ## 검증
 

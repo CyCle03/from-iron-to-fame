@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CURRENT_SAVE_VERSION, createGame, validateGameState } from './game';
-import { migrateGameSave, parseGameSave, serializeGameSave } from './save';
+import { getSavePreview, migrateGameSave, parseGameSave, serializeGameSave } from './save';
 
 describe('save migration', () => {
   it('rejects values that are not save objects', () => {
@@ -45,5 +45,18 @@ describe('save migration', () => {
 
     expect(parseGameSave(serializeGameSave(game))).toEqual(game);
     expect(parseGameSave('{broken')).toBeNull();
+  });
+
+  it('builds a safe summary before an imported save is applied', () => {
+    const game = createGame('미리보기 선수', '골드', '일반 유저', '유키');
+
+    expect(getSavePreview(game)).toEqual({
+      name: '미리보기 선수',
+      season: 11,
+      rank: '골드',
+      main: '유키',
+      teamName: null,
+      version: CURRENT_SAVE_VERSION,
+    });
   });
 });
