@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {CURRENT_SAVE_VERSION, createGame, validateGameState} from './game';
-import {migrateGameSave} from './save';
+import {migrateGameSave, parseGameSave, serializeGameSave} from './save';
 
 describe('save migration', () => {
   it('rejects values that are not save objects', () => {
@@ -35,5 +35,12 @@ describe('save migration', () => {
     expect(migrated?.rank).toBe('아이언');
     expect(migrated?.main).toBeTruthy();
     expect(migrated?.trainingFocus).toEqual(['physical', 'macro']);
+  });
+
+  it('round-trips an exported save and rejects malformed JSON', () => {
+    const game = createGame('백업 선수', '골드', '일반 유저', '유키');
+
+    expect(parseGameSave(serializeGameSave(game))).toEqual(game);
+    expect(parseGameSave('{broken')).toBeNull();
   });
 });

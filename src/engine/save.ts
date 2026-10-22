@@ -111,3 +111,13 @@ export function migrateGameSave(raw: unknown): Game | null {
     seasonMeta: isRecord(raw.seasonMeta) ? raw.seasonMeta as Game['seasonMeta'] : createSeasonMeta(season),
   };
 }
+
+export const serializeGameSave = (game: Game) => JSON.stringify(game, null, 2);
+
+export function parseGameSave(contents: string): Game | null {
+  try {
+    return migrateGameSave(JSON.parse(contents));
+  } catch {
+    return null;
+  }
+}
