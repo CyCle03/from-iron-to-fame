@@ -8,6 +8,7 @@ import {
   canJoinKel,
   canPromoteTeamToKel,
   nextCareerGoal,
+  starterSwapImpact,
 } from './careerRules';
 
 const career = (overrides: Partial<Game> = {}) => ({
@@ -40,5 +41,21 @@ describe('career rules', () => {
     expect(
       nextCareerGoal(career({ teamName: '테스트 팀', careerLeague: '아마추어', rp: 2300, fame: 70 })).detail,
     ).toContain('RP 100');
+  });
+
+  it('previews the same weakest-starter swap used by roster changes', () => {
+    const game = career({ teamName: '테스트 팀' });
+    game.teamMembers.push({
+      nickname: '후보',
+      experiment: '아야',
+      role: '원거리 딜러',
+      skill: 90,
+      form: 80,
+      fatigue: 0,
+      starter: false,
+    });
+    const impact = starterSwapImpact(game, game.teamMembers.length - 1);
+    expect(impact?.teamworkChange).toBe(-3);
+    expect(impact?.powerChange).toBeGreaterThan(0);
   });
 });

@@ -379,8 +379,8 @@ li {
     padding: 8px 6px;
     font-size: 13px;
   }
-  .navigation-tabs button:nth-child(4),
-  .navigation-tabs button:nth-child(7) {
+  .navigation-tabs button:nth-child(5),
+  .navigation-tabs button:nth-child(8) {
     display: none;
   }
   .save-menu summary {
@@ -1999,6 +1999,51 @@ li {
   color: var(--color-muted);
   font-size: 13px;
 }
+.team-summary {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 2fr;
+  gap: var(--space-4);
+  align-items: center;
+}
+.team-summary h2 {
+  margin: 4px 0;
+}
+.team-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.team-summary-stats span,
+.contract-comparison {
+  padding: var(--space-2);
+  background: rgb(14 20 39 / 75%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+.team-summary-stats small,
+.team-summary-stats b,
+.contract-comparison span {
+  display: block;
+}
+.team-summary-stats small {
+  color: var(--color-muted);
+  margin-bottom: 5px;
+}
+.contract-comparison {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+.swap-preview {
+  min-height: 42px;
+  padding: 8px;
+  color: var(--color-accent) !important;
+  background: rgb(244 189 85 / 8%);
+  border-radius: var(--radius-sm);
+}
+.team-empty {
+  color: var(--color-muted);
+}
 @media (max-width: 640px) {
   .season-preview {
     grid-template-columns: 1fr;
@@ -2009,5 +2054,11 @@ li {
   }
   .selection-heading button {
     width: 100%;
+  }
+  .team-summary {
+    grid-template-columns: 1fr;
+  }
+  .team-summary-stats {
+    grid-template-columns: 1fr 1fr;
   }
 }

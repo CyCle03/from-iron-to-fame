@@ -13,6 +13,7 @@ import {
   type Game,
 } from '../engine/game';
 import { saveCareerCard } from '../utils/careerCard';
+import { starterSwapImpact } from '../engine/careerRules';
 
 type GamePanelProps = {
   game: Game;
@@ -88,18 +89,30 @@ export function ContractPanel({ game, onChange }: GamePanelProps) {
         <p>현재 무소속입니다. 지역 컵에서 명성을 쌓거나 스카우트 제안을 선택하세요.</p>
       )}
       <div className="offer-grid">
-        {game.scoutOffers.map((offer, index) => (
-          <article key={offer.team}>
-            <b>{offer.team}</b>
-            <span>
-              {offer.league} · {offer.seasonsRemaining}시즌
-            </span>
-            <small>
-              급여 {offer.salary} C · 계약금 {offer.signingBonus} C
-            </small>
-            <button onClick={() => onChange(acceptScoutOffer(game, index))}>이적 제안 수락</button>
-          </article>
-        ))}
+        {game.scoutOffers.map((offer, index) => {
+          const salaryChange = offer.salary - (game.contract?.salary ?? 0);
+          return (
+            <article key={offer.team}>
+              <b>{offer.team}</b>
+              <span>
+                {offer.league} · {offer.seasonsRemaining}시즌
+              </span>
+              <small>
+                급여 {offer.salary} C · 계약금 {offer.signingBonus} C
+              </small>
+              <div className="contract-comparison">
+                <span className={salaryChange >= 0 ? 'up' : 'down'}>
+                  현재 대비 급여 {salaryChange >= 0 ? '+' : ''}
+                  {salaryChange} C
+                </span>
+                <span>
+                  {game.contract ? `${game.contract.league} → ${offer.league}` : `${offer.league} 첫 계약`}
+                </span>
+              </div>
+              <button onClick={() => onChange(acceptScoutOffer(game, index))}>이적 제안 수락</button>
+            </article>
+          );
+        })}
       </div>
       {!game.scoutOffers.length && <small>새 스카우트 제안은 시즌 결산 후 도착합니다.</small>}
     </section>
@@ -117,24 +130,34 @@ export function RosterPanel({ game, onChange }: GamePanelProps) {
         폼을 회복할 수 있습니다.
       </p>
       <div className="roster-grid">
-        {game.teamMembers.map((member, index) => (
-          <article
-            className={member.starter ? 'starter' : ''}
-            key={`${member.nickname}-${member.experiment}`}
-          >
-            <small>{member.starter ? '주전' : '후보'}</small>
-            <b>{member.nickname}</b>
-            <span>
-              {member.experiment} · {member.role}
-            </span>
-            <span>
-              실력 {member.skill} · 폼 {member.form} · 피로 {member.fatigue}
-            </span>
-            <button disabled={member.starter} onClick={() => onChange(changeStarter(game, index))}>
-              {member.starter ? '주전 등록됨' : '주전으로 교체'}
-            </button>
-          </article>
-        ))}
+        {game.teamMembers.map((member, index) => {
+          const impact = starterSwapImpact(game, index);
+          return (
+            <article
+              className={member.starter ? 'starter' : ''}
+              key={`${member.nickname}-${member.experiment}`}
+            >
+              <small>{member.starter ? '주전' : '후보'}</small>
+              <b>{member.nickname}</b>
+              <span>
+                {member.experiment} · {member.role}
+              </span>
+              <span>
+                실력 {member.skill} · 폼 {member.form} · 피로 {member.fatigue}
+              </span>
+              {impact && (
+                <small className="swap-preview">
+                  교체 예상 · {impact.benchedNickname} 대신 투입 · 단순 전력{' '}
+                  {impact.powerChange >= 0 ? '+' : ''}
+                  {impact.powerChange} · 팀워크 {impact.teamworkChange}
+                </small>
+              )}
+              <button disabled={member.starter} onClick={() => onChange(changeStarter(game, index))}>
+                {member.starter ? '주전 등록됨' : '주전으로 교체'}
+              </button>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

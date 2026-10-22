@@ -58,3 +58,17 @@ export function nextCareerGoal(game: Game): { title: string; detail: string } {
     };
   return { title: '커리어 기록 완성', detail: '명예의 전당 심사 조건을 확인하세요' };
 }
+
+export function starterSwapImpact(game: Game, targetIndex: number) {
+  const target = game.teamMembers[targetIndex];
+  if (!target || target.starter) return null;
+  const benched = game.teamMembers
+    .filter((member) => member.starter)
+    .sort((a, b) => a.form - b.form || a.skill - b.skill)[0];
+  if (!benched) return null;
+  return {
+    benchedNickname: benched.nickname,
+    powerChange: target.skill + target.form - (benched.skill + benched.form),
+    teamworkChange: -3,
+  };
+}

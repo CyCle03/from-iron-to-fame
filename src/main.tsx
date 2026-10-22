@@ -15,19 +15,14 @@ import {
 } from './engine/game';
 import { simulateTournament, type TournamentKind, type TournamentResult } from './engine/tournament';
 import { canEnterKelStage, canEnterMasters, nextCareerGoal } from './engine/careerRules';
-import {
-  CareerArchivePanel,
-  ContractPanel,
-  ExperimentPoolPanel,
-  RetiredCareer,
-  RosterPanel,
-} from './components/CareerPanels';
+import { CareerArchivePanel, ExperimentPoolPanel, RetiredCareer } from './components/CareerPanels';
 import { CreateCareer } from './components/CreateCareer';
 import { AppNavigation } from './components/AppNavigation';
 import { EquipmentShop, GameGuide, PlayerRecords } from './components/SecondaryViews';
 import { SeasonCenter } from './components/SeasonCenter';
 import { TournamentView } from './components/TournamentView';
 import { SeasonPlanner, SeasonReport } from './components/SeasonPlanner';
+import { TeamHub } from './components/TeamHub';
 import { SEASON_ACTIONS, type NavigationTab } from './constants/ui';
 import { useCareerGame } from './hooks/useCareerGame';
 import './style.css';
@@ -355,11 +350,10 @@ function App() {
             ))}
           </section>
           <ExperimentPoolPanel game={game} onChange={setGame} />
-          <RosterPanel game={game} onChange={setGame} />
-          <ContractPanel game={game} onChange={setGame} />
           <CareerArchivePanel game={game} onChange={setGame} />
         </>
       )}
+      {tab === '팀' && <TeamHub game={game} onChange={setGame} />}
       {tab === '장비 상점' && <EquipmentShop game={game} onChange={setGame} />}
       {tab === '대회' && (
         <TournamentView
