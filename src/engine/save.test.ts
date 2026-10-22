@@ -1,6 +1,6 @@
-import {describe, expect, it} from 'vitest';
-import {CURRENT_SAVE_VERSION, createGame, validateGameState} from './game';
-import {migrateGameSave, parseGameSave, serializeGameSave} from './save';
+import { describe, expect, it } from 'vitest';
+import { CURRENT_SAVE_VERSION, createGame, validateGameState } from './game';
+import { migrateGameSave, parseGameSave, serializeGameSave } from './save';
 
 describe('save migration', () => {
   it('rejects values that are not save objects', () => {
@@ -9,7 +9,10 @@ describe('save migration', () => {
   });
 
   it('upgrades an older save and fills new career fields', () => {
-    const oldSave = createGame('이전 저장', '골드', '일반 유저', '유키') as unknown as Record<string, unknown>;
+    const oldSave = createGame('이전 저장', '골드', '일반 유저', '유키') as unknown as Record<
+      string,
+      unknown
+    >;
     oldSave.version = 1;
     delete oldSave.awards;
     delete oldSave.teamHistory;

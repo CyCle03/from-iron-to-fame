@@ -1,6 +1,6 @@
-import {useRef} from 'react';
-import type {Game} from '../engine/game';
-import {parseGameSave, serializeGameSave} from '../engine/save';
+import { useRef } from 'react';
+import type { Game } from '../engine/game';
+import { parseGameSave, serializeGameSave } from '../engine/save';
 
 type SaveControlsProps = {
   game: Game;
@@ -8,11 +8,11 @@ type SaveControlsProps = {
   onReset: () => void;
 };
 
-export function SaveControls({game, onImport, onReset}: SaveControlsProps) {
+export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const exportSave = () => {
-    const blob = new Blob([serializeGameSave(game)], {type: 'application/json'});
+    const blob = new Blob([serializeGameSave(game)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -32,19 +32,22 @@ export function SaveControls({game, onImport, onReset}: SaveControlsProps) {
   };
 
   const reset = () => {
-    if (window.confirm('현재 커리어를 삭제하고 새로 시작할까요? 내보내지 않은 진행은 복구할 수 없습니다.')) onReset();
+    if (window.confirm('현재 커리어를 삭제하고 새로 시작할까요? 내보내지 않은 진행은 복구할 수 없습니다.'))
+      onReset();
   };
 
-  return <>
-    <button onClick={exportSave}>저장 내보내기</button>
-    <button onClick={() => fileInput.current?.click()}>저장 불러오기</button>
-    <input
-      ref={fileInput}
-      type="file"
-      accept="application/json,.json"
-      hidden
-      onChange={(event) => void importSave(event.target.files?.[0])}
-    />
-    <button onClick={reset}>새 커리어</button>
-  </>;
+  return (
+    <>
+      <button onClick={exportSave}>저장 내보내기</button>
+      <button onClick={() => fileInput.current?.click()}>저장 불러오기</button>
+      <input
+        ref={fileInput}
+        type="file"
+        accept="application/json,.json"
+        hidden
+        onChange={(event) => void importSave(event.target.files?.[0])}
+      />
+      <button onClick={reset}>새 커리어</button>
+    </>
+  );
 }

@@ -18,7 +18,14 @@ import {
 
 const DEFAULT_FOCUS: StatKey[] = ['physical', 'macro'];
 const STAT_KEYS = new Set<StatKey>([
-  'physical', 'combat', 'macro', 'judgement', 'teamwork', 'mental', 'focus', 'adaptability',
+  'physical',
+  'combat',
+  'macro',
+  'judgement',
+  'teamwork',
+  'mental',
+  'focus',
+  'adaptability',
 ]);
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -41,7 +48,9 @@ export function migrateGameSave(raw: unknown): Game | null {
   const main = savedMain ?? roleExperiments[requestedRole][0];
   const role = roleForExperiment(main) ?? requestedRole;
   const trainingFocus = Array.isArray(raw.trainingFocus)
-    ? raw.trainingFocus.filter((key): key is StatKey => typeof key === 'string' && STAT_KEYS.has(key as StatKey)).slice(0, 2)
+    ? raw.trainingFocus
+        .filter((key): key is StatKey => typeof key === 'string' && STAT_KEYS.has(key as StatKey))
+        .slice(0, 2)
     : DEFAULT_FOCUS;
   const baseline = createGame(
     typeof raw.name === 'string' ? raw.name : '루미아 신인',
@@ -75,9 +84,11 @@ export function migrateGameSave(raw: unknown): Game | null {
   const teammateExperiments = stringArray(raw.teammateExperiments).filter((name) => characterSet.has(name));
   const savedMembers = Array.isArray(raw.teamMembers) ? raw.teamMembers : [];
   const teamMembers = savedMembers.filter(
-    (member): member is TeamMember => isRecord(member) && typeof member.experiment === 'string' && characterSet.has(member.experiment),
+    (member): member is TeamMember =>
+      isRecord(member) && typeof member.experiment === 'string' && characterSet.has(member.experiment),
   );
-  const season = typeof raw.season === 'number' && Number.isFinite(raw.season) ? Math.max(11, Math.floor(raw.season)) : 11;
+  const season =
+    typeof raw.season === 'number' && Number.isFinite(raw.season) ? Math.max(11, Math.floor(raw.season)) : 11;
   const teamName = typeof raw.teamName === 'string' ? raw.teamName : null;
 
   return {
@@ -96,19 +107,25 @@ export function migrateGameSave(raw: unknown): Game | null {
     teammateRoles: teammateExperiments.map((name) => roleForExperiment(name) ?? '근거리 딜러'),
     teamMembers: teamMembers.length ? teamMembers : baseline.teamMembers,
     teamName,
-    teamHistory: stringArray(raw.teamHistory).length ? stringArray(raw.teamHistory) : teamName ? [teamName] : [],
+    teamHistory: stringArray(raw.teamHistory).length
+      ? stringArray(raw.teamHistory)
+      : teamName
+        ? [teamName]
+        : [],
     awards: stringArray(raw.awards),
     equipment: stringArray(raw.equipment),
     history: stringArray(raw.history).length ? stringArray(raw.history) : baseline.history,
     notices: stringArray(raw.notices).length ? stringArray(raw.notices) : baseline.notices,
-    competitionHistory: Array.isArray(raw.competitionHistory) ? raw.competitionHistory as Game['competitionHistory'] : [],
-    matches: Array.isArray(raw.matches) ? raw.matches as Game['matches'] : [],
-    contract: isRecord(raw.contract) ? raw.contract as Game['contract'] : null,
-    scoutOffers: Array.isArray(raw.scoutOffers) ? raw.scoutOffers as Game['scoutOffers'] : [],
+    competitionHistory: Array.isArray(raw.competitionHistory)
+      ? (raw.competitionHistory as Game['competitionHistory'])
+      : [],
+    matches: Array.isArray(raw.matches) ? (raw.matches as Game['matches']) : [],
+    contract: isRecord(raw.contract) ? (raw.contract as Game['contract']) : null,
+    scoutOffers: Array.isArray(raw.scoutOffers) ? (raw.scoutOffers as Game['scoutOffers']) : [],
     mastersSeason: isRecord(raw.mastersSeason)
-      ? raw.mastersSeason as Game['mastersSeason']
+      ? (raw.mastersSeason as Game['mastersSeason'])
       : createMastersSeason(season, teamName),
-    seasonMeta: isRecord(raw.seasonMeta) ? raw.seasonMeta as Game['seasonMeta'] : createSeasonMeta(season),
+    seasonMeta: isRecord(raw.seasonMeta) ? (raw.seasonMeta as Game['seasonMeta']) : createSeasonMeta(season),
   };
 }
 

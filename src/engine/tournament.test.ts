@@ -1,6 +1,53 @@
-import {describe,it,expect} from 'vitest';import {createGame} from './game';import {createSeededRandom} from './random';import {simulateTournament} from './tournament';
-describe('tournament engine',()=>{it('enforces the two-pick cap in KEL simulation',()=>{const r=simulateTournament(createGame('테스트','이터니티','일반 유저','아야'),'kel');const picks=r.rounds.reduce<Record<string,number>>((a,x)=>({...a,[x.pick]:(a[x.pick]??0)+1}),{});expect(Object.values(picks).every(x=>x<=2)).toBe(true);expect(r.rounds.length).toBeLessThanOrEqual(9)});it('models masters as a phase with circuit points',()=>{const r=simulateTournament(createGame('테스트','골드','일반 유저','유키'),'masters');expect(r.rounds).toHaveLength(4);expect(r.circuitPoints).toBeGreaterThan(0);expect(r.rounds.every(x=>!x.banned.includes(x.pick))).toBe(true);expect(r.note).toContain('3픽밴')})});
+import { describe, it, expect } from 'vitest';
+import { createGame } from './game';
+import { createSeededRandom } from './random';
+import { simulateTournament } from './tournament';
+describe('tournament engine', () => {
+  it('enforces the two-pick cap in KEL simulation', () => {
+    const r = simulateTournament(createGame('테스트', '이터니티', '일반 유저', '아야'), 'kel');
+    const picks = r.rounds.reduce<Record<string, number>>(
+      (a, x) => ({ ...a, [x.pick]: (a[x.pick] ?? 0) + 1 }),
+      {},
+    );
+    expect(Object.values(picks).every((x) => x <= 2)).toBe(true);
+    expect(r.rounds.length).toBeLessThanOrEqual(9);
+  });
+  it('models masters as a phase with circuit points', () => {
+    const r = simulateTournament(createGame('테스트', '골드', '일반 유저', '유키'), 'masters');
+    expect(r.rounds).toHaveLength(4);
+    expect(r.circuitPoints).toBeGreaterThan(0);
+    expect(r.rounds.every((x) => !x.banned.includes(x.pick))).toBe(true);
+    expect(r.note).toContain('3픽밴');
+  });
+});
 
-describe('meta and experiment pool',()=>{it('uses trained alternatives when the main pick reaches the KEL cap',()=>{const game=createGame('테스트','이터니티','일반 유저','아야');const result=simulateTournament(game,'kel');expect(new Set(result.rounds.map(round=>round.pick)).size).toBeGreaterThan(1);expect(result.rounds.slice(0,6).every(round=>game.experimentPool.includes(round.pick))).toBe(true)});it('reports the bonuses used by tournament power',()=>{const game=createGame('테스트','골드','일반 유저','유키');game.seasonMeta={season:game.season,name:'테스트 메타',strongRoles:[game.role],description:'테스트'};const result=simulateTournament(game,'masters');expect(result.modifiers.meta).toBe(5);expect(result.modifiers.mastery).toBeGreaterThan(0);expect(result.modifiers.roster).toBeGreaterThan(0)})});
+describe('meta and experiment pool', () => {
+  it('uses trained alternatives when the main pick reaches the KEL cap', () => {
+    const game = createGame('테스트', '이터니티', '일반 유저', '아야');
+    const result = simulateTournament(game, 'kel');
+    expect(new Set(result.rounds.map((round) => round.pick)).size).toBeGreaterThan(1);
+    expect(result.rounds.slice(0, 6).every((round) => game.experimentPool.includes(round.pick))).toBe(true);
+  });
+  it('reports the bonuses used by tournament power', () => {
+    const game = createGame('테스트', '골드', '일반 유저', '유키');
+    game.seasonMeta = {
+      season: game.season,
+      name: '테스트 메타',
+      strongRoles: [game.role],
+      description: '테스트',
+    };
+    const result = simulateTournament(game, 'masters');
+    expect(result.modifiers.meta).toBe(5);
+    expect(result.modifiers.mastery).toBeGreaterThan(0);
+    expect(result.modifiers.roster).toBeGreaterThan(0);
+  });
+});
 
-describe('deterministic tournament simulation',()=>{it('replays the same tournament with the same seed',()=>{const game=createGame('테스트','골드','일반 유저','유키');const first=simulateTournament(game,'masters',createSeededRandom(2026));const second=simulateTournament(game,'masters',createSeededRandom(2026));expect(second).toEqual(first)})});
+describe('deterministic tournament simulation', () => {
+  it('replays the same tournament with the same seed', () => {
+    const game = createGame('테스트', '골드', '일반 유저', '유키');
+    const first = simulateTournament(game, 'masters', createSeededRandom(2026));
+    const second = simulateTournament(game, 'masters', createSeededRandom(2026));
+    expect(second).toEqual(first);
+  });
+});

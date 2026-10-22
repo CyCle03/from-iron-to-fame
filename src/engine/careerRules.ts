@@ -1,4 +1,4 @@
-import type {Game} from './game';
+import type { Game } from './game';
 
 export const CAREER_REQUIREMENTS = {
   communityCupRp: 1200,
@@ -22,12 +22,10 @@ export const canEnterMasters = (game: Game) =>
   game.fame >= CAREER_REQUIREMENTS.mastersFame &&
   game.mastersPhase < 3;
 
-export const canEnterKelStage = (game: Game) =>
-  game.careerLeague === 'KEL' && game.kelStage < 7;
+export const canEnterKelStage = (game: Game) => game.careerLeague === 'KEL' && game.kelStage < 7;
 
 export const canJoinAmateurTeam = (game: Game) =>
   !game.teamName && game.fame >= CAREER_REQUIREMENTS.amateurTeamFame;
 
 export const canJoinKel = (game: Game) =>
-  game.fame >= CAREER_REQUIREMENTS.kelFame &&
-  game.mastersPoints >= CAREER_REQUIREMENTS.kelMastersPoints;
+  game.fame >= CAREER_REQUIREMENTS.kelFame && game.mastersPoints >= CAREER_REQUIREMENTS.kelMastersPoints;

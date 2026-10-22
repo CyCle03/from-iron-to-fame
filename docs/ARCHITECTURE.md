@@ -3,6 +3,7 @@
 ## 책임 경계
 
 - `src/engine/game.ts`: 커리어 상태와 순수 상태 전이 함수
+- `src/engine/career.ts`: 통산 집계·은퇴·명예의 전당 상태 전이
 - `src/engine/tournament.ts`: 마스터즈·KEL 라운드 시뮬레이션과 픽 제한
 - `src/engine/save.ts`: 저장 데이터 검증·마이그레이션·기본값 보완
 - `src/engine/random.ts`: 재현 가능한 시뮬레이션을 위한 난수 소스
@@ -10,6 +11,7 @@
 - `src/components/CreateCareer.tsx`: 신규 커리어 생성 마법사
 - `src/components/CareerPanels.tsx`: 계약·로스터·실험체 풀·기록 패널
 - `src/components/SaveControls.tsx`: JSON 저장 내보내기·불러오기·초기화 확인
+- `src/components/SecondaryViews.tsx`: 장비 상점·선수 기록·게임 안내 화면
 - `src/hooks/useCareerGame.ts`: 커리어 상태와 브라우저 저장 수명주기
 - `src/constants/ui.ts`: 화면 공통 라벨·탭·시즌 행동 정의
 - `src/utils/careerCard.ts`: 읽기 전용 커리어 카드 렌더링
@@ -28,12 +30,10 @@ UI는 게임 규칙을 직접 계산하지 않고 엔진 함수를 호출한다.
 ## 검증
 
 ```bash
-npm test
-npm run build
 npm run check
 ```
 
-단위 테스트는 진입 조건, 대회 규칙, 계약·로스터·은퇴 상태 전이를 검증한다. 장기 회귀 테스트는 고정 난수로 30시즌을 진행하며 능력치, 재화, 주차, 실험체 풀과 주전 인원 불변식을 확인한다.
+`check`는 Prettier 형식, ESLint 정적 규칙, TypeScript 타입, 단위 테스트와 배포 빌드를 순서대로 검증한다. 단위 테스트는 진입 조건, 대회 규칙, 계약·로스터·은퇴 상태 전이를 검증한다. 장기 회귀 테스트는 고정 난수로 30시즌을 진행하며 능력치, 재화, 주차, 실험체 풀과 주전 인원 불변식을 확인한다.
 
 ## 변경 원칙
 
@@ -41,4 +41,4 @@ npm run check
 2. 규칙은 엔진의 순수 함수로 구현한 뒤 테스트를 작성한다.
 3. UI는 검증된 엔진 함수만 호출한다.
 4. 배포 빌드와 문서를 같은 변경에서 갱신한다.
-5. GitHub Actions에서 타입 검사, 테스트, 배포 빌드를 같은 순서로 반복한다.
+5. GitHub Actions에서 포맷, 린트, 타입 검사, 테스트, 배포 빌드를 같은 순서로 반복한다.
