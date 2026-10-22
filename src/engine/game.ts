@@ -1,4 +1,5 @@
 import type { RandomSource } from './random';
+import { rankEntryFee, rankFor, startingRp } from './rank';
 
 export type Rank =
   | '아이언'
@@ -368,32 +369,6 @@ export const statLabels: Record<StatKey, string> = {
   focus: '집중력',
   adaptability: '적응력',
 };
-const rankBands: { rank: Rank; min: number; startFee: number }[] = [
-  { rank: '아이언', min: 0, startFee: 0 },
-  { rank: '브론즈', min: 600, startFee: 10 },
-  { rank: '실버', min: 1400, startFee: 18 },
-  { rank: '골드', min: 2400, startFee: 28 },
-  { rank: '플래티넘', min: 3600, startFee: 36 },
-  { rank: '다이아몬드', min: 5000, startFee: 45 },
-  { rank: '메테오라이트', min: 6400, startFee: 53 },
-  { rank: '미스릴', min: 7600, startFee: 58 },
-  { rank: '데미갓', min: 8400, startFee: 58 },
-  { rank: '이터니티', min: 9600, startFee: 58 },
-];
-const rankFor = (rp: number): Rank => [...rankBands].reverse().find((b) => rp >= b.min)?.rank ?? '아이언';
-const startingRp = (rank: Rank) =>
-  ({
-    아이언: 120,
-    브론즈: 720,
-    실버: 1520,
-    골드: 2520,
-    플래티넘: 3720,
-    다이아몬드: 5120,
-    메테오라이트: 6520,
-    미스릴: 7620,
-    데미갓: 8400,
-    이터니티: 9600,
-  })[rank];
 const teamWordsA = ['루미아', '이터널', '네온', '블루', '레드', '실버', '골든', '아스트라'];
 const teamWordsB = ['웨이브', '폭스', '블레이즈', '나이츠', '피닉스', '스톰'];
 const hash = (text: string) =>
@@ -452,18 +427,6 @@ export function createMastersSeason(season: number, playerTeam: string | null): 
     champion: null,
     playerFinalPlace: null,
   };
-}
-/** Current official fee bands for 1/3-player premades. Top-rank cutoffs are simulated. */
-export function rankEntryFee(rp: number): number {
-  if (rp < 600) return 0;
-  if (rp < 1400) return 10 + Math.min(3, Math.floor((rp - 600) / 200)) * 2;
-  if (rp < 2400) return 18 + Math.min(3, Math.floor((rp - 1400) / 250)) * 2;
-  if (rp < 3600) return 28 + Math.min(3, Math.floor((rp - 2400) / 300)) * 2;
-  if (rp < 5000) return 36 + Math.min(3, Math.floor((rp - 3600) / 350)) * 2;
-  if (rp < 6400) return 45 + Math.min(3, Math.floor((rp - 5000) / 350)) * 2;
-  if (rp < 7600) return 53 + Math.min(3, Math.floor((rp - 6400) / 300));
-  if (rp < 9600) return 58;
-  return 58 + Math.floor((rp - 9600) / 250) * 2;
 }
 export function createGame(
   name: string,
@@ -1281,3 +1244,4 @@ export function renewContract(g: Game): Game {
 }
 
 export { careerTotals, hallOfFameProgress, inductHallOfFame, retireCareer } from './career';
+export { rankEntryFee } from './rank';

@@ -4,6 +4,7 @@
 
 - `src/engine/game.ts`: 커리어 상태와 순수 상태 전이 함수
 - `src/engine/career.ts`: 통산 집계·은퇴·명예의 전당 상태 전이
+- `src/engine/rank.ts`: RP 구간·티어·랭크 입장료 계산
 - `src/engine/tournament.ts`: 마스터즈·KEL 라운드 시뮬레이션과 픽 제한
 - `src/engine/save.ts`: 저장 데이터 검증·마이그레이션·기본값 보완
 - `src/engine/random.ts`: 재현 가능한 시뮬레이션을 위한 난수 소스
@@ -12,6 +13,7 @@
 - `src/components/CareerPanels.tsx`: 계약·로스터·실험체 풀·기록 패널
 - `src/components/SaveControls.tsx`: JSON 저장 내보내기·불러오기·초기화 확인
 - `src/components/SecondaryViews.tsx`: 장비 상점·선수 기록·게임 안내 화면
+- `src/components/SeasonCenter.tsx`: 마스터즈·KEL 시즌 일정과 누적 순위 화면
 - `src/hooks/useCareerGame.ts`: 커리어 상태와 브라우저 저장 수명주기
 - `src/constants/ui.ts`: 화면 공통 라벨·탭·시즌 행동 정의
 - `src/utils/careerCard.ts`: 읽기 전용 커리어 카드 렌더링
