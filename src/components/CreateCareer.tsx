@@ -12,6 +12,7 @@ import {
   type StatKey,
 } from '../engine/game';
 import { STAT_LABELS } from '../constants/ui';
+import { randomChoice } from '../engine/random';
 
 type CreateCareerProps = { onCreate: (game: Game) => void };
 
@@ -26,7 +27,7 @@ export function CreateCareer({ onCreate }: CreateCareerProps) {
 
   const begin = () => {
     const candidates = roleExperiments[role];
-    const main = candidates[Math.floor(Math.random() * candidates.length)];
+    const main = randomChoice(candidates);
     onCreate(createGame(name.trim() || '루미아 신인', rank, background, role, main, [focusA, focusB]));
   };
 
@@ -52,6 +53,22 @@ export function CreateCareer({ onCreate }: CreateCareerProps) {
                 ))}
               </select>
             </label>
+            <div className="selection-heading">
+              <div>
+                <b>선수 배경</b>
+                <small aria-live="polite">현재 선택 · {background}</small>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setBackground(
+                    randomChoice(Object.keys(backgrounds) as Background[], Math.random, background),
+                  )
+                }
+              >
+                🎲 배경 랜덤
+              </button>
+            </div>
             <div className="backgrounds">
               {Object.entries(backgrounds).map(([key, value]) => (
                 <button
@@ -70,6 +87,20 @@ export function CreateCareer({ onCreate }: CreateCareerProps) {
           <>
             <h2>플레이 역할군</h2>
             <p>주력 실험체는 선택한 역할군 안에서 무작위로 정해집니다.</p>
+            <div className="selection-heading">
+              <div>
+                <b>선호 역할</b>
+                <small aria-live="polite">현재 선택 · {role}</small>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setRole(randomChoice(Object.keys(roleExperiments) as Role[], Math.random, role))
+                }
+              >
+                🎲 역할군 랜덤
+              </button>
+            </div>
             <fieldset className="roles">
               {Object.keys(roleExperiments).map((item) => (
                 <button
@@ -125,7 +156,7 @@ export function CreateCareer({ onCreate }: CreateCareerProps) {
             <div className="wizard-summary">
               <b>{name || '루미아 신인'}</b>
               <span>
-                {rank} · {role}
+                {rank} · {background} · {role}
               </span>
               <span>
                 성장 중점 · {STAT_LABELS[focusA]} · {STAT_LABELS[focusB]}

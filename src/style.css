@@ -115,6 +115,31 @@ select {
   gap: 8px;
   margin: 18px 0;
 }
+.selection-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: 18px;
+}
+.selection-heading b,
+.selection-heading small {
+  display: block;
+}
+.selection-heading small {
+  margin-top: 4px;
+  color: var(--color-muted);
+}
+.selection-heading button {
+  min-height: 44px;
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  color: var(--color-text);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
 .backgrounds button,
 .actions button {
   padding: 14px;
@@ -1977,5 +2002,12 @@ li {
 @media (max-width: 640px) {
   .season-preview {
     grid-template-columns: 1fr;
+  }
+  .selection-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .selection-heading button {
+    width: 100%;
   }
 }

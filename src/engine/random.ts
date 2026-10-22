@@ -1,5 +1,12 @@
 export type RandomSource = () => number;
 
+export function randomChoice<T>(items: readonly T[], random: RandomSource = Math.random, exclude?: T): T {
+  const candidates = exclude === undefined ? items : items.filter((item) => item !== exclude);
+  const source = candidates.length ? candidates : items;
+  if (!source.length) throw new Error('Cannot choose from an empty collection.');
+  return source[Math.floor(random() * source.length)];
+}
+
 export function createSeededRandom(seed: number): RandomSource {
   let state = seed >>> 0;
   return () => {
