@@ -14,6 +14,7 @@
 - `src/components/SaveControls.tsx`: JSON 저장 내보내기·불러오기·초기화 확인
 - `src/components/SecondaryViews.tsx`: 장비 상점·선수 기록·게임 안내 화면
 - `src/components/SeasonCenter.tsx`: 마스터즈·KEL 시즌 일정과 누적 순위 화면
+- `src/components/SeasonPlanner.tsx`: 시즌 방향 비교·확인과 직전 시즌 결과 요약
 - `src/components/TournamentView.tsx`: 커리어 진입 무대·공식 대회 진행과 결과 화면
 - `src/components/AppNavigation.tsx`: 데스크톱·모바일 탐색과 저장 관리 진입점
 - `src/hooks/useCareerGame.ts`: 커리어 상태와 브라우저 저장 수명주기

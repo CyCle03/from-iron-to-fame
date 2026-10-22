@@ -27,6 +27,7 @@ import { AppNavigation } from './components/AppNavigation';
 import { EquipmentShop, GameGuide, PlayerRecords } from './components/SecondaryViews';
 import { SeasonCenter } from './components/SeasonCenter';
 import { TournamentView } from './components/TournamentView';
+import { SeasonPlanner, SeasonReport } from './components/SeasonPlanner';
 import { SEASON_ACTIONS, type NavigationTab } from './constants/ui';
 import { useCareerGame } from './hooks/useCareerGame';
 import './style.css';
@@ -167,59 +168,14 @@ function App() {
               <span className={game.hallOfFame ? 'done' : ''}>명예의 전당</span>
             </div>
           </section>
-          <section className="weekly-plan season-wizard">
-            <p className="eyebrow">
-              SEASON {seasonInfo(game.season).number} · {seasonStep + 1}/3
-            </p>
-            {seasonStep === 0 && (
-              <>
-                <h2>이번 시즌의 목표를 정하세요</h2>
-                <p>한 가지 방향을 고르면, 훈련·랭크·회복이 자동으로 배분됩니다.</p>
-                <button className="primary" onClick={() => setSeasonStep(1)}>
-                  시즌 계획 세우기
-                </button>
-              </>
-            )}
-            {seasonStep === 1 && (
-              <>
-                <h2>주력 운영 방향</h2>
-                <div className="plan-actions">
-                  {actions.map((a) => (
-                    <button
-                      key={a.id}
-                      className={plannedAction === a.id ? 'selected' : ''}
-                      onClick={() => setPlannedAction(a.id)}
-                    >
-                      <b>{a.title}</b>
-                      <small>{a.desc}</small>
-                    </button>
-                  ))}
-                </div>
-                <div className="wizard-actions">
-                  <button onClick={() => setSeasonStep(0)}>이전</button>
-                  <button className="primary" disabled={!plannedAction} onClick={() => setSeasonStep(2)}>
-                    계획 확인
-                  </button>
-                </div>
-              </>
-            )}
-            {seasonStep === 2 && plannedAction && (
-              <>
-                <h2>{actions.find((x) => x.id === plannedAction)?.title} 시즌</h2>
-                <div className="wizard-summary">
-                  <b>12주 자동 운영</b>
-                  <span>{actions.find((x) => x.id === plannedAction)?.desc}</span>
-                  <small>피로가 과도하게 누적되지 않도록 회복·리뷰 주간을 포함합니다.</small>
-                </div>
-                <div className="wizard-actions">
-                  <button onClick={() => setSeasonStep(1)}>이전</button>
-                  <button className="primary" onClick={() => playWeek(plannedAction)}>
-                    시즌 진행
-                  </button>
-                </div>
-              </>
-            )}
-          </section>
+          <SeasonPlanner
+            game={game}
+            step={seasonStep}
+            selected={plannedAction}
+            onStepChange={setSeasonStep}
+            onSelect={setPlannedAction}
+            onRun={playWeek}
+          />
           <section className="season-unit">
             <span>
               성장 중점 ·{' '}
@@ -248,42 +204,7 @@ function App() {
             </b>
             <small>한 번의 선택으로 12주(1시즌)가 진행되며, 1년은 약 3개 시즌입니다.</small>
           </section>
-          {game.lastSeasonSummary && (
-            <section className="season-report panel">
-              <div>
-                <p className="eyebrow">SEASON REPORT</p>
-                <h2>S{game.lastSeasonSummary.season} 시즌 결산</h2>
-              </div>
-              <div className="report-stats">
-                <span>
-                  랭크{' '}
-                  <b>
-                    {game.lastSeasonSummary.rankBefore} → {game.lastSeasonSummary.rankAfter}
-                  </b>
-                </span>
-                <span>
-                  RP{' '}
-                  <b>
-                    {game.lastSeasonSummary.rpAfter - game.lastSeasonSummary.rpBefore >= 0 ? '+' : ''}
-                    {game.lastSeasonSummary.rpAfter - game.lastSeasonSummary.rpBefore}
-                  </b>
-                </span>
-                <span>
-                  명성 <b>+{game.lastSeasonSummary.fameGained}</b>
-                </span>
-                <span>
-                  랭크 경기 <b>{game.lastSeasonSummary.matches}판</b>
-                </span>
-                <span>
-                  최고 순위{' '}
-                  <b>{game.lastSeasonSummary.bestPlace ? game.lastSeasonSummary.bestPlace + '위' : '-'}</b>
-                </span>
-                <span>
-                  공식 일정 <b>{game.lastSeasonSummary.tournamentEvents}개</b>
-                </span>
-              </div>
-            </section>
-          )}
+          <SeasonReport game={game} />
           <section className="hall-panel panel">
             <div>
               <p className="eyebrow">HALL OF FAME</p>
