@@ -4,7 +4,7 @@ export type TournamentRound = {round:number;pick:string;place:number;checkpoint:
 export type TournamentResult = { kind:TournamentKind; champion:string; playerPlace:number; circuitPoints:number; rounds:TournamentRound[]; note:string };
 const pool=['아야','현우','유키','재키','리오','하트','매그너스','쇼이치','타지아','이바','엘레나','피오라','혜진','아드리아나','키아라','루크','수아','시셀라','캐시','나딘','알렉스','로지','니키','아이작'];
 const clamp=(n:number)=>Math.max(1,Math.min(8,Math.round(n)));
-const power=(g:Game)=>(g.stats.physical+g.stats.combat+g.stats.macro+g.stats.judgement+g.stats.teamwork+g.stats.focus)/6+(g.mastery[g.main]??0)*.15-g.fatigue*.18;
+const power=(g:Game)=>{const roster=(g.teamMembers??[]).filter(member=>member.starter);const teamBonus=roster.length?roster.reduce((sum,member)=>sum+member.skill+member.form-member.fatigue*.5,0)/roster.length*.08:0;return (g.stats.physical+g.stats.combat+g.stats.macro+g.stats.judgement+g.stats.teamwork+g.stats.focus)/6+(g.mastery[g.main]??0)*.15-g.fatigue*.18+teamBonus;};
 const checkpointCount=(round:number)=>round<5?0:round===5?2:round===6?3:round===7?5:round===8?7:8;
 const banDuration=(picked:number)=>picked>=5?3:picked===4?2:picked===3?1:0;
 /** Masters: a lobby-wide 3-Pick-Ban simulation. KEL: a per-team 2-PICK-CAP simulation. */
