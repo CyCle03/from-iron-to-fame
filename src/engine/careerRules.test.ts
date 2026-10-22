@@ -6,6 +6,7 @@ import {
   canEnterMasters,
   canJoinAmateurTeam,
   canJoinKel,
+  canPromoteTeamToKel,
 } from './careerRules';
 
 const career = (overrides: Partial<Game> = {}) => ({
@@ -25,5 +26,8 @@ describe('career rules', () => {
   it('reports team progression eligibility', () => {
     expect(canJoinAmateurTeam(career({ fame: 45 }))).toBe(true);
     expect(canJoinKel(career({ fame: 180, mastersPoints: 400 }))).toBe(true);
+    expect(canPromoteTeamToKel(career({ fame: 240, mastersPoints: 600, careerLeague: '마스터즈' }))).toBe(
+      true,
+    );
   });
 });

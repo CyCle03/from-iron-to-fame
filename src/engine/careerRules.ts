@@ -29,3 +29,6 @@ export const canJoinAmateurTeam = (game: Game) =>
 
 export const canJoinKel = (game: Game) =>
   game.fame >= CAREER_REQUIREMENTS.kelFame && game.mastersPoints >= CAREER_REQUIREMENTS.kelMastersPoints;
+
+export const canPromoteTeamToKel = (game: Game) =>
+  ['아마추어', '마스터즈'].includes(game.careerLeague) && game.fame >= 240 && game.mastersPoints >= 600;

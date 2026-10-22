@@ -14,12 +14,15 @@
 - `src/components/SaveControls.tsx`: JSON 저장 내보내기·불러오기·초기화 확인
 - `src/components/SecondaryViews.tsx`: 장비 상점·선수 기록·게임 안내 화면
 - `src/components/SeasonCenter.tsx`: 마스터즈·KEL 시즌 일정과 누적 순위 화면
+- `src/components/TournamentView.tsx`: 커리어 진입 무대·공식 대회 진행과 결과 화면
 - `src/hooks/useCareerGame.ts`: 커리어 상태와 브라우저 저장 수명주기
 - `src/constants/ui.ts`: 화면 공통 라벨·탭·시즌 행동 정의
 - `src/utils/careerCard.ts`: 읽기 전용 커리어 카드 렌더링
 - `src/main.tsx`: 진행 중인 커리어 화면과 사용자 동작 조합
 
 UI는 게임 규칙을 직접 계산하지 않고 엔진 함수를 호출한다. 엔진 함수는 입력 `Game`을 직접 변경하지 않고 새 상태를 반환한다. 공식 규칙과 팬게임용 수치·확률은 문서와 UI에서 구분한다.
+
+대회·팀 진입 버튼의 활성 조건은 `careerRules` 선택자를 공유한다. 화면과 상태 전이 함수가 같은 임계값을 중복 정의하지 않도록 새 진입 조건은 먼저 정책 모듈에 추가한다.
 
 확률을 사용하는 선수 생성, 랭크, 시즌, 지역 컵, 로스터 구성과 대회 시뮬레이터는 기본적으로 `Math.random`을 사용하되 테스트와 밸런스 도구에서 난수 소스를 주입할 수 있게 설계한다. 동일 시드 테스트는 장기 커리어와 대회 결과가 재현되는지 확인한다.
 
