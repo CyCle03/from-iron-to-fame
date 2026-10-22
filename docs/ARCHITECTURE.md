@@ -12,6 +12,7 @@
 - `src/components/CreateCareer.tsx`: 신규 커리어 생성 마법사
 - `src/components/CareerPanels.tsx`: 계약·로스터·실험체 풀·기록 패널
 - `src/components/SaveControls.tsx`: 저장 관리 모달·JSON 가져오기 미리보기·초기화 확인·토스트 피드백
+- `src/components/ToastProvider.tsx`: 게임 전역 알림 수명주기와 접근성 라이브 영역
 - `src/components/SecondaryViews.tsx`: 장비 상점·선수 기록·게임 안내 화면
 - `src/components/SeasonCenter.tsx`: 마스터즈·KEL 시즌 일정과 누적 순위 화면
 - `src/components/SeasonPlanner.tsx`: 시즌 방향 비교·확인과 직전 시즌 결과 요약
@@ -41,7 +42,7 @@ UI는 게임 규칙을 직접 계산하지 않고 엔진 함수를 호출한다.
 npm run check
 ```
 
-`check`는 Prettier 형식, ESLint 정적 규칙, TypeScript 타입, 단위 테스트와 배포 빌드를 순서대로 검증한다. 단위 테스트는 진입 조건, 대회 규칙, 계약·로스터·은퇴 상태 전이를 검증한다. 장기 회귀 테스트는 고정 난수로 30시즌을 진행하며 능력치, 재화, 주차, 실험체 풀과 주전 인원 불변식을 확인한다.
+`check`는 Prettier 형식, ESLint 정적 규칙, TypeScript 타입, 단위 테스트와 배포 빌드를 순서대로 검증한다. 단위 테스트는 진입 조건, 대회 규칙, 계약·로스터·은퇴 상태 전이를 검증한다. 장기 회귀 테스트는 고정 난수로 30시즌을 진행하며 능력치, 재화, 주차, 실험체 풀과 주전 인원 불변식을 확인한다. jsdom 기반 UI 테스트는 저장 가져오기 미리보기·적용, 초기화 확인과 키보드 포커스 복귀를 실제 사용자 입력 흐름으로 검증한다.
 
 ## 변경 원칙
 

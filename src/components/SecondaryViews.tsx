@@ -55,12 +55,12 @@ export function PlayerRecords({ game }: Pick<GameViewProps, 'game'>) {
           <tbody>
             {game.matches.map((match, index) => (
               <tr key={index}>
-                <td>{match.name}</td>
-                <td>{match.place}위</td>
-                <td>{match.kills}</td>
-                <td>{match.fee ?? 0}</td>
-                <td>{match.gross ?? match.rp}</td>
-                <td className={match.rp >= 0 ? 'up' : 'down'}>
+                <td data-label="실험체">{match.name}</td>
+                <td data-label="순위">{match.place}위</td>
+                <td data-label="킬">{match.kills}</td>
+                <td data-label="입장료">{match.fee ?? 0}</td>
+                <td data-label="획득 RP">{match.gross ?? match.rp}</td>
+                <td data-label="순 RP" className={match.rp >= 0 ? 'up' : 'down'}>
                   {match.rp >= 0 ? '+' : ''}
                   {match.rp}
                 </td>

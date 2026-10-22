@@ -494,10 +494,6 @@ li {
   border-color: #c95568;
 }
 .toast {
-  position: fixed;
-  z-index: 120;
-  right: 20px;
-  bottom: 20px;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -510,11 +506,26 @@ li {
   border-radius: var(--radius-md);
   box-shadow: 0 12px 36px rgb(0 0 0 / 38%);
 }
+.toast-viewport {
+  position: fixed;
+  z-index: 120;
+  right: 20px;
+  bottom: 20px;
+  display: grid;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+.toast-viewport .toast {
+  pointer-events: auto;
+}
 .toast.success {
   border-left-color: #4fc28b;
 }
 .toast.error {
   border-left-color: #e36678;
+}
+.toast.info {
+  border-left-color: #72a9ff;
 }
 .toast > span {
   color: var(--color-accent);
@@ -540,11 +551,54 @@ li {
   .save-actions {
     grid-template-columns: 1fr;
   }
-  .toast {
+  .toast-viewport {
     right: 12px;
     bottom: 76px;
     left: 12px;
+  }
+  .toast {
     max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  table.responsive-table,
+  .panel table {
+    display: block;
+  }
+  .panel table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .panel table tbody,
+  .panel table tr,
+  .panel table td {
+    display: block;
+    width: 100%;
+  }
+  .panel table tr {
+    margin-bottom: var(--space-2);
+    padding: var(--space-2);
+    background: rgb(14 20 39 / 75%);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .panel table td {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: space-between;
+    padding: 7px 0;
+    text-align: right;
+    border: 0;
+  }
+  .panel table td::before {
+    content: attr(data-label);
+    color: var(--color-muted);
+    font-weight: 500;
+    text-align: left;
   }
 }
 

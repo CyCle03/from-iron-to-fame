@@ -1,34 +1,52 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Game } from '../engine/game';
 import { getSavePreview, parseGameSave, serializeGameSave } from '../engine/save';
+import { useToast } from './ToastProvider';
 
 type SaveControlsProps = { game: Game; onImport: (game: Game) => void; onReset: () => void };
-type Toast = { kind: 'success' | 'error'; message: string };
 
 export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState<Game | null>(null);
-  const [toast, setToast] = useState<Toast | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const { notify } = useToast();
+  const triggerButton = useRef<HTMLButtonElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
-  const toastTimer = useRef<number | null>(null);
+
+  const closeModal = useCallback(() => {
+    setOpen(false);
+    setConfirmReset(false);
+    window.setTimeout(() => triggerButton.current?.focus());
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     closeButton.current?.focus();
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyboard = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeModal();
+      if (event.key !== 'Tab') return;
+      const modal = closeButton.current?.closest('[role="dialog"]');
+      const focusable = modal?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled)');
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
-    window.addEventListener('keydown', closeOnEscape);
-    return () => window.removeEventListener('keydown', closeOnEscape);
-  }, [open]);
-
-  const notify = (next: Toast) => {
-    setToast(next);
-    if (toastTimer.current) window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(null), 3500);
-  };
+    window.addEventListener('keydown', handleKeyboard);
+    return () => {
+      window.removeEventListener('keydown', handleKeyboard);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [closeModal, open]);
 
   const exportSave = () => {
     const blob = new Blob([serializeGameSave(game)], { type: 'application/json' });
@@ -38,14 +56,14 @@ export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
     link.download = `iron-to-fame-${game.name}-s${game.season}.json`;
     link.click();
     URL.revokeObjectURL(url);
-    notify({ kind: 'success', message: '현재 커리어 백업을 내려받았습니다.' });
+    notify('현재 커리어 백업을 내려받았습니다.');
   };
 
   const inspectFile = async (file?: File) => {
     if (!file) return;
     const imported = parseGameSave(await file.text());
     setPreview(imported);
-    if (!imported) notify({ kind: 'error', message: '불러올 수 없는 저장 파일입니다.' });
+    if (!imported) notify('불러올 수 없는 저장 파일입니다.', 'error');
     if (fileInput.current) fileInput.current.value = '';
   };
 
@@ -53,8 +71,8 @@ export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
     if (!preview) return;
     onImport(preview);
     setPreview(null);
-    setOpen(false);
-    notify({ kind: 'success', message: '저장 파일을 적용했습니다.' });
+    closeModal();
+    notify('저장 파일을 적용했습니다.');
   };
 
   const reset = () => {
@@ -67,12 +85,14 @@ export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
 
   return (
     <>
-      <button onClick={() => setOpen(true)}>저장·새 커리어</button>
+      <button ref={triggerButton} onClick={() => setOpen(true)}>
+        저장·새 커리어
+      </button>
       {open && (
         <div
           className="modal-backdrop"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setOpen(false);
+            if (event.target === event.currentTarget) closeModal();
           }}
         >
           <section className="save-modal" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
@@ -81,7 +101,7 @@ export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
                 <p className="eyebrow">SAVE MANAGER</p>
                 <h2 id="save-modal-title">저장 관리</h2>
               </div>
-              <button ref={closeButton} aria-label="저장 관리 닫기" onClick={() => setOpen(false)}>
+              <button ref={closeButton} aria-label="저장 관리 닫기" onClick={closeModal}>
                 ×
               </button>
             </div>
@@ -145,15 +165,6 @@ export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
               )}
             </div>
           </section>
-        </div>
-      )}
-      {toast && (
-        <div className={`toast ${toast.kind}`} role="status" aria-live="polite">
-          <span>{toast.kind === 'success' ? '완료' : '오류'}</span>
-          {toast.message}
-          <button aria-label="알림 닫기" onClick={() => setToast(null)}>
-            ×
-          </button>
         </div>
       )}
     </>

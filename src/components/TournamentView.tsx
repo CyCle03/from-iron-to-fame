@@ -116,11 +116,13 @@ export function TournamentView({
             <tbody>
               {result.rounds.map((round) => (
                 <tr key={round.round}>
-                  <td>{round.round}R</td>
-                  <td>{round.pick}</td>
-                  <td>{round.place}위</td>
-                  <td>{round.checkpoint ? (round.eligible ? '보유' : '미보유') : '-'}</td>
-                  <td>{round.banned.length ? round.banned.join(' · ') : '-'}</td>
+                  <td data-label="라운드">{round.round}R</td>
+                  <td data-label="선택 실험체">{round.pick}</td>
+                  <td data-label="순위">{round.place}위</td>
+                  <td data-label="체크포인트">
+                    {round.checkpoint ? (round.eligible ? '보유' : '미보유') : '-'}
+                  </td>
+                  <td data-label="이번 R 밴">{round.banned.length ? round.banned.join(' · ') : '-'}</td>
                 </tr>
               ))}
             </tbody>

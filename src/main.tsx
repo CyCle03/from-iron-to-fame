@@ -23,18 +23,24 @@ import { SeasonCenter } from './components/SeasonCenter';
 import { TournamentView } from './components/TournamentView';
 import { SeasonPlanner, SeasonReport } from './components/SeasonPlanner';
 import { TeamHub } from './components/TeamHub';
+import { ToastProvider, useToast } from './components/ToastProvider';
 import { SEASON_ACTIONS, type NavigationTab } from './constants/ui';
 import { useCareerGame } from './hooks/useCareerGame';
 import './style.css';
 const actions = SEASON_ACTIONS;
 function App() {
   const { game, setGame, resetGame } = useCareerGame();
+  const { notify } = useToast();
   const [seasonStep, setSeasonStep] = useState(0);
   const [plannedAction, setPlannedAction] = useState<Action | null>(null);
   const [report, setReport] = useState<string | null>(null);
   const [tab, setTab] = useState<NavigationTab>('대시보드');
   const [result, setResult] = useState<TournamentResult | null>(null);
-  if (game?.retired) return <RetiredCareer game={game} onChange={setGame} />;
+  const applyGameChange = (next: NonNullable<typeof game>) => {
+    setGame(next);
+    if (next.notices[0]) notify(next.notices[0]);
+  };
+  if (game?.retired) return <RetiredCareer game={game} onChange={applyGameChange} />;
   if (!game) return <CreateCareer onCreate={setGame} />;
   const playWeek = (a: Action) => {
     let staged = game;
@@ -66,6 +72,7 @@ function App() {
     setReport(
       tournamentEvents ? '시즌 완료 · 공식 대회 ' + tournamentEvents + '개 일정 자동 진행' : ran.history[0],
     );
+    notify(tournamentEvents ? `시즌 완료 · 공식 대회 ${tournamentEvents}개 일정 자동 진행` : ran.history[0]);
     setGame(ran);
     setSeasonStep(0);
     setPlannedAction(null);
@@ -86,16 +93,16 @@ function App() {
   const kelEligible = canEnterKelStage(game);
   const tournament = (kind: TournamentKind) => {
     if (kind === 'masters' && !mastersEligible) {
-      setGame(recordMastersPhase(game, 0));
+      applyGameChange(recordMastersPhase(game, 0));
       return;
     }
     if (kind === 'kel' && !kelEligible) {
-      setGame(recordKelStage(game, 24));
+      applyGameChange(recordKelStage(game, 24));
       return;
     }
     const r = simulateTournament(game, kind);
     setResult(r);
-    setGame(
+    applyGameChange(
       kind === 'masters'
         ? recordMastersPhase(game, r.circuitPoints, r.playerPlace)
         : recordKelStage(game, r.playerPlace),
@@ -213,7 +220,7 @@ function App() {
             </div>
             <button
               disabled={game.hallOfFame || !Object.values(hof).every(Boolean)}
-              onClick={() => setGame(inductHallOfFame(game))}
+              onClick={() => applyGameChange(inductHallOfFame(game))}
             >
               {game.hallOfFame ? '루미아의 전설' : '명예의 전당 헌액'}
             </button>
@@ -335,7 +342,7 @@ function App() {
           game={game}
           mastersEligible={mastersEligible}
           kelEligible={kelEligible}
-          onChange={setGame}
+          onChange={applyGameChange}
           onTournament={tournament}
         />
       )}
@@ -349,19 +356,19 @@ function App() {
               </button>
             ))}
           </section>
-          <ExperimentPoolPanel game={game} onChange={setGame} />
-          <CareerArchivePanel game={game} onChange={setGame} />
+          <ExperimentPoolPanel game={game} onChange={applyGameChange} />
+          <CareerArchivePanel game={game} onChange={applyGameChange} />
         </>
       )}
-      {tab === '팀' && <TeamHub game={game} onChange={setGame} />}
-      {tab === '장비 상점' && <EquipmentShop game={game} onChange={setGame} />}
+      {tab === '팀' && <TeamHub game={game} onChange={applyGameChange} />}
+      {tab === '장비 상점' && <EquipmentShop game={game} onChange={applyGameChange} />}
       {tab === '대회' && (
         <TournamentView
           game={game}
           result={result}
           mastersEligible={mastersEligible}
           kelEligible={kelEligible}
-          onChange={setGame}
+          onChange={applyGameChange}
           onTournament={tournament}
         />
       )}
@@ -370,4 +377,8 @@ function App() {
     </main>
   );
 }
-createRoot(document.getElementById('root')!).render(<App />);
+createRoot(document.getElementById('root')!).render(
+  <ToastProvider>
+    <App />
+  </ToastProvider>,
+);
