@@ -73,3 +73,7 @@
   .career-progress b{font-size:25px}
   table{font-size:15px}
 }
+
+.role-roster{display:block;margin-top:8px;color:#7483a8;font-size:12px;line-height:1.4}
+.roles .selected .role-roster{color:#c8bca6}
+@media(max-width:640px){.role-roster{font-size:14px}.roles button small{font-size:14px;line-height:1.4}}

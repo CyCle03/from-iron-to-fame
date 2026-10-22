@@ -1,13 +1,14 @@
 export type Rank = '아이언'|'브론즈'|'실버'|'골드'|'플래티넘'|'다이아몬드'|'메테오라이트'|'미스릴'|'데미갓'|'이터니티';
 export type Background = '일반 유저'|'피지컬 괴물'|'이론 분석가'|'원챔 장인'|'아마추어 경험자'|'복귀 유망주';
 export type Role = '탱커'|'근거리 딜러'|'원거리 딜러'|'스킬 증폭 딜러'|'서포터'|'하이퍼캐리';
+/** 91-character S12 roster. One primary career role per experiment; weapon variants are collapsed. */
 export const roleExperiments: Record<Role,string[]>={
-'탱커':['현우','매그너스','레녹스','쇼우','일레븐','에스텔','마커스','알론소','엘레나','미르카','비형','블레어','케네스','세레스','마이'],
-'근거리 딜러':['재키','유키','피오라','루크','캐시','리 다이린','얀','다니엘','카밀로','에키온','니키','아이작','펠릭스','이슈트반','레온','피올로','에이든','라우라'],
-'원거리 딜러':['아야','리오','하트','나딘','버니스','로지','제니','윌리엄','테오도르','마르티나'],
-'스킬 증폭 딜러':['혜진','아드리아나','키아라','자히르','시셀라','엠마','바바라','수아','비앙카','셀린','클로에','카티야','데비','마를렌','르노어','아이솔','헤이즈','크레이버','루치아','유스티나','헨리','아디나','띠아','실비아','나타폰','비트리스'],
-'서포터':['레니','샬럿','요한','프리야','아르다'],
-'하이퍼캐리':['쇼이치','타지아','이바','알렉스','아델라','니나','칼라','이렘','슈린']
+'탱커':['매그너스','현우','쇼우','레녹스','일레븐','마이','엘레나','마커스','에스텔','알론소','케네스','세레스'],
+'근거리 딜러':['재키','피오라','리 다이린','유키','키아라','루크','캐시','레온','니키','얀','다니엘','카밀로','에키온','에이든','라우라','펠릭스','피올로','아이작','이안','바냐','데비 마를렌','아비게일','다르코','가넷','히스이','이슈트반','슈린','블레어','미르카','펜리르','비형'],
+'원거리 딜러':['아야','나딘','하트','로지','버니스','리오','윌리엄','제니','클로에','칼라','카티야','츠바메','테오도르'],
+'스킬 증폭 딜러':['자히르','아이솔','혜진','시셀라','아드리아나','엠마','아델라','바바라','수아','나타폰','비앙카','셀린','띠아','아디나','헤이즈','르노어','유민','유스티나','니아','헨리','코렐라인','루치아','크레이버','아르다'],
+'서포터':['요한','프리야','레니','샬럿'],
+'하이퍼캐리':['쇼이치','이바','알렉스','실비아','마르티나','타지아','이렘']
 };
 export type Equipment={id:string;name:string;cost:number;stat:keyof Stats;amount:number;desc:string};
 export const equipmentCatalog:Equipment[]=[{id:'aim',name:'정밀 조준 모듈',cost:450,stat:'physical',amount:3,desc:'손끝 감각을 보강합니다.'},{id:'route',name:'루트 분석 태블릿',cost:550,stat:'macro',amount:4,desc:'파밍·운영 분석 효율을 높입니다.'},{id:'comms',name:'팀 보이스 키트',cost:600,stat:'teamwork',amount:4,desc:'팀 합동 연습의 호흡을 보강합니다.'},{id:'focus',name:'집중력 부스터',cost:700,stat:'focus',amount:4,desc:'중요한 교전의 집중력을 끌어올립니다.'}];
@@ -22,6 +23,15 @@ export const backgrounds: Record<Background,{desc:string; buffs:Partial<Stats>}>
  '일반 유저':{desc:'고른 출발선. 어떤 길이든 열려 있습니다.',buffs:{}},'피지컬 괴물':{desc:'교전은 자신 있지만 콜은 아직 거칩니다.',buffs:{physical:10,combat:8,macro:-5,teamwork:-4}},'이론 분석가':{desc:'판은 읽지만 손이 조금 느립니다.',buffs:{macro:10,judgement:8,physical:-5,combat:-4}},'원챔 장인':{desc:'주력 실험체와 함께라면 무섭습니다.',buffs:{combat:5,adaptability:-7}},'아마추어 경험자':{desc:'대회장의 호흡을 이미 압니다.',buffs:{teamwork:9,mental:5}},'복귀 유망주':{desc:'감각은 남아 있지만 메타는 새롭습니다.',buffs:{focus:7,adaptability:-5}}
 };
 export const characters=Object.values(roleExperiments).flat();
+export const roleDescriptions:Record<Role,string>={
+ '탱커':'전선을 만들고 아군의 딜각을 여는 역할',
+ '근거리 딜러':'근접 교전과 진입으로 압박하는 역할',
+ '원거리 딜러':'지속적인 원거리 화력을 담당하는 역할',
+ '스킬 증폭 딜러':'스킬 연계와 순간 화력을 담당하는 역할',
+ '서포터':'회복·보호·강화로 팀을 지원하는 역할',
+ '하이퍼캐리':'높은 숙련도와 팀 자원을 화력으로 바꾸는 역할'
+};
+export const roleForExperiment=(name:string):Role|undefined=>(Object.keys(roleExperiments) as Role[]).find(role=>roleExperiments[role].includes(name));
 export const seasonInfo=(season:number)=>({year:2026+Math.floor((season-11)/3),number:((season-11)%3+3)%3+1});
 const clamp=(n:number)=>Math.max(0,Math.min(100,Math.round(n)));
 export const statLabels:Record<StatKey,string>={physical:'피지컬',combat:'교전',macro:'운영',judgement:'판단',teamwork:'팀워크',mental:'멘탈',focus:'집중력',adaptability:'적응력'};
@@ -34,7 +44,7 @@ const startingRp=(rank:Rank)=>({아이언:120,브론즈:720,실버:1520,골드:2
 export function rankEntryFee(rp:number):number { if(rp<600)return 0; if(rp<1400)return 10+Math.min(3,Math.floor((rp-600)/200))*2; if(rp<2400)return 18+Math.min(3,Math.floor((rp-1400)/250))*2; if(rp<3600)return 28+Math.min(3,Math.floor((rp-2400)/300))*2; if(rp<5000)return 36+Math.min(3,Math.floor((rp-3600)/350))*2; if(rp<6400)return 45+Math.min(3,Math.floor((rp-5000)/350))*2; if(rp<7600)return 53+Math.min(3,Math.floor((rp-6400)/300)); if(rp<9600)return 58; return 58+Math.floor((rp-9600)/250)*2; }
 export function createGame(name:string, rank:Rank, background:Background, roleOrMain:Role|string, maybeMain?:string, trainingFocus:StatKey[]=['physical','macro']):Game {
  const main=maybeMain??roleOrMain as string; const role=(maybeMain?roleOrMain:Object.keys(roleExperiments).find(key=>roleExperiments[key as Role].includes(main))??'근거리 딜러') as Role; const base=38+ranks.indexOf(rank)*5; const stats={physical:base,combat:base,macro:base,judgement:base,teamwork:base,mental:base,focus:base,adaptability:base}; for(const [k,v] of Object.entries(backgrounds[background].buffs)) stats[k as keyof Stats]=clamp(stats[k as keyof Stats]+(v??0)); let teammateRoles:Role[]=role==='하이퍼캐리'?(Math.random()<.65?['서포터','탱커']:['근거리 딜러','원거리 딜러']):(Math.random()<.3?['서포터','탱커']:['근거리 딜러','원거리 딜러']); let teammateExperiments=teammateRoles.map(r=>roleExperiments[r][Math.floor(Math.random()*roleExperiments[r].length)]); const signaturePresets:Record<string,{name:string;members:string[]}>={'쇼이치':{name:'마이 · 레니 · 쇼이치',members:['마이','레니']},'타지아':{name:'[대회] 니키 · 타지아 · 샬럿',members:['니키','샬럿']}}; const preset=signaturePresets[main]; const signatureComp=preset&&Math.random()<.35?preset.name:null; if(signatureComp){teammateExperiments=preset.members;teammateRoles=preset.members.map(member=>(Object.keys(roleExperiments).find(key=>roleExperiments[key as Role].includes(member))??'근거리 딜러') as Role);} const duo=verifiedDuoSynergies[main]; const duoSynergy=duo&&teammateExperiments.includes(duo.partner)?duo.name:null; return {trainingFocus,teammateRoles,teammateExperiments,signatureComp,duoSynergy,fame:0,teamName:null,careerLeague:'솔로',communityCups:0,kelRosterSize:0,seasonEvent:'시즌 시작 이벤트: 코치진이 성장 중점을 점검했습니다.',version:1,name,rank,role,rp:startingRp(rank),credits:1200,equipment:[],mastersPoints:0,mastersPhase:0,kelStage:0,week:1,season:11,background,main,stats,fatigue:12,morale:58,mastery:{[main]:28},actionPoints:3,history:['루미아 섬에 새로운 선수가 도착했습니다.'],matches:[],notices:['시즌 11 MVP: 랭크·훈련·휴식을 조합해 당신만의 커리어를 시작하세요.']}; }
-const hyperCarryTankers=['매그너스','에스텔','펠릭스','엘레나','마커스'];
+export const hyperCarryTankers=['쇼우','레녹스','일레븐','마이','에스텔','알론소','케네스','세레스'];
 const verifiedDuoSynergies:Record<string,{partner:string;name:string}>={'슈린':{partner:'레니',name:'슈린 · 레니'},'제니':{partner:'샬럿',name:'제니 · 샬럿'},'재키':{partner:'아르다',name:'재키 · 아르다'},'레녹스':{partner:'이바',name:'레녹스 · 이바'},'이렘':{partner:'엘레나',name:'이렘 · 엘레나'}};
 export function act(g:Game,a:Action):Game { if(g.actionPoints<1) return {...g,notices:['이번 주 행동력이 없습니다. 주를 넘겨주세요.']}; const n=structuredClone(g); n.actionPoints--; const s=n.stats; const gain=(key:keyof Stats,amount:number)=>s[key]=clamp(s[key]+amount*(1-s[key]/140)); const log=(t:string)=>n.history.unshift(`S${n.season} ${n.week}주 · ${t}`);
  if(a==='rest'){n.fatigue=clamp(n.fatigue-24);n.morale=clamp(n.morale+8);log('휴식으로 컨디션을 회복했습니다.');}
