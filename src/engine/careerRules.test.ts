@@ -7,6 +7,7 @@ import {
   canJoinAmateurTeam,
   canJoinKel,
   canPromoteTeamToKel,
+  nextCareerGoal,
 } from './careerRules';
 
 const career = (overrides: Partial<Game> = {}) => ({
@@ -29,5 +30,15 @@ describe('career rules', () => {
     expect(canPromoteTeamToKel(career({ fame: 240, mastersPoints: 600, careerLeague: '마스터즈' }))).toBe(
       true,
     );
+  });
+
+  it('describes the next unmet career goal', () => {
+    expect(nextCareerGoal(career({ fame: 20 }))).toEqual({
+      title: '아마추어 팀 합류',
+      detail: '명성 25 필요',
+    });
+    expect(
+      nextCareerGoal(career({ teamName: '테스트 팀', careerLeague: '아마추어', rp: 2300, fame: 70 })).detail,
+    ).toContain('RP 100');
   });
 });

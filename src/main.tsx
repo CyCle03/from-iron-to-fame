@@ -14,7 +14,7 @@ import {
   inductHallOfFame,
 } from './engine/game';
 import { simulateTournament, type TournamentKind, type TournamentResult } from './engine/tournament';
-import { canEnterKelStage, canEnterMasters } from './engine/careerRules';
+import { canEnterKelStage, canEnterMasters, nextCareerGoal } from './engine/careerRules';
 import {
   CareerArchivePanel,
   ContractPanel,
@@ -23,11 +23,11 @@ import {
   RosterPanel,
 } from './components/CareerPanels';
 import { CreateCareer } from './components/CreateCareer';
-import { SaveControls } from './components/SaveControls';
+import { AppNavigation } from './components/AppNavigation';
 import { EquipmentShop, GameGuide, PlayerRecords } from './components/SecondaryViews';
 import { SeasonCenter } from './components/SeasonCenter';
 import { TournamentView } from './components/TournamentView';
-import { NAVIGATION_TABS, SEASON_ACTIONS, type NavigationTab } from './constants/ui';
+import { SEASON_ACTIONS, type NavigationTab } from './constants/ui';
 import { useCareerGame } from './hooks/useCareerGame';
 import './style.css';
 const actions = SEASON_ACTIONS;
@@ -85,6 +85,7 @@ function App() {
     </div>
   );
   const hof = hallOfFameProgress(game);
+  const nextGoal = nextCareerGoal(game);
   const mastersEligible = canEnterMasters(game);
   const kelEligible = canEnterKelStage(game);
   const tournament = (kind: TournamentKind) => {
@@ -146,14 +147,7 @@ function App() {
           </div>
         </div>
       </header>
-      <nav>
-        {NAVIGATION_TABS.map((x) => (
-          <button key={x} className={tab === x ? 'active' : ''} onClick={() => setTab(x)}>
-            {x}
-          </button>
-        ))}
-        <SaveControls game={game} onImport={setGame} onReset={resetGame} />
-      </nav>
+      <AppNavigation game={game} activeTab={tab} onNavigate={setTab} onImport={setGame} onReset={resetGame} />
       <div className="notice">✦ {report ?? game.notices[0]}</div>
       {tab === '대시보드' && (
         <>
@@ -398,8 +392,8 @@ function App() {
             </article>
             <article>
               <h2>다음 목표</h2>
-              <p>마스터즈 오픈 토너먼트까지 4주</p>
-              <small>이번 주 행동으로 폼을 다진 뒤, 대회 탭에서 공식 형식 시뮬레이션에 도전하세요.</small>
+              <p>{nextGoal.title}</p>
+              <small>{nextGoal.detail}</small>
               <button className="goal-cta" onClick={() => setTab('주간 행동')}>
                 이번 주 계획 세우기 →
               </button>
