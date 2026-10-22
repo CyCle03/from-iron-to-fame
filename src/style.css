@@ -77,3 +77,7 @@
 .role-roster{display:block;margin-top:8px;color:#7483a8;font-size:12px;line-height:1.4}
 .roles .selected .role-roster{color:#c8bca6}
 @media(max-width:640px){.role-roster{font-size:14px}.roles button small{font-size:14px;line-height:1.4}}
+
+/* Desktop title legibility: avoid ultra-heavy Hangul strokes merging at large sizes. */
+.create h1,.app h1{font-family:'IBM Plex Sans KR',sans-serif;font-weight:700;letter-spacing:-.025em;line-height:1.22;text-rendering:optimizeLegibility;word-break:keep-all}
+@media(min-width:641px){.create h1{font-size:44px}.app h1{font-size:30px}.app header>div:first-child{min-width:220px;margin-right:10px}}
