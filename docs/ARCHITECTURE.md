@@ -5,11 +5,16 @@
 - `src/engine/game.ts`: 커리어 상태와 순수 상태 전이 함수
 - `src/engine/tournament.ts`: 마스터즈·KEL 라운드 시뮬레이션과 픽 제한
 - `src/engine/save.ts`: 저장 데이터 검증·마이그레이션·기본값 보완
+- `src/engine/random.ts`: 재현 가능한 시뮬레이션을 위한 난수 소스
 - `src/components/`: 화면 단위 React 컴포넌트
+- `src/hooks/useCareerGame.ts`: 커리어 상태와 브라우저 저장 수명주기
+- `src/constants/ui.ts`: 화면 공통 라벨·탭·시즌 행동 정의
 - `src/utils/careerCard.ts`: 읽기 전용 커리어 카드 렌더링
 - `src/main.tsx`: 앱 상태와 화면 조합, 브라우저 저장 연결
 
 UI는 게임 규칙을 직접 계산하지 않고 엔진 함수를 호출한다. 엔진 함수는 입력 `Game`을 직접 변경하지 않고 새 상태를 반환한다. 공식 규칙과 팬게임용 수치·확률은 문서와 UI에서 구분한다.
+
+확률을 사용하는 시뮬레이터는 기본적으로 `Math.random`을 사용하되 테스트와 밸런스 도구에서 난수 소스를 주입할 수 있게 설계한다. 동일 시드 테스트는 결과 전체가 재현되는지 확인한다.
 
 ## 저장 호환성
 
