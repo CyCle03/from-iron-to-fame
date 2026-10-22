@@ -42,3 +42,34 @@
 .wizard{max-width:620px}.wizard section:before{content:none}.wizard h2{font-size:28px;margin:0 0 12px}.wizard-summary{display:grid;gap:8px;padding:18px;background:#11182d;border:1px solid #3b4d77;border-radius:12px}.wizard-summary b{font-size:22px;color:#f4bd55}.wizard-summary span{font-size:17px}.wizard-summary small{color:#aebbd8}.wizard-actions{display:flex;gap:10px;margin-top:22px}.wizard-actions button{min-height:50px;border:0;border-radius:9px;padding:12px 16px;background:#303c60;color:#fff;font-weight:800}.wizard-actions .primary{flex:1}.season-wizard .primary{margin-top:16px}.plan-actions .selected{border-color:#f4bd55;background:#29233a}@media(max-width:640px){.wizard{padding:28px 16px}.wizard h1{font-size:38px}.wizard section{margin-top:20px;padding:20px 16px}.wizard h2{font-size:25px}.wizard-actions{position:sticky;bottom:12px;padding:10px;background:#171d33}.season-wizard{padding:20px 16px}.season-wizard h2{font-size:25px}.season-wizard .plan-actions{grid-template-columns:1fr}.season-wizard .wizard-actions{position:static;background:none;padding:0}.season-wizard .primary{min-height:56px}}
 .fame-hud{display:grid;min-width:92px;padding:8px 11px;background:#1d233b;border:1px solid #7b6236;border-radius:7px;color:#c4cee7}.fame-hud b{font-size:22px;color:#f4bd55}.fame-hud small{font-size:11px}.career-progress{display:flex;align-items:center;gap:12px;padding:15px;background:#16213a;border:1px solid #3a4d79;border-radius:10px}.career-progress b{font-size:22px;color:#f4bd55}.career-progress small{color:#acb8d7;margin-left:auto}@media(max-width:640px){.fame-hud{margin-top:8px;display:inline-grid;min-width:112px}.career-progress{display:grid;gap:5px}.career-progress small{margin:0}.tournament-buttons{grid-template-columns:1fr}.tournament-buttons button{min-height:76px}}
 .save-indicator{position:absolute;right:24px;top:63px;color:#8ea1c8;font-size:12px}@media(max-width:640px){.save-indicator{position:static;display:block;margin:5px 0 0;font-size:12px}}
+
+/* Mobile readability pass: fewer duplicate values, larger touch targets and a stable 2x2 HUD. */
+.tournament-buttons button:disabled{opacity:.48;cursor:not-allowed;filter:saturate(.55)}
+@media(max-width:640px){
+  body{font-size:18px;line-height:1.55}
+  .app{padding:16px 14px 40px}
+  .app header{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:start}
+  .app header>div:first-child{min-width:0}
+  .app header .rp{display:none}
+  .app h1{font-size:34px;line-height:1.08;margin:5px 0}
+  .save-indicator{grid-column:1/-1;margin:0;font-size:13px}
+  .credits,.fame-hud{position:static;margin:0;min-height:58px;padding:9px 12px;align-self:stretch}
+  .fame-hud{grid-column:2;grid-row:1;min-width:104px}
+  .credits{grid-column:1;display:flex;align-items:center;width:max-content;font-size:17px}
+  .rank-hud{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:4px 0 0;overflow:visible;padding:0}
+  .rank-hud div{min-width:0;min-height:72px;padding:10px 12px;scroll-snap-align:none}
+  .rank-hud small{font-size:13px}
+  .rank-hud b{font-size:18px;line-height:1.25}
+  .app nav{margin-top:18px}
+  .app nav button{min-height:50px;font-size:16px;padding:12px 14px}
+  .notice{font-size:16px}
+  .panel{padding:19px 16px;border-radius:14px}
+  .panel h2,.season-center h2,article h2{font-size:25px;line-height:1.25}
+  .season-columns article,.shop-grid article{padding:20px 17px}
+  .season-columns article>b{font-size:27px}
+  .season-center button,.tournament-buttons button,.shop-grid button,.card-export button{min-height:56px;font-size:17px}
+  .tournament-buttons button{padding:17px}
+  .tournament-buttons small{font-size:14px;line-height:1.45}
+  .career-progress b{font-size:25px}
+  table{font-size:15px}
+}
