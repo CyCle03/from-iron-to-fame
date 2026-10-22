@@ -1,4 +1,6 @@
-# 광물에서 명전까지 — 시스템 설계
+# 광물에서 명전까지 — 게임 시스템 설계
+
+세부 대회 규칙은 [ESPORTS_RULES.md](ESPORTS_RULES.md), 구현된 랭크·커리어 수치는 [RANK_AND_CAREER_SYSTEMS.md](RANK_AND_CAREER_SYSTEMS.md), 출처는 [DATA_SOURCES.md](DATA_SOURCES.md)를 기준으로 한다.
 
 ## 핵심 루프
 

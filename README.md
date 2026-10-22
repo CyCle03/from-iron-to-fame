@@ -11,4 +11,11 @@ npm run dev
 
 검증: `npm test`, 배포 빌드: `npm run build`
 
-현재 구현: 선수 생성, 시작 랭크·배경, 능력치/피로/숙련도, 주간 행동, 랭크 경기·RP, 시즌 진행, 자동 저장. 공식 데이터와 창작 데이터의 구분은 [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md)를 참고하세요.
+현재 구현: 단계별 선수 생성, 역할군 내 주력 실험체 랜덤 배정, 12주 단위 시즌 진행, 랭크·RP, 팀/대회 커리어, 장비, 명예의 전당, 브라우저 자동 저장.
+
+## 문서
+
+- [게임 시스템 설계](docs/GAME_DESIGN.md)
+- [KEL·마스터즈 대회 구조와 규칙](docs/ESPORTS_RULES.md)
+- [랭크·시즌·커리어 시스템](docs/RANK_AND_CAREER_SYSTEMS.md)
+- [공식 자료 출처와 적용 원칙](docs/DATA_SOURCES.md)
