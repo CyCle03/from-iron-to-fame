@@ -85,6 +85,7 @@ flowchart TB
 - `src/engine/careerRules.ts`: 대회·팀 진입 조건과 다음 목표를 계산하는 순수 정책이다.
 - `src/engine/seasonProgress.ts`: 주차 진행, 시즌 전환과 RP 소프트 리셋을 담당한다.
 - `src/engine/competitionProgress.ts`: KeG·KEL 참가 결과와 인지도·대회 이력을 갱신한다.
+- `src/engine/mastersProgress.ts`: 48팀 필드 생성, 페이즈 CP, LCQ와 시즌 파이널 상태 전이를 담당한다.
 - `src/engine/roster.ts`: 주전 교체와 교체 비용을 담당한다.
 - `src/engine/contracts.ts`: 재계약 상태 전이를 담당한다.
 - `src/engine/tournament.ts`: 마스터즈·KEL 결과 시뮬레이션을 담당한다.

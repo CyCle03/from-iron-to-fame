@@ -80,6 +80,12 @@ describe('career engine', () => {
     expect(after.mastersPhase).toBe(0);
     expect(after.kelStage).toBe(0);
   });
+  it('preserves cumulative Masters circuit points between seasons', () => {
+    const before = { ...createGame('CP 선수', '데미갓', '일반 유저', '유키'), mastersPoints: 500 };
+    const after = runSeason(before, 'review', () => 0.5);
+    expect(after.mastersPoints).toBe(500);
+    expect(after.mastersPhase).toBe(0);
+  });
   it('lets a low-tier rank-focused career make visible progress in one season', () => {
     const before = createGame('등반', '아이언', '일반 유저', '유키');
     const after = runSeason(before, 'rank', createSeededRandom(20261023));
