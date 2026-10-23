@@ -4,7 +4,9 @@ import {
   changeStarter,
   characters,
   hallOfFameProgress,
-  inductHallOfFame,
+  majorTitleCount,
+  mvpCount,
+  receiveHallHonor,
   renewContract,
   replacePoolExperiment,
   retireCareer,
@@ -193,14 +195,16 @@ export function CareerArchivePanel({ game, onChange }: GamePanelProps) {
 export function RetiredCareer({ game, onChange }: GamePanelProps) {
   const totals = careerTotals(game);
   const progress = hallOfFameProgress(game);
+  const majorTitles = majorTitleCount(game);
+  const mvps = mvpCount(game);
   const requirementLabels: Record<string, string> = {
     retired: '은퇴',
-    fame: '명성 1,500',
-    trophies: '우승 3회',
-    kel: 'KEL 경력',
-    rank: '메테오라이트 이상',
+    heroes: '히어로즈 선정',
+    majorTitles: '메이저 우승 5회',
+    mvps: 'MVP 2회',
+    fame: '명성 2,500',
   };
-  const missing = Object.entries(progress)
+  const missing = Object.entries(progress.honors)
     .filter(([, done]) => !done)
     .map(([key]) => requirementLabels[key]);
   return (
@@ -234,11 +238,25 @@ export function RetiredCareer({ game, onChange }: GamePanelProps) {
         <p>팀 이력 · {game.teamHistory.join(' → ') || '무소속'}</p>
         <p>수상 · {game.awards.join(' · ') || '수상 없음'}</p>
         <button onClick={() => saveCareerCard(game)}>커리어 카드 저장</button>
+        <div className="archive-stats">
+          <span>
+            메이저 우승 <b>{majorTitles}</b>
+          </span>
+          <span>
+            MVP <b>{mvps}</b>
+          </span>
+          <span>
+            스타즈 <b>{game.starsSelections}회</b>
+          </span>
+          <span>
+            히어로즈 <b>{game.hallOfFameHonors.includes('히어로즈') ? '선정' : '미선정'}</b>
+          </span>
+        </div>
         <button
           disabled={game.hallOfFame || missing.length > 0}
-          onClick={() => onChange(inductHallOfFame(game))}
+          onClick={() => onChange(receiveHallHonor(game, '아너스'))}
         >
-          {game.hallOfFame ? '명예의 전당 헌액 완료' : '명예의 전당 심사'}
+          {game.hallOfFame ? '아너스 영구 헌액 완료' : '아너스 영구 헌액 심사'}
         </button>
         {missing.length > 0 && <p className="official-note">미충족 조건: {missing.join(' · ')}</p>}
       </section>

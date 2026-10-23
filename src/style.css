@@ -2092,6 +2092,39 @@ li {
   background: #30384e;
   color: #8792ac;
 }
+.hall-categories {
+  display: grid;
+  align-items: stretch;
+}
+.hall-heading small,
+.hall-category-grid article em {
+  color: #9eacca;
+  font-style: normal;
+}
+.hall-category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+.hall-category-grid article {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #34466d;
+  border-radius: 10px;
+  background: #0d162a;
+}
+.hall-category-grid article strong {
+  color: #f4bd55;
+  font-size: 18px;
+}
+.hall-category-grid article button {
+  width: 100%;
+  margin-top: auto;
+}
 .roster-card {
   display: grid;
   gap: 5px;
@@ -2124,6 +2157,12 @@ li {
   .hall-panel button {
     width: 100%;
     min-height: 54px;
+  }
+  .hall-category-grid {
+    grid-template-columns: 1fr;
+  }
+  .hall-category-grid article {
+    font-size: 15px;
   }
   .roster-card {
     font-size: 16px;

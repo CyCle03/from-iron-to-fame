@@ -265,7 +265,8 @@ export type CareerTotals = {
   bestPlace: number | null;
   representative: string;
 };
-export const CURRENT_SAVE_VERSION = 5 as const;
+export type HallOfFameCategory = '스타즈' | '히어로즈' | '아너스';
+export const CURRENT_SAVE_VERSION = 6 as const;
 export type Game = {
   lastSeasonPlan: Action;
   trainingFocus: StatKey[];
@@ -291,6 +292,9 @@ export type Game = {
   kelRosterSize: number;
   trophies: number;
   hallOfFame: boolean;
+  hallOfFameHonors: HallOfFameCategory[];
+  starsSelections: number;
+  lastStarsSeason: number | null;
   lastSeasonSummary: SeasonSummary | null;
   teamMembers: TeamMember[];
   competitionHistory: CompetitionRecord[];
@@ -544,6 +548,9 @@ export function createGame(
     kelRosterSize: 0,
     trophies: 0,
     hallOfFame: false,
+    hallOfFameHonors: [],
+    starsSelections: 0,
+    lastStarsSeason: null,
     lastSeasonSummary: null,
     teamMembers,
     competitionHistory: [],
@@ -1334,5 +1341,14 @@ export function renewContract(g: Game): Game {
   return n;
 }
 
-export { careerTotals, hallOfFameProgress, inductHallOfFame, retireCareer } from './career';
+export {
+  canReceiveHallHonor,
+  careerTotals,
+  hallOfFameProgress,
+  inductHallOfFame,
+  majorTitleCount,
+  mvpCount,
+  receiveHallHonor,
+  retireCareer,
+} from './career';
 export { rankEntryFee, rankLabel, nextRankStep, rankScoreFor } from './rank';

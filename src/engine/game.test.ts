@@ -124,14 +124,23 @@ describe('career engine', () => {
     let g: Game = {
       ...createGame('전설', '메테오라이트', '일반 유저', '유키'),
       rp: 7000,
-      fame: 1500,
       trophies: 3,
       careerLeague: 'KEL' as const,
       retired: true,
       retirementSeason: 11,
       teamHistory: ['KEL 시티 유나이티드'],
+      hallOfFameHonors: ['히어로즈'],
+      awards: ['MVP 1', 'MVP 2'],
+      competitionHistory: Array.from({ length: 5 }, (_, season) => ({
+        season,
+        kind: '시즌 파이널' as const,
+        stage: 1,
+        place: 1,
+        points: 0,
+      })),
+      fame: 2500,
     };
-    expect(Object.values(hallOfFameProgress(g)).every(Boolean)).toBe(true);
+    expect(Object.values(hallOfFameProgress(g).honors).every(Boolean)).toBe(true);
     g = inductHallOfFame(g);
     expect(g.hallOfFame).toBe(true);
     const cupBase = { ...g, seasonCupEntries: 2 };
@@ -275,14 +284,23 @@ describe('career archive', () => {
     const active: Game = {
       ...createGame('전설', '메테오라이트', '일반 유저', '유키'),
       rp: 7000,
-      fame: 1500,
       trophies: 3,
       careerLeague: 'KEL',
       teamName: 'KEL 시티 유나이티드',
       teamHistory: ['KEL 시티 유나이티드'],
       contract: { team: 'KEL 시티 유나이티드', league: 'KEL', salary: 900, seasonsRemaining: 2 },
+      fame: 2500,
+      hallOfFameHonors: ['히어로즈'],
+      awards: ['MVP 1', 'MVP 2'],
+      competitionHistory: Array.from({ length: 5 }, (_, season) => ({
+        season,
+        kind: '시즌 파이널' as const,
+        stage: 1,
+        place: 1,
+        points: 0,
+      })),
     };
-    expect(hallOfFameProgress(active).retired).toBe(false);
+    expect(hallOfFameProgress(active).honors.retired).toBe(false);
     const retired = retireCareer(active);
     expect(retired.retired).toBe(true);
     expect(retired.contract).toBeNull();

@@ -1,4 +1,4 @@
-import type { CareerTotals, Game } from './game';
+import type { CareerTotals, Game, HallOfFameCategory } from './game';
 
 export function careerTotals(game: Game): CareerTotals {
   const placed = game.competitionHistory.filter((record) => record.place > 0);
@@ -11,6 +11,14 @@ export function careerTotals(game: Game): CareerTotals {
     representative,
   };
 }
+
+export const majorTitleCount = (game: Game) =>
+  game.competitionHistory.filter(
+    (record) =>
+      record.place === 1 && (record.kind === '시즌 파이널' || (record.kind === 'KEL' && record.stage === 7)),
+  ).length;
+
+export const mvpCount = (game: Game) => game.awards.filter((award) => award.includes('MVP')).length;
 
 export function retireCareer(game: Game): Game {
   if (game.retired) return game;
@@ -25,23 +33,51 @@ export function retireCareer(game: Game): Game {
 }
 
 export const hallOfFameProgress = (game: Game) => ({
-  retired: game.retired,
-  fame: game.fame >= 1500,
-  trophies: game.trophies >= 3,
-  kel: game.careerLeague === 'KEL' || game.teamHistory.some((team) => team.includes('KEL')),
-  rank: game.rp >= 6400,
+  stars: {
+    active: !game.retired,
+    fame: game.fame >= 750,
+    seasonPerformance: (game.lastSeasonSummary?.wins ?? 0) >= 3 || (game.lastSeasonSummary?.top3 ?? 0) >= 12,
+    selectable: game.lastStarsSeason !== game.season,
+  },
+  heroes: {
+    active: !game.retired,
+    majorTitles: majorTitleCount(game) >= 3,
+  },
+  honors: {
+    retired: game.retired,
+    heroes: game.hallOfFameHonors.includes('히어로즈'),
+    majorTitles: majorTitleCount(game) >= 5,
+    mvps: mvpCount(game) >= 2,
+    fame: game.fame >= 2500,
+  },
 });
 
-export function inductHallOfFame(game: Game): Game {
-  if (!Object.values(hallOfFameProgress(game)).every(Boolean)) {
-    return {
-      ...game,
-      notices: ['명예의 전당 조건: 은퇴 · 명성 1,500 · 우승 3회 · KEL 경력 · 메테오라이트 이상'],
-    };
+export const canReceiveHallHonor = (game: Game, category: HallOfFameCategory) => {
+  const progress = hallOfFameProgress(game);
+  if (category === '스타즈') return Object.values(progress.stars).every(Boolean);
+  if (category === '히어로즈')
+    return !game.hallOfFameHonors.includes(category) && Object.values(progress.heroes).every(Boolean);
+  return !game.hallOfFameHonors.includes(category) && Object.values(progress.honors).every(Boolean);
+};
+
+export function receiveHallHonor(game: Game, category: HallOfFameCategory): Game {
+  if (!canReceiveHallHonor(game, category)) {
+    return { ...game, notices: [`${category} 선정 조건이 아직 충족되지 않았습니다.`] };
   }
   const next = structuredClone(game);
-  next.hallOfFame = true;
-  next.history.unshift('명예의 전당 헌액 · 루미아 섬에 이름을 남겼습니다.');
-  next.notices = ['명예의 전당에 헌액되었습니다!'];
+  if (category === '스타즈') {
+    next.starsSelections += 1;
+    next.lastStarsSeason = next.season;
+    next.awards.unshift(`S${next.season} e스포츠 명예의 전당 스타즈`);
+  } else {
+    next.hallOfFameHonors = [...new Set([...next.hallOfFameHonors, category])];
+    if (category === '아너스') next.hallOfFame = true;
+    next.awards.unshift(`e스포츠 명예의 전당 ${category}`);
+  }
+  next.history.unshift(`e스포츠 명예의 전당 ${category} 선정`);
+  next.notices = [`e스포츠 명예의 전당 ${category}에 선정되었습니다!`];
   return next;
 }
+
+/** 이전 저장·호출부 호환: 최종 영구 헌액인 아너스 심사를 뜻한다. */
+export const inductHallOfFame = (game: Game) => receiveHallHonor(game, '아너스');

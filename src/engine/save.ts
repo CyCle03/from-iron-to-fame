@@ -143,6 +143,19 @@ export function migrateGameSave(raw: unknown): Game | null {
         ? [teamName]
         : [],
     awards: stringArray(raw.awards),
+    hallOfFameHonors: stringArray(raw.hallOfFameHonors).filter(
+      (item): item is Game['hallOfFameHonors'][number] =>
+        item === '스타즈' || item === '히어로즈' || item === '아너스',
+    ).length
+      ? (stringArray(raw.hallOfFameHonors).filter(
+          (item) => item === '스타즈' || item === '히어로즈' || item === '아너스',
+        ) as Game['hallOfFameHonors'])
+      : raw.hallOfFame === true
+        ? ['히어로즈', '아너스']
+        : [],
+    starsSelections:
+      typeof raw.starsSelections === 'number' ? Math.max(0, Math.floor(raw.starsSelections)) : 0,
+    lastStarsSeason: typeof raw.lastStarsSeason === 'number' ? Math.floor(raw.lastStarsSeason) : null,
     equipment: stringArray(raw.equipment),
     history: stringArray(raw.history).length ? stringArray(raw.history) : baseline.history,
     notices: stringArray(raw.notices).length ? stringArray(raw.notices) : baseline.notices,
