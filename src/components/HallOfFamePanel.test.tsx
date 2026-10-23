@@ -16,7 +16,7 @@ describe('HallOfFamePanel', () => {
 
     const starsButton = screen.getByRole('button', { name: '선정 조건 미충족' });
     expect((starsButton as HTMLButtonElement).disabled).toBe(true);
-    expect(screen.getByText('현재 데미갓 이상 · 소속 팀').className).not.toContain('done');
+    expect(screen.getByText('시즌 대회 기준 데미갓 이상 · 소속 팀').className).not.toContain('done');
     expect(screen.getByText('마스터즈 출전 경력').className).not.toContain('done');
   });
 });

@@ -32,7 +32,7 @@ export function HallOfFamePanel({ game, onChange }: Props) {
           <em>연간 팬 투표 선정</em>
           <div className="hof-reqs">
             <span className={progress.stars.currentMastersLevel ? 'done' : ''}>
-              현재 데미갓 이상 · 소속 팀
+              시즌 대회 기준 데미갓 이상 · 소속 팀
             </span>
             <span className={progress.stars.awareness ? 'done' : ''}>인지도 70/100</span>
             <span className={progress.stars.mastersAppearance ? 'done' : ''}>마스터즈 출전 경력</span>

@@ -3,6 +3,7 @@ import { COMPETITION_RP } from './competitionRules';
 import { rankEntryFee, rankFor, rankScoreFor, startingRp } from './rank';
 import { summarizeMatches } from './matchSummary';
 import { nextWeek } from './seasonProgress';
+import { seasonQualificationRp } from './careerRules';
 import { createMastersSeason } from './mastersProgress';
 
 export type Rank =
@@ -827,7 +828,7 @@ function simulateSeason(g: Game, a: Action, random: RandomSource): Game {
   return n;
 }
 function createScoutOffers(g: Game): ScoutOffer[] {
-  if (g.rp < COMPETITION_RP.teamFormation || g.fame < 5) return [];
+  if (seasonQualificationRp(g) < COMPETITION_RP.teamFormation || g.fame < 5) return [];
   const offers: ScoutOffer[] = [
     {
       team: '네온 폭스',
@@ -1009,7 +1010,7 @@ function ensureBench(n: Game, random: RandomSource) {
     });
 }
 export function joinAmateurTeam(g: Game, random: RandomSource = Math.random): Game {
-  if (g.rp < COMPETITION_RP.teamFormation || (g.fame ?? 0) < 5 || g.teamName)
+  if (seasonQualificationRp(g) < COMPETITION_RP.teamFormation || (g.fame ?? 0) < 5 || g.teamName)
     return { ...g, notices: ['미스릴 이상 · 인지도 5부터 아마추어 팀 제안이 옵니다.'] };
   const n = structuredClone(g);
   n.teamName = '루미아 웨이브';

@@ -1,9 +1,11 @@
 import { seasonInfo, type Game } from '../engine/game';
+import { seasonQualificationRp } from '../engine/careerRules';
 type SeasonCenterProps = { game: Game };
 
 const KEL_STAGES = ['오프닝 위크', '서킷 1', '서킷 2', '미드시즌 컵', '서킷 3', '서킷 4', '내셔널 챔피언십'];
 
 export function SeasonCenter({ game }: SeasonCenterProps) {
+  const qualificationRp = seasonQualificationRp(game);
   return (
     <section className="season-center panel">
       <h2>
@@ -13,6 +15,9 @@ export function SeasonCenter({ game }: SeasonCenterProps) {
         <article>
           <p className="eyebrow">MASTERS · 48 TEAMS</p>
           <h3>마스터즈 페이즈 {game.mastersPhase}/3</h3>
+          <small>
+            현재 {game.rp} RP · 시즌 대회 기준 {qualificationRp} RP
+          </small>
           <b>{game.mastersPoints} CP</b>
           <p>
             데미갓 이상 팀은 시즌 진행 시 자동 참가합니다. 3개 페이즈와 LCQ·시즌 파이널 결과가 자동

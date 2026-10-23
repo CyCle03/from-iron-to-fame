@@ -1,5 +1,10 @@
 import { joinAmateurTeam, joinKel, promoteTeamToKel, type Game } from '../engine/game';
-import { canJoinAmateurTeam, canJoinKel, canPromoteTeamToKel } from '../engine/careerRules';
+import {
+  canJoinAmateurTeam,
+  canJoinKel,
+  canPromoteTeamToKel,
+  seasonQualificationRp,
+} from '../engine/careerRules';
 import type { TournamentResult } from '../engine/tournament';
 
 type TournamentViewProps = {
@@ -9,6 +14,7 @@ type TournamentViewProps = {
 };
 
 export function TournamentView({ game, result, onChange }: TournamentViewProps) {
+  const qualificationRp = seasonQualificationRp(game);
   const competitionName = (kind: Game['competitionHistory'][number]['kind'], stage: number) => {
     if (kind !== '지역 컵') return kind;
     return stage === 1 ? '대통령배 KeG 지역대표선발전' : '대통령배 KeG 전국결선';
@@ -19,6 +25,7 @@ export function TournamentView({ game, result, onChange }: TournamentViewProps) 
       <h2>커리어 경쟁 무대</h2>
       <div className="career-progress">
         <b>인지도 {game.fame}/100</b>
+        <b>시즌 대회 기준 {qualificationRp} RP</b>
         <span>
           {game.teamName ?? '무소속'} · {game.careerLeague}
           {game.careerLeague === 'KEL' ? ' · 4인 로스터' : ''}

@@ -1,5 +1,6 @@
 import { COMPETITION_RP } from './competitionRules';
 import type { Game } from './game';
+import { seasonQualificationRp } from './careerRules';
 import type { RandomSource } from './random';
 
 const clamp = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
@@ -28,8 +29,8 @@ export function recordKelStage(game: Game, place: number): Game {
 export function playCommunityCup(game: Game, random: RandomSource = Math.random): Game {
   if ((game.seasonCupEntries ?? 0) >= 2)
     return { ...game, notices: ['이번 시즌 대통령배 KeG 일정을 모두 마쳤습니다.'] };
-  if (game.rp < COMPETITION_RP.nationalAmateur)
-    return { ...game, notices: ['전국 아마추어 대회는 미스릴 이상부터 자동 참가합니다.'] };
+  if (seasonQualificationRp(game) < COMPETITION_RP.nationalAmateur)
+    return { ...game, notices: ['전국 아마추어 대회는 시즌 대회 기준 미스릴 이상부터 자동 참가합니다.'] };
   const next = structuredClone(game);
   const eventName = next.seasonCupEntries === 0 ? '대통령배 KeG 지역대표선발전' : '대통령배 KeG 전국결선';
   const power =

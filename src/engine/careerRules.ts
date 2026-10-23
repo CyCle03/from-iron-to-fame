@@ -15,9 +15,15 @@ export const CAREER_REQUIREMENTS = {
   hallOfFameHonorsMajorTitles: 5,
 } as const;
 
+export const seasonQualificationRp = (game: Game) => {
+  const summary = game.lastSeasonSummary;
+  const preResetRp = summary ? summary.rpBefore + (summary.totalRp ?? 0) : game.rp;
+  return Math.max(game.rp, preResetRp);
+};
+
 export const canEnterCommunityCup = (game: Game) =>
   game.careerLeague !== 'KEL' &&
-  game.rp >= CAREER_REQUIREMENTS.communityCupRp &&
+  seasonQualificationRp(game) >= CAREER_REQUIREMENTS.communityCupRp &&
   (game.seasonCupEntries === 0 ||
     (game.seasonCupEntries === 1 &&
       game.competitionHistory.some(
@@ -31,7 +37,7 @@ export const canEnterCommunityCup = (game: Game) =>
 export const canEnterMasters = (game: Game) =>
   game.careerLeague !== '솔로' &&
   game.careerLeague !== 'KEL' &&
-  game.rp >= CAREER_REQUIREMENTS.mastersRp &&
+  seasonQualificationRp(game) >= CAREER_REQUIREMENTS.mastersRp &&
   game.fame >= CAREER_REQUIREMENTS.mastersFame &&
   game.mastersPhase < 3;
 
@@ -39,7 +45,7 @@ export const canEnterKelStage = (game: Game) => game.careerLeague === 'KEL' && g
 
 export const canJoinAmateurTeam = (game: Game) =>
   !game.teamName &&
-  game.rp >= CAREER_REQUIREMENTS.teamFormationRp &&
+  seasonQualificationRp(game) >= CAREER_REQUIREMENTS.teamFormationRp &&
   game.fame >= CAREER_REQUIREMENTS.amateurTeamFame;
 
 export const canJoinKel = (game: Game) =>
@@ -49,8 +55,9 @@ export const canPromoteTeamToKel = (game: Game) =>
   ['아마추어', '마스터즈'].includes(game.careerLeague) && game.fame >= 60 && game.mastersPoints >= 600;
 
 export function nextCareerGoal(game: Game): { title: string; detail: string } {
+  const qualificationRp = seasonQualificationRp(game);
   if (!game.teamName) {
-    const rp = Math.max(0, CAREER_REQUIREMENTS.teamFormationRp - game.rp);
+    const rp = Math.max(0, CAREER_REQUIREMENTS.teamFormationRp - qualificationRp);
     const fame = Math.max(0, CAREER_REQUIREMENTS.amateurTeamFame - game.fame);
     return {
       title: '아마추어 팀 합류',
@@ -60,7 +67,7 @@ export function nextCareerGoal(game: Game): { title: string; detail: string } {
     };
   }
   if (game.careerLeague !== 'KEL') {
-    const rp = Math.max(0, CAREER_REQUIREMENTS.mastersRp - game.rp);
+    const rp = Math.max(0, CAREER_REQUIREMENTS.mastersRp - qualificationRp);
     const fame = Math.max(0, CAREER_REQUIREMENTS.mastersFame - game.fame);
     if (rp || fame)
       return {

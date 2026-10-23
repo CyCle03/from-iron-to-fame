@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createGame, type Game } from './game';
+import { createGame, runSeason, type Game } from './game';
 import {
   canEnterCommunityCup,
   canEnterKelStage,
@@ -7,6 +7,7 @@ import {
   canJoinAmateurTeam,
   canJoinKel,
   canPromoteTeamToKel,
+  seasonQualificationRp,
   nextCareerGoal,
   scoutOfferContext,
   starterSwapImpact,
@@ -38,6 +39,22 @@ describe('career rules', () => {
       true,
     );
     expect(canEnterKelStage(career({ careerLeague: 'KEL', kelStage: 6 }))).toBe(true);
+  });
+
+  it('uses the pre-reset season rating for mid-season tournament qualification', () => {
+    const completed = runSeason(career({ rp: 8400 }), 'review', () => 0.5);
+    const resetPlayer = {
+      ...completed,
+      rp: 7300,
+      lastSeasonSummary: { ...completed.lastSeasonSummary!, rpBefore: 8400, totalRp: 100 },
+      fame: 15,
+      teamName: '시즌 팀',
+      careerLeague: '아마추어' as const,
+    };
+
+    expect(seasonQualificationRp(resetPlayer)).toBeGreaterThanOrEqual(8400);
+    expect(canEnterMasters(resetPlayer)).toBe(true);
+    expect(nextCareerGoal(resetPlayer).detail).toBe('다음 시즌 진행 시 자동 참가합니다');
   });
 
   it('reports team progression eligibility', () => {

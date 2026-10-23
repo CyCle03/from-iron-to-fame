@@ -1,5 +1,6 @@
 import { COMPETITION_RP } from './competitionRules';
 import type { Game, MastersSeason, MastersStanding } from './game';
+import { seasonQualificationRp } from './careerRules';
 
 const clamp = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
 const teamWordsA = ['루미아', '이터널', '네온', '블루', '레드', '실버', '골든', '아스트라'];
@@ -50,8 +51,8 @@ const mastersPointsForPlace = (place: number) =>
 const rankMasters = (standings: MastersStanding[]) =>
   [...standings].sort((a, b) => b.points - a.points || b.wins - a.wins || a.name.localeCompare(b.name, 'ko'));
 export function recordMastersPhase(g: Game, points: number, place = 0): Game {
-  if (g.careerLeague === '솔로' || g.rp < COMPETITION_RP.masters || (g.fame ?? 0) < 15)
-    return { ...g, notices: ['마스터즈 레이팅 컷: 데미갓 이상 · 인지도 15 · 소속 팀'] };
+  if (g.careerLeague === '솔로' || seasonQualificationRp(g) < COMPETITION_RP.masters || (g.fame ?? 0) < 15)
+    return { ...g, notices: ['마스터즈 시즌 대회 기준: 데미갓 이상 · 인지도 15 · 소속 팀'] };
   if (g.careerLeague === 'KEL') return { ...g, notices: ['KEL 등록 선수는 마스터즈에 참가할 수 없습니다.'] };
   if ((g.mastersPhase ?? 0) >= 3)
     return { ...g, notices: ['이번 시즌 마스터즈 3개 페이즈를 모두 완료했습니다.'] };
