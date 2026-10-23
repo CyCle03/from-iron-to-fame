@@ -1243,4 +1243,4 @@ export function renewContract(g: Game): Game {
 }
 
 export { careerTotals, hallOfFameProgress, inductHallOfFame, retireCareer } from './career';
-export { rankEntryFee } from './rank';
+export { rankEntryFee, rankLabel, nextRankStep } from './rank';

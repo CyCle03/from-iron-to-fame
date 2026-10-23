@@ -1,4 +1,4 @@
-import { seasonInfo, type Action, type Game } from '../engine/game';
+import { seasonInfo, rankLabel, type Action, type Game } from '../engine/game';
 import { SEASON_ACTIONS } from '../constants/ui';
 
 type SeasonPlannerProps = {
@@ -89,7 +89,7 @@ export function SeasonReport({ game }: { game: Game }) {
         <p>{SEASON_ACTIONS.find((option) => option.id === summary.plan)?.title} 운영 결과</p>
       </div>
       <div className="report-stats">
-        <span>랭크 <b>{summary.rankBefore} → {summary.rankAfter}</b></span>
+        <span>랭크 <b>{rankLabel(summary.rpBefore)} → {rankLabel(summary.rpAfter)}</b></span>
         <span>RP <b className={rpChange >= 0 ? 'up' : 'down'}>{rpChange >= 0 ? '+' : ''}{rpChange}</b></span>
         <span>명성 <b>+{summary.fameGained}</b></span>
         <span>랭크 경기 <b>{summary.matches}판</b></span>

@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import {
   runSeason,
   rankEntryFee,
+  rankLabel,
+  nextRankStep,
   type Action,
   hasExperimentTag,
   hyperCarryTankers,
@@ -91,6 +93,7 @@ function App() {
     </div>
   );
   const hof = hallOfFameProgress(game);
+  const rankStep = nextRankStep(game.rp);
   const nextGoal = nextCareerGoal(game);
   const mastersEligible = canEnterMasters(game);
   const kelEligible = canEnterKelStage(game);
@@ -119,7 +122,7 @@ function App() {
             {seasonInfo(game.season).year} · 시즌 {seasonInfo(game.season).number} · S{game.season}
           </p>
           <h1>
-            {game.name} <em>{game.rank}</em>
+            {game.name} <em>{rankLabel(game.rp)}</em>
           </h1>
         </div>
         <div className="rp">
@@ -137,7 +140,7 @@ function App() {
         <div className="rank-hud">
           <div>
             <small>현재 티어</small>
-            <b>{game.rank}</b>
+            <b>{rankLabel(game.rp)}</b>
           </div>
           <div>
             <small>랭크 포인트</small>
@@ -148,7 +151,11 @@ function App() {
             <b>{100 - game.fatigue}/100</b>
           </div>
           <div>
-            <small>다음 입장료</small>
+            <small>다음 승급</small>
+            <b>{rankStep ? rankStep.label + '까지 ' + (rankStep.min - game.rp) + ' RP' : '서버 순위'}</b>
+          </div>
+          <div>
+            <small>입장료</small>
             <b>{rankEntryFee(game.rp)} RP</b>
           </div>
         </div>

@@ -13,8 +13,50 @@ const RANK_BANDS: { rank: Rank; min: number }[] = [
   { rank: '이터니티', min: 9600 },
 ];
 
+type DivisionBand = { min: number; label: string };
+const DIVISION_BANDS: DivisionBand[] = [
+  { min: 7600, label: '미스릴' },
+  { min: 7300, label: '메테오라이트 1' },
+  { min: 7000, label: '메테오라이트 2' },
+  { min: 6700, label: '메테오라이트 3' },
+  { min: 6400, label: '메테오라이트 4' },
+  { min: 6050, label: '다이아몬드 1' },
+  { min: 5700, label: '다이아몬드 2' },
+  { min: 5350, label: '다이아몬드 3' },
+  { min: 5000, label: '다이아몬드 4' },
+  { min: 4650, label: '플래티넘 1' },
+  { min: 4300, label: '플래티넘 2' },
+  { min: 3950, label: '플래티넘 3' },
+  { min: 3600, label: '플래티넘 4' },
+  { min: 3300, label: '골드 1' },
+  { min: 3000, label: '골드 2' },
+  { min: 2700, label: '골드 3' },
+  { min: 2400, label: '골드 4' },
+  { min: 2150, label: '실버 1' },
+  { min: 1900, label: '실버 2' },
+  { min: 1650, label: '실버 3' },
+  { min: 1400, label: '실버 4' },
+  { min: 1200, label: '브론즈 1' },
+  { min: 1000, label: '브론즈 2' },
+  { min: 800, label: '브론즈 3' },
+  { min: 600, label: '브론즈 4' },
+  { min: 450, label: '아이언 1' },
+  { min: 300, label: '아이언 2' },
+  { min: 150, label: '아이언 3' },
+  { min: 0, label: '아이언 4' },
+];
+
 export const rankFor = (rp: number): Rank =>
   [...RANK_BANDS].reverse().find((band) => rp >= band.min)?.rank ?? '아이언';
+
+/** Official RP divisions through Mithril. Demigod/Eternity require live server standings and remain simulated. */
+export const rankLabel = (rp: number) =>
+  DIVISION_BANDS.find((band) => rp >= band.min)?.label ?? '아이언 4';
+
+export const nextRankStep = (rp: number) => {
+  const ascending = [...DIVISION_BANDS].reverse();
+  return ascending.find((band) => band.min > rp) ?? null;
+};
 
 export const startingRp = (rank: Rank) =>
   ({

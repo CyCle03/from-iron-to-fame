@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { Game, Match } from '../engine/game';
+import { rankLabel, type Game, type Match } from '../engine/game';
 
 type Props = { game: Game; open: boolean; onClose: () => void };
 
@@ -59,7 +59,7 @@ export function SeasonRecap({ game, open, onClose }: Props) {
         </div>
         {complete ? (
           <>{resetApplied && <p className="recap-reset">시즌 소프트 리셋 · {preResetRp.toLocaleString()} RP → {summary.rpAfter.toLocaleString()} RP</p>}<footer className="recap-final">
-            <span><small>최종 티어</small><b>{summary.rankBefore} → {summary.rankAfter}</b></span>
+            <span><small>최종 티어</small><b>{rankLabel(summary.rpBefore)} → {rankLabel(summary.rpAfter)}</b></span>
             <span><small>최고 순위</small><b>{summary.bestPlace ? `${summary.bestPlace}등` : '-'}</b></span>
             <span><small>명성</small><b>+{summary.fameGained}</b></span>
             <button onClick={onClose}>결산 확인</button>
