@@ -1,7 +1,8 @@
 import type { RandomSource } from './random';
 import { COMPETITION_RP } from './competitionRules';
-import { rankEntryFee, rankFor, rankScoreFor, softResetRp, startingRp } from './rank';
+import { rankEntryFee, rankFor, rankScoreFor, startingRp } from './rank';
 import { summarizeMatches } from './matchSummary';
+import { nextWeek } from './seasonProgress';
 
 export type Rank =
   | '아이언'
@@ -1026,25 +1027,6 @@ export function replacePoolExperiment(g: Game, index: number, name: string): Gam
   n.notices = [name + '을 보조 실험체 풀에 등록했습니다.'];
   return n;
 }
-export function changeStarter(g: Game, index: number): Game {
-  const target = g.teamMembers[index];
-  if (!target) return { ...g, notices: ['선택한 로스터 선수를 찾을 수 없습니다.'] };
-  if (target.starter) return { ...g, notices: [target.nickname + '은 이미 주전입니다.'] };
-  const n = structuredClone(g);
-  const active = n.teamMembers
-    .map((member, memberIndex) => ({ member, memberIndex }))
-    .filter((entry) => entry.member.starter);
-  const benched = [...active].sort(
-    (a, b) => a.member.form - b.member.form || a.member.skill - b.member.skill,
-  )[0];
-  if (benched) n.teamMembers[benched.memberIndex].starter = false;
-  n.teamMembers[index].starter = true;
-  n.stats.teamwork = clamp(n.stats.teamwork - 3);
-  n.morale = clamp(n.morale - 1);
-  n.history.unshift('로스터 교체 · ' + (benched?.member.nickname ?? '기존 주전') + ' → ' + target.nickname);
-  n.notices = [target.nickname + ' 주전 등록 · 새 호흡 적응으로 팀워크 -3'];
-  return n;
-}
 const mastersPointsForPlace = (place: number) =>
   place === 1 ? 400 : place === 2 ? 345 : place === 3 ? 290 : place === 4 ? 245 : place <= 8 ? 200 : 0;
 const rankMasters = (standings: MastersStanding[]) =>
@@ -1163,72 +1145,6 @@ export function finishMastersSeason(g: Game): Game {
   n.notices = ['시즌 파이널 종료 · 우승 ' + season.champion];
   return n;
 }
-export function recordKelStage(g: Game, place: number): Game {
-  if (g.careerLeague !== 'KEL')
-    return { ...g, notices: ['KEL 일정은 KEL 4인 로스터 등록 후 참가할 수 있습니다.'] };
-  if ((g.kelStage ?? 0) >= 7) return { ...g, notices: ['이번 KEL 시즌 일정을 모두 완료했습니다.'] };
-  const n = structuredClone(g);
-  n.kelStage = (n.kelStage ?? 0) + 1;
-  if (place === 1) {
-    n.trophies = (n.trophies ?? 0) + 1;
-    n.awards = [`S${n.season} KEL ${n.kelStage}차 일정 MVP`, ...n.awards];
-  }
-  n.fame = clamp((n.fame ?? 0) + (place === 1 ? 8 : place <= 3 ? 6 : place <= 8 ? 4 : 2));
-  n.credits += Math.max(100, 350 - place * 25);
-  n.competitionHistory = [
-    { season: n.season, kind: 'KEL', stage: n.kelStage, place, points: 0 },
-    ...(n.competitionHistory ?? []),
-  ];
-  n.history.unshift('KEL 일정 ' + n.kelStage + ' 완료 · ' + place + '위');
-  n.notices = ['KEL 일정이 진행되었습니다. 다음 일정이 열렸습니다.'];
-  return n;
-}
-export function nextWeek(g: Game, random: RandomSource = Math.random): Game {
-  const n = structuredClone(g);
-  n.week++;
-  if (n.week > 12) {
-    const before = n.rp;
-    n.week = 1;
-    n.season++;
-    n.rp = softResetRp(n.rp);
-    n.rank = rankFor(n.rp);
-    n.notices = ['시즌 ' + n.season + ' 소프트 리셋 · ' + before + ' RP → ' + n.rp + ' RP'];
-  } else {
-    const e =
-      random() > 0.75
-        ? '스카우트가 최근 경기 기록을 주목합니다.'
-        : '다음 대회까지 랭크와 연습으로 기반을 다져보세요.';
-    n.notices = [e];
-  }
-  n.actionPoints = 3;
-  n.fatigue = clamp(n.fatigue - 8);
-  return n;
-}
-export function playCommunityCup(g: Game, random: RandomSource = Math.random): Game {
-  if ((g.seasonCupEntries ?? 0) >= 2)
-    return { ...g, notices: ['이번 시즌 대통령배 KeG 일정을 모두 마쳤습니다.'] };
-  if (g.rp < COMPETITION_RP.nationalAmateur)
-    return { ...g, notices: ['전국 아마추어 대회는 미스릴 이상부터 자동 참가합니다.'] };
-  const n = structuredClone(g);
-  const eventName = n.seasonCupEntries === 0 ? '대통령배 KeG 지역대표선발전' : '대통령배 KeG 전국결선';
-  const power =
-    (n.stats.combat + n.stats.macro + n.stats.teamwork + n.stats.focus) / 4 +
-    (n.mastery[n.main] ?? 0) * 0.2 +
-    (random() - 0.5) * 24;
-  const place = Math.max(1, Math.min(8, Math.round(9 - power / 9)));
-  const fame = place === 1 ? 8 : place <= 3 ? 5 : place <= 5 ? 3 : 1;
-  n.fame = clamp((n.fame ?? 0) + fame);
-  n.communityCups = (n.communityCups ?? 0) + 1;
-  n.seasonCupEntries = (n.seasonCupEntries ?? 0) + 1;
-  n.competitionHistory = [
-    { season: n.season, kind: '지역 컵', stage: n.seasonCupEntries, place, points: 0 },
-    ...(n.competitionHistory ?? []),
-  ];
-  n.credits += fame * 18;
-  n.history.unshift(eventName + ' ' + place + '위 · 인지도 +' + fame);
-  n.notices = [eventName + ' ' + place + '위! 인지도 +' + fame];
-  return n;
-}
 function ensureBench(n: Game, random: RandomSource) {
   if (n.teamMembers.some((member) => !member.starter)) return;
   const role: Role = ['탱커', '근거리 딜러', '원거리 딜러', '스킬 증폭 딜러', '서포터'][
@@ -1340,19 +1256,6 @@ export function acceptScoutOffer(g: Game, index: number, random: RandomSource = 
   n.notices = [offer.team + ' 이적 완료 · 계약금 ' + offer.signingBonus + ' C'];
   return n;
 }
-export function renewContract(g: Game): Game {
-  if (!g.contract || g.contract.seasonsRemaining > 1)
-    return { ...g, notices: ['계약이 없거나 아직 재계약 협상 시기가 아닙니다.'] };
-  const n = structuredClone(g);
-  const contract = n.contract!;
-  contract.seasonsRemaining = 2;
-  contract.salary += 100;
-  n.credits += 200;
-  n.history.unshift('재계약 · ' + contract.team + ' · 2시즌 · 급여 ' + contract.salary + ' C');
-  n.notices = ['재계약 완료 · 계약금 200 C'];
-  return n;
-}
-
 export {
   canReceiveHallHonor,
   careerTotals,
@@ -1363,4 +1266,8 @@ export {
   receiveHallHonor,
   retireCareer,
 } from './career';
+export { playCommunityCup, recordKelStage } from './competitionProgress';
+export { renewContract } from './contracts';
+export { changeStarter } from './roster';
+export { nextWeek } from './seasonProgress';
 export { rankEntryFee, rankLabel, nextRankStep, rankScoreFor } from './rank';

@@ -9,6 +9,7 @@ import {
   roleExperiments,
   roleForExperiment,
   type Background,
+  type CompetitionRecord,
   type Game,
   type Rank,
   type Role,
@@ -18,6 +19,13 @@ import {
 
 const DEFAULT_FOCUS: StatKey[] = ['physical', 'macro'];
 const ACTIONS = new Set(['rank', 'physical', 'macro', 'specialist', 'review', 'team', 'rest']);
+const COMPETITION_KINDS = new Set<CompetitionRecord['kind']>([
+  '지역 컵',
+  '마스터즈',
+  'LCQ',
+  '시즌 파이널',
+  'KEL',
+]);
 const STAT_KEYS = new Set<StatKey>([
   'physical',
   'combat',
@@ -34,6 +42,25 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const stringArray = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+
+const competitionRecord = (value: unknown): CompetitionRecord | null => {
+  if (!isRecord(value) || !COMPETITION_KINDS.has(value.kind as CompetitionRecord['kind'])) return null;
+  const numbers = ['season', 'stage', 'place', 'points'] as const;
+  if (numbers.some((key) => typeof value[key] !== 'number' || !Number.isFinite(value[key]) || value[key] < 0))
+    return null;
+  return {
+    season: Math.floor(value.season as number),
+    kind: value.kind as CompetitionRecord['kind'],
+    stage: Math.floor(value.stage as number),
+    place: Math.floor(value.place as number),
+    points: Math.floor(value.points as number),
+  };
+};
+
+const competitionRecords = (value: unknown): CompetitionRecord[] =>
+  Array.isArray(value)
+    ? value.map(competitionRecord).filter((record): record is CompetitionRecord => record !== null)
+    : [];
 
 const recognitionCap = (history: Game['competitionHistory']) => {
   if (history.some((record) => record.kind === 'KEL' || record.kind === '시즌 파이널')) return 100;
@@ -121,9 +148,7 @@ export function migrateGameSave(raw: unknown): Game | null {
         totalRp: typeof savedSummary.totalRp === 'number' ? savedSummary.totalRp : 0,
       } as Game['lastSeasonSummary'])
     : null;
-  const competitionHistory = Array.isArray(raw.competitionHistory)
-    ? (raw.competitionHistory as Game['competitionHistory'])
-    : [];
+  const competitionHistory = competitionRecords(raw.competitionHistory);
   const savedFame = typeof raw.fame === 'number' ? Math.max(0, Math.round(raw.fame)) : 0;
 
   return {

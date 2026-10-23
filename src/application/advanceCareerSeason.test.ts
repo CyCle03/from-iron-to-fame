@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createGame } from '../engine/game';
+import { createSeededRandom } from '../engine/random';
 import { advanceCareerSeason } from './advanceCareerSeason';
 
 describe('advanceCareerSeason', () => {
@@ -11,6 +12,17 @@ describe('advanceCareerSeason', () => {
     expect(result.tournamentEvents).toBe(0);
     expect(result.game.competitionHistory).toHaveLength(0);
     expect(before.season).not.toBe(result.game.season);
+  });
+
+  it('reproduces the entire season flow with one seeded random source', () => {
+    const before = createGame('재현 선수', '미스릴', '일반 유저', '유키');
+    before.rp = 7600;
+
+    const first = advanceCareerSeason(before, 'rank', createSeededRandom(20261023));
+    const second = advanceCareerSeason(before, 'rank', createSeededRandom(20261023));
+
+    expect(first).toEqual(second);
+    expect(first.game.competitionHistory.length).toBeGreaterThan(0);
   });
 
   it('automatically completes the Masters schedule for an eligible team player', () => {

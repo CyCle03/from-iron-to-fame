@@ -83,6 +83,10 @@ flowchart TB
 - `src/engine/game.ts`: 커리어 상태와 원자적인 상태 전이를 제공한다.
 - `src/engine/career.ts`: 통산 집계·은퇴·명예의 전당 규칙을 담당한다.
 - `src/engine/careerRules.ts`: 대회·팀 진입 조건과 다음 목표를 계산하는 순수 정책이다.
+- `src/engine/seasonProgress.ts`: 주차 진행, 시즌 전환과 RP 소프트 리셋을 담당한다.
+- `src/engine/competitionProgress.ts`: KeG·KEL 참가 결과와 인지도·대회 이력을 갱신한다.
+- `src/engine/roster.ts`: 주전 교체와 교체 비용을 담당한다.
+- `src/engine/contracts.ts`: 재계약 상태 전이를 담당한다.
 - `src/engine/tournament.ts`: 마스터즈·KEL 결과 시뮬레이션을 담당한다.
 - `src/engine/save.ts`: 저장 데이터 검증·마이그레이션·기본값 보완을 담당한다.
 - `src/components/*`: 정책을 계산하지 않고 상태와 유스케이스 결과를 표현한다.
@@ -108,7 +112,7 @@ npm run architecture:check
 
 ## 저장 호환성
 
-브라우저 키 `iron-to-fame-save-v1`을 유지하고 내부 `version`으로 스키마를 관리하며 현재 버전은 7이다. `migrateGameSave`는 알 수 없는 입력을 검증하고 현재 버전의 필수 필드를 보완하고 공식 대회 이력에 맞지 않는 레거시 인지도를 안전한 범위로 교정한다. 가져온 JSON은 같은 마이그레이션을 거쳐 미리보기를 보여준 뒤 사용자가 적용할 때만 현재 커리어를 교체한다.
+브라우저 키 `iron-to-fame-save-v1`을 유지하고 내부 `version`으로 스키마를 관리하며 현재 버전은 7이다. `migrateGameSave`는 알 수 없는 입력과 대회 이력의 각 항목을 검증하고 현재 버전의 필수 필드를 보완하며 공식 대회 이력에 맞지 않는 레거시 인지도를 안전한 범위로 교정한다. 가져온 JSON은 같은 마이그레이션을 거쳐 미리보기를 보여준 뒤 사용자가 적용할 때만 현재 커리어를 교체한다.
 
 ## 검증
 

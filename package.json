@@ -12,7 +12,8 @@
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "check": "npm run format:check && npm run architecture:check && npm run lint && npm run typecheck && npm test && npm run build",
-    "architecture:check": "node scripts/check-architecture.mjs"
+    "architecture:check": "node scripts/check-architecture.mjs",
+    "balance:analyze": "vite-node scripts/analyze-balance.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "5.2.0",

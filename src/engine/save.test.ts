@@ -55,6 +55,25 @@ describe('save migration', () => {
     ).toBe(40);
   });
 
+  it('filters malformed competition records without failing migration', () => {
+    const base = createGame('손상 복구', '플래티넘', '일반 유저', '유키');
+    const migrated = migrateGameSave({
+      ...base,
+      fame: 100,
+      competitionHistory: [
+        null,
+        { kind: '가짜 대회', season: 11, stage: 1, place: 1, points: 0 },
+        { kind: '마스터즈', season: '잘못됨', stage: 1, place: 1, points: 400 },
+        { kind: '지역 컵', season: 11, stage: 1, place: 2, points: 0 },
+      ],
+    });
+
+    expect(migrated?.competitionHistory).toEqual([
+      { kind: '지역 컵', season: 11, stage: 1, place: 2, points: 0 },
+    ]);
+    expect(migrated?.fame).toBe(40);
+  });
+
   it('repairs invalid profile choices without losing a valid name', () => {
     const migrated = migrateGameSave({
       name: '복구 선수',
