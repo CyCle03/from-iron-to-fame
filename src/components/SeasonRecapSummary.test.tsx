@@ -12,7 +12,12 @@ describe('SeasonRecapSummary', () => {
   it('moves from the headline through rank details to the next-story inbox', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
-    const base = { ...createGame('레퍼런스', '골드', '일반 유저', '유키'), fame: 200, mastersPoints: 500 };
+    const base = {
+      ...createGame('레퍼런스', '골드', '일반 유저', '유키'),
+      fame: 200,
+      mastersPoints: 500,
+      rp: 9600,
+    };
     const game = runSeason(base, 'rank', () => 0.5);
 
     render(<SeasonRecapSummary game={game} open onClose={onClose} />);

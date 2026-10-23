@@ -12,9 +12,10 @@ import {
   recordMastersPhase,
   recordKelStage,
   finishMastersSeason,
+  playCommunityCup,
 } from './engine/game';
-import { simulateTournament, type TournamentKind, type TournamentResult } from './engine/tournament';
-import { canEnterKelStage, canEnterMasters, nextCareerGoal } from './engine/careerRules';
+import { simulateTournament, type TournamentResult } from './engine/tournament';
+import { canEnterCommunityCup, canEnterMasters, nextCareerGoal } from './engine/careerRules';
 import { CareerArchivePanel, ExperimentPoolPanel, RetiredCareer } from './components/CareerPanels';
 import { HallOfFamePanel } from './components/HallOfFamePanel';
 import { CreateCareer } from './components/CreateCareer';
@@ -52,13 +53,19 @@ function App() {
     let staged = game;
     let lastResult: TournamentResult | null = null;
     let tournamentEvents = 0;
+    if (!canEnterMasters(staged)) {
+      while (canEnterCommunityCup(staged)) {
+        staged = playCommunityCup(staged);
+        tournamentEvents++;
+      }
+    }
     if (staged.careerLeague === 'KEL') {
       while ((staged.kelStage ?? 0) < 7) {
         lastResult = simulateTournament(staged, 'kel');
         staged = recordKelStage(staged, lastResult.playerPlace);
         tournamentEvents++;
       }
-    } else if (staged.careerLeague !== '솔로' && staged.rp >= 2400 && (staged.fame ?? 0) >= 75) {
+    } else if (canEnterMasters(staged)) {
       while ((staged.mastersPhase ?? 0) < 3) {
         lastResult = simulateTournament(staged, 'masters');
         staged = recordMastersPhase(staged, lastResult.circuitPoints, lastResult.playerPlace);
@@ -96,25 +103,6 @@ function App() {
   );
   const rankStep = nextRankStep(game.rp);
   const nextGoal = nextCareerGoal(game);
-  const mastersEligible = canEnterMasters(game);
-  const kelEligible = canEnterKelStage(game);
-  const tournament = (kind: TournamentKind) => {
-    if (kind === 'masters' && !mastersEligible) {
-      applyGameChange(recordMastersPhase(game, 0));
-      return;
-    }
-    if (kind === 'kel' && !kelEligible) {
-      applyGameChange(recordKelStage(game, 8));
-      return;
-    }
-    const r = simulateTournament(game, kind);
-    setResult(r);
-    applyGameChange(
-      kind === 'masters'
-        ? recordMastersPhase(game, r.circuitPoints, r.playerPlace)
-        : recordKelStage(game, r.playerPlace),
-    );
-  };
   return (
     <main className="app">
       <header>
@@ -337,15 +325,7 @@ function App() {
           </section>
         </>
       )}
-      {tab === '시즌 센터' && (
-        <SeasonCenter
-          game={game}
-          mastersEligible={mastersEligible}
-          kelEligible={kelEligible}
-          onChange={applyGameChange}
-          onTournament={tournament}
-        />
-      )}
+      {tab === '시즌 센터' && <SeasonCenter game={game} />}
       {tab === '시즌 플랜' && (
         <>
           <section className="actions">
@@ -370,16 +350,7 @@ function App() {
       )}
       {tab === '팀' && <TeamHub game={game} onChange={applyGameChange} />}
       {tab === '장비 상점' && <EquipmentShop game={game} onChange={applyGameChange} />}
-      {tab === '대회' && (
-        <TournamentView
-          game={game}
-          result={result}
-          mastersEligible={mastersEligible}
-          kelEligible={kelEligible}
-          onChange={applyGameChange}
-          onTournament={tournament}
-        />
-      )}
+      {tab === '대회' && <TournamentView game={game} result={result} onChange={applyGameChange} />}
       {tab === '선수 기록' && <RankRecords game={game} />}
       {tab === '게임 안내' && <GameGuide />}
       <SeasonRecapSummary game={game} open={showSeasonRecap} onClose={() => setShowSeasonRecap(false)} />

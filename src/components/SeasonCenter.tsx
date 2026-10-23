@@ -1,23 +1,9 @@
-import { finishMastersSeason, seasonInfo, type Game } from '../engine/game';
-import type { TournamentKind } from '../engine/tournament';
-
-type SeasonCenterProps = {
-  game: Game;
-  mastersEligible: boolean;
-  kelEligible: boolean;
-  onChange: (game: Game) => void;
-  onTournament: (kind: TournamentKind) => void;
-};
+import { seasonInfo, type Game } from '../engine/game';
+type SeasonCenterProps = { game: Game };
 
 const KEL_STAGES = ['오프닝 위크', '서킷 1', '서킷 2', '미드시즌 컵', '서킷 3', '서킷 4', '내셔널 챔피언십'];
 
-export function SeasonCenter({
-  game,
-  mastersEligible,
-  kelEligible,
-  onChange,
-  onTournament,
-}: SeasonCenterProps) {
+export function SeasonCenter({ game }: SeasonCenterProps) {
   return (
     <section className="season-center panel">
       <h2>
@@ -28,30 +14,16 @@ export function SeasonCenter({
           <p className="eyebrow">MASTERS · 48 TEAMS</p>
           <h3>마스터즈 페이즈 {game.mastersPhase}/3</h3>
           <b>{game.mastersPoints} CP</b>
-          <p>3개 페이즈 누적 상위 7팀은 시즌 파이널 직행, 마지막 1팀은 LCQ에서 선발됩니다.</p>
-          <button disabled={!mastersEligible} onClick={() => onTournament('masters')}>
-            {game.mastersPhase >= 3 ? '페이즈 완료' : '마스터즈 다음 페이즈 진행'}
-          </button>
-          {game.mastersPhase >= 3 && (
-            <button
-              disabled={!!game.mastersSeason.champion}
-              onClick={() => onChange(finishMastersSeason(game))}
-            >
-              {game.mastersSeason.champion ? '시즌 파이널 종료' : 'LCQ · 시즌 파이널 진행'}
-            </button>
-          )}
+          <p>
+            데미갓 이상 팀은 시즌 진행 시 자동 참가합니다. 3개 페이즈와 LCQ·시즌 파이널 결과가 자동
+            기록됩니다.
+          </p>
         </article>
         <article>
           <p className="eyebrow">KEL</p>
           <h3>{KEL_STAGES[game.kelStage] ?? '시즌 일정 완료'}</h3>
           <b>{game.kelStage}/7 일정</b>
-          <p>
-            16개 지역 대표팀 일정입니다. 마스터즈는 3픽밴, KEL 결승은 2-PICK-CAP·순차 체크포인트로 각기
-            시뮬레이션합니다.
-          </p>
-          <button disabled={!kelEligible} onClick={() => onTournament('kel')}>
-            {game.kelStage >= 7 ? 'KEL 시즌 완료' : '현재 KEL 일정 진행'}
-          </button>
+          <p>KEL 등록 선수는 시즌 진행 시 7개 일정을 자동 소화합니다. 마스터즈와 중복 출전하지 않습니다.</p>
         </article>
       </div>
       <div className="season-flow">

@@ -15,6 +15,8 @@ const RANK_BANDS: { rank: Rank; min: number }[] = [
 
 type DivisionBand = { min: number; label: string };
 const DIVISION_BANDS: DivisionBand[] = [
+  { min: 9600, label: '이터니티' },
+  { min: 8400, label: '데미갓' },
   { min: 7600, label: '미스릴' },
   { min: 7300, label: '메테오라이트 1' },
   { min: 7000, label: '메테오라이트 2' },

@@ -7,13 +7,15 @@ describe('official rank divisions', () => {
     expect(nextRankStep(2296)).toEqual({ min: 2400, label: '골드 4' });
   });
 
-  it('uses every published division boundary through Mithril', () => {
+  it('uses every published division boundary and fan-game top-rank thresholds', () => {
     expect(rankLabel(0)).toBe('아이언 4');
     expect(rankLabel(600)).toBe('브론즈 4');
     expect(rankLabel(1400)).toBe('실버 4');
     expect(rankLabel(2150)).toBe('실버 1');
     expect(rankLabel(2400)).toBe('골드 4');
     expect(rankLabel(7600)).toBe('미스릴');
+    expect(rankLabel(8400)).toBe('데미갓');
+    expect(rankLabel(9600)).toBe('이터니티');
   });
 });
 

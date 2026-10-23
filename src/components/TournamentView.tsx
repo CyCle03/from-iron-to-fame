@@ -1,29 +1,19 @@
-import { joinAmateurTeam, joinKel, playCommunityCup, promoteTeamToKel, type Game } from '../engine/game';
-import {
-  canEnterCommunityCup,
-  canJoinAmateurTeam,
-  canJoinKel,
-  canPromoteTeamToKel,
-} from '../engine/careerRules';
-import type { TournamentKind, TournamentResult } from '../engine/tournament';
+import { joinAmateurTeam, joinKel, promoteTeamToKel, type Game } from '../engine/game';
+import { canJoinAmateurTeam, canJoinKel, canPromoteTeamToKel } from '../engine/careerRules';
+import type { TournamentResult } from '../engine/tournament';
 
 type TournamentViewProps = {
   game: Game;
   result: TournamentResult | null;
-  mastersEligible: boolean;
-  kelEligible: boolean;
   onChange: (game: Game) => void;
-  onTournament: (kind: TournamentKind) => void;
 };
 
-export function TournamentView({
-  game,
-  result,
-  mastersEligible,
-  kelEligible,
-  onChange,
-  onTournament,
-}: TournamentViewProps) {
+export function TournamentView({ game, result, onChange }: TournamentViewProps) {
+  const competitionName = (kind: Game['competitionHistory'][number]['kind'], stage: number) => {
+    if (kind !== '지역 컵') return kind;
+    return stage === 1 ? '동호인 오픈' : '전국 아마추어 대회';
+  };
+
   return (
     <section className="tournament panel">
       <h2>커리어 경쟁 무대</h2>
@@ -33,7 +23,7 @@ export function TournamentView({
           {game.teamName ?? '무소속'} · {game.careerLeague}
           {game.careerLeague === 'KEL' ? ' · 4인 로스터' : ''}
         </span>
-        <small>지역 컵 → 팀 합류 → 마스터즈 → KEL 로스터</small>
+        <small>미스릴 전국대회 → 팀 결성 → 데미갓 마스터즈 → KEL</small>
       </div>
       <div className="roster-card">
         <b>{game.teamName ?? '팀 미정'}</b>
@@ -59,13 +49,9 @@ export function TournamentView({
         </small>
       </div>
       <div className="tournament-buttons">
-        <button disabled={!canEnterCommunityCup(game)} onClick={() => onChange(playCommunityCup(game))}>
-          <b>지역 컵 참가</b>
-          <small>브론즈 이상 · 시즌 {game.seasonCupEntries}/2회 참가</small>
-        </button>
         <button disabled={!canJoinAmateurTeam(game)} onClick={() => onChange(joinAmateurTeam(game))}>
           <b>아마추어 팀 합류</b>
-          <small>명성 45 · 마스터즈 도전 팀 결성</small>
+          <small>미스릴 이상 · 명성 45 · 팀 결성</small>
         </button>
         <button disabled={!canPromoteTeamToKel(game)} onClick={() => onChange(promoteTeamToKel(game))}>
           <b>팀 전체 KEL 승격</b>
@@ -79,21 +65,22 @@ export function TournamentView({
           <small>명성 180 · 마스터즈 CP 400</small>
         </button>
       </div>
-      <h2>공식 형식 대회 시뮬레이션</h2>
-      <p>
-        공식 운영 구조를 바탕으로 한 게임용 결과입니다. 실제 대회 기록이나 선수 데이터를 재현하지 않습니다.
-      </p>
-      <div className="tournament-buttons">
-        <button disabled={!mastersEligible} onClick={() => onTournament('masters')}>
-          <b>마스터즈 페이즈</b>
-          <small>
-            {mastersEligible ? '3픽밴 · 페이즈 결과와 서킷 포인트' : '골드 · 명성 75 · 아마추어 팀 필요'}
-          </small>
-        </button>
-        <button disabled={!kelEligible} onClick={() => onTournament('kel')}>
-          <b>KEL 순차 체크포인트 결승</b>
-          <small>{kelEligible ? '2-PICK-CAP · 순차 체크포인트' : 'KEL 4인 로스터 등록 필요'}</small>
-        </button>
+      <h2>자동 참가 결과</h2>
+      <p>자격을 충족한 대회는 시즌 진행과 함께 자동 처리됩니다. 아래에는 최근 결과만 표시합니다.</p>
+      <div className="competition-results">
+        {game.competitionHistory.slice(0, 8).map((record, index) => (
+          <article key={record.season + '-' + record.kind + '-' + record.stage + '-' + index}>
+            <span>
+              <small>S{record.season}</small>
+              {competitionName(record.kind, record.stage)}
+            </span>
+            <b>{record.place > 0 ? record.place + '위' : '진출 실패'}</b>
+            {record.points > 0 && <small>{record.points} CP</small>}
+          </article>
+        ))}
+        {!game.competitionHistory.length && (
+          <small>미스릴 달성 후 전국 아마추어 대회부터 자동 참가합니다.</small>
+        )}
       </div>
       {result && (
         <article className="result">

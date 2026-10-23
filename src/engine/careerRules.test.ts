@@ -19,15 +19,20 @@ const career = (overrides: Partial<Game> = {}) => ({
 
 describe('career rules', () => {
   it('keeps tournament eligibility in pure selectors', () => {
-    expect(canEnterCommunityCup(career({ rp: 1200 }))).toBe(true);
-    expect(canEnterMasters(career({ rp: 2400, fame: 75, teamName: '팀', careerLeague: '아마추어' }))).toBe(
+    expect(canEnterCommunityCup(career({ rp: 7599 }))).toBe(false);
+    expect(canEnterCommunityCup(career({ rp: 7600 }))).toBe(true);
+    expect(canEnterMasters(career({ rp: 8399, fame: 75, teamName: '팀', careerLeague: '아마추어' }))).toBe(
+      false,
+    );
+    expect(canEnterMasters(career({ rp: 8400, fame: 75, teamName: '팀', careerLeague: '아마추어' }))).toBe(
       true,
     );
     expect(canEnterKelStage(career({ careerLeague: 'KEL', kelStage: 6 }))).toBe(true);
   });
 
   it('reports team progression eligibility', () => {
-    expect(canJoinAmateurTeam(career({ fame: 45 }))).toBe(true);
+    expect(canJoinAmateurTeam(career({ rp: 7599, fame: 45 }))).toBe(false);
+    expect(canJoinAmateurTeam(career({ rp: 7600, fame: 45 }))).toBe(true);
     expect(canJoinKel(career({ fame: 180, mastersPoints: 400 }))).toBe(true);
     expect(canPromoteTeamToKel(career({ fame: 240, mastersPoints: 600, careerLeague: '마스터즈' }))).toBe(
       true,
@@ -35,13 +40,13 @@ describe('career rules', () => {
   });
 
   it('describes the next unmet career goal', () => {
-    expect(nextCareerGoal(career({ fame: 20 }))).toEqual({
+    expect(nextCareerGoal(career({ rp: 7600, fame: 20 }))).toEqual({
       title: '아마추어 팀 합류',
-      detail: '명성 25 필요',
+      detail: '명성 25',
     });
     expect(
-      nextCareerGoal(career({ teamName: '테스트 팀', careerLeague: '아마추어', rp: 2300, fame: 70 })).detail,
-    ).toContain('RP 100');
+      nextCareerGoal(career({ teamName: '테스트 팀', careerLeague: '아마추어', rp: 8300, fame: 70 })).detail,
+    ).toContain('데미갓까지 100 RP');
   });
 
   it('derives comparable role, path and fit labels for scout offers', () => {

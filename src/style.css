@@ -700,12 +700,47 @@ li {
 .result b {
   color: #f4bd55;
 }
+.competition-results {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.competition-results article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #2b3655;
+  border-radius: 10px;
+  background: #11182d;
+}
+.competition-results span {
+  min-width: 0;
+  font-weight: 700;
+}
+.competition-results span small {
+  display: block;
+  margin-bottom: 3px;
+  color: #8995b6;
+  font-weight: 500;
+}
+.competition-results article > small {
+  color: #f4bd55;
+  white-space: nowrap;
+}
 @media (max-width: 640px) {
   .tournament-buttons {
     grid-template-columns: 1fr;
   }
   .tournament-buttons button {
     min-height: 88px;
+  }
+  .competition-results article {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .competition-results article > small {
+    grid-column: 1 / -1;
   }
 }
 

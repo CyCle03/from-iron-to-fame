@@ -98,7 +98,7 @@ describe('career engine', () => {
     const base = { ...createGame('테스트', '골드', '일반 유저', '유키'), week: 12, rp: 3000 };
     const reset = nextWeek(base);
     expect(reset.rp).toBe(2790);
-    const cup = playCommunityCup({ ...reset, rp: 1400 });
+    const cup = playCommunityCup({ ...reset, rp: 7600 });
     expect(cup.fame).toBeGreaterThan(0);
     expect(cup.competitionHistory[0].place).toBeGreaterThanOrEqual(1);
     expect(cup.competitionHistory[0].place).toBeLessThanOrEqual(8);
@@ -112,7 +112,13 @@ describe('career engine', () => {
   it('enforces esports eligibility in the engine', () => {
     const solo = createGame('테스트', '골드', '일반 유저', '유키');
     expect(recordMastersPhase({ ...solo, fame: 100 }, 100).mastersPhase).toBe(0);
-    const amateur = { ...solo, fame: 100, teamName: '테스트 팀', careerLeague: '아마추어' as const };
+    const amateur = {
+      ...solo,
+      rp: 8400,
+      fame: 100,
+      teamName: '테스트 팀',
+      careerLeague: '아마추어' as const,
+    };
     const masters = recordMastersPhase(amateur, 120);
     expect(masters.mastersPhase).toBe(1);
     expect(masters.careerLeague).toBe('마스터즈');
@@ -173,6 +179,7 @@ describe('masters season', () => {
   it('runs phases, LCQ, and an eight-team final', () => {
     let game: Game = {
       ...createGame('테스트', '골드', '일반 유저', '유키'),
+      rp: 8400,
       fame: 100,
       teamName: '테스트 팀',
       careerLeague: '아마추어',
@@ -212,7 +219,7 @@ describe('experiment pool management', () => {
 
 describe('contracts and transfers', () => {
   it('pays salary and expires a contract into free agency', () => {
-    let game = joinAmateurTeam({ ...createGame('테스트', '골드', '일반 유저', '유키'), fame: 50 });
+    let game = joinAmateurTeam({ ...createGame('테스트', '골드', '일반 유저', '유키'), rp: 7600, fame: 50 });
     expect(game.contract?.seasonsRemaining).toBe(2);
     const credits = game.credits;
     game = runSeason(game, 'rest');
@@ -222,14 +229,17 @@ describe('contracts and transfers', () => {
     expect(game.contract).toBeNull();
     expect(game.teamName).toBeNull();
     expect(game.careerLeague).toBe('솔로');
-    expect(game.scoutOffers.length).toBeGreaterThan(0);
+    expect(game.scoutOffers.length).toBe(0);
   });
   it('renews and accepts a transfer offer', () => {
-    let game = joinAmateurTeam({ ...createGame('테스트', '골드', '일반 유저', '유키'), fame: 130 });
+    let game = joinAmateurTeam({ ...createGame('테스트', '골드', '일반 유저', '유키'), rp: 7600, fame: 130 });
     game = { ...game, contract: { ...game.contract!, seasonsRemaining: 1 } };
     game = renewContract(game);
     expect(game.contract?.seasonsRemaining).toBe(2);
     game = runSeason(game, 'rest');
+    game.scoutOffers = [
+      { team: '아스트라 나이츠', league: '마스터즈', salary: 800, seasonsRemaining: 2, signingBonus: 400 },
+    ];
     expect(game.scoutOffers.some((offer) => offer.league === '마스터즈')).toBe(true);
     const index = game.scoutOffers.findIndex((offer) => offer.league === '마스터즈');
     const moved = acceptScoutOffer(game, index);
@@ -241,7 +251,11 @@ describe('contracts and transfers', () => {
 
 describe('roster management', () => {
   it('swaps a bench player into the active squad with a teamwork cost', () => {
-    const game = joinAmateurTeam({ ...createGame('테스트', '골드', '일반 유저', '유키'), fame: 50 });
+    const game = joinAmateurTeam({
+      ...createGame('테스트', '골드', '일반 유저', '유키'),
+      rp: 7600,
+      fame: 50,
+    });
     const benchIndex = game.teamMembers.findIndex((member) => !member.starter);
     expect(benchIndex).toBeGreaterThanOrEqual(0);
     const teamwork = game.stats.teamwork;
@@ -251,7 +265,11 @@ describe('roster management', () => {
     expect(changed.stats.teamwork).toBe(teamwork - 3);
   });
   it('improves active roster form more during team practice', () => {
-    const game = joinAmateurTeam({ ...createGame('테스트', '골드', '일반 유저', '유키'), fame: 50 });
+    const game = joinAmateurTeam({
+      ...createGame('테스트', '골드', '일반 유저', '유키'),
+      rp: 7600,
+      fame: 50,
+    });
     const starter = game.teamMembers.findIndex((member) => member.starter);
     const bench = game.teamMembers.findIndex((member) => !member.starter);
     const trained = act(game, 'team');

@@ -1,9 +1,11 @@
 import type { Game } from './game';
+import { COMPETITION_RP } from './competitionRules';
 
 export const CAREER_REQUIREMENTS = {
-  communityCupRp: 1200,
+  communityCupRp: COMPETITION_RP.nationalAmateur,
+  teamFormationRp: COMPETITION_RP.teamFormation,
   amateurTeamFame: 45,
-  mastersRp: 2400,
+  mastersRp: COMPETITION_RP.masters,
   mastersFame: 75,
   kelFame: 180,
   kelMastersPoints: 400,
@@ -14,7 +16,7 @@ export const CAREER_REQUIREMENTS = {
 } as const;
 
 export const canEnterCommunityCup = (game: Game) =>
-  game.rp >= CAREER_REQUIREMENTS.communityCupRp && game.seasonCupEntries < 2;
+  game.careerLeague !== 'KEL' && game.rp >= CAREER_REQUIREMENTS.communityCupRp && game.seasonCupEntries < 2;
 
 export const canEnterMasters = (game: Game) =>
   game.careerLeague !== '솔로' &&
@@ -26,7 +28,9 @@ export const canEnterMasters = (game: Game) =>
 export const canEnterKelStage = (game: Game) => game.careerLeague === 'KEL' && game.kelStage < 7;
 
 export const canJoinAmateurTeam = (game: Game) =>
-  !game.teamName && game.fame >= CAREER_REQUIREMENTS.amateurTeamFame;
+  !game.teamName &&
+  game.rp >= CAREER_REQUIREMENTS.teamFormationRp &&
+  game.fame >= CAREER_REQUIREMENTS.amateurTeamFame;
 
 export const canJoinKel = (game: Game) =>
   game.fame >= CAREER_REQUIREMENTS.kelFame && game.mastersPoints >= CAREER_REQUIREMENTS.kelMastersPoints;
@@ -36,10 +40,13 @@ export const canPromoteTeamToKel = (game: Game) =>
 
 export function nextCareerGoal(game: Game): { title: string; detail: string } {
   if (!game.teamName) {
+    const rp = Math.max(0, CAREER_REQUIREMENTS.teamFormationRp - game.rp);
     const fame = Math.max(0, CAREER_REQUIREMENTS.amateurTeamFame - game.fame);
     return {
       title: '아마추어 팀 합류',
-      detail: fame ? `명성 ${fame} 필요` : '대회 화면에서 팀 제안을 수락하세요',
+      detail:
+        [rp ? '미스릴까지 ' + rp + ' RP' : '', fame ? '명성 ' + fame : ''].filter(Boolean).join(' · ') ||
+        '팀 화면에서 제안을 수락하세요',
     };
   }
   if (game.careerLeague !== 'KEL') {
@@ -48,9 +55,11 @@ export function nextCareerGoal(game: Game): { title: string; detail: string } {
     if (rp || fame)
       return {
         title: '마스터즈 진출',
-        detail: [`RP ${rp}`, `명성 ${fame}`].filter((value) => !value.endsWith(' 0')).join(' · ') + ' 필요',
+        detail:
+          [rp ? '데미갓까지 ' + rp + ' RP' : '', fame ? '명성 ' + fame : ''].filter(Boolean).join(' · ') +
+          ' 필요',
       };
-    return { title: '마스터즈 진출', detail: '시즌 센터에서 다음 페이즈에 참가하세요' };
+    return { title: '마스터즈 진출', detail: '다음 시즌 진행 시 자동 참가합니다' };
   }
   if (!game.retired)
     return {
@@ -95,5 +104,5 @@ export function scoutOfferContext(game: Game, league: Game['careerLeague']): Sco
       path: '서킷 포인트→시즌 파이널',
       fit: average >= 55 ? '적합' : '성장 필요',
     };
-  return { role: '육성 로스터 주전', path: '지역 컵→마스터즈 진출', fit: '안정적' };
+  return { role: '육성 로스터 주전', path: '전국대회→마스터즈 진출', fit: '안정적' };
 }
