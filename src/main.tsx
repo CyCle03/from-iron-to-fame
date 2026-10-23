@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  runSeason,
   rankEntryFee,
   rankLabel,
   nextRankStep,
@@ -9,13 +8,9 @@ import {
   hasExperimentTag,
   hyperCarryTankers,
   seasonInfo,
-  recordMastersPhase,
-  recordKelStage,
-  finishMastersSeason,
-  playCommunityCup,
 } from './engine/game';
-import { simulateTournament, type TournamentResult } from './engine/tournament';
-import { canEnterCommunityCup, canEnterMasters, nextCareerGoal } from './engine/careerRules';
+import { nextCareerGoal } from './engine/careerRules';
+import { advanceCareerSeason, type SeasonAdvanceResult } from './application/advanceCareerSeason';
 import { CareerArchivePanel, ExperimentPoolPanel, RetiredCareer } from './components/CareerPanels';
 import { HallOfFamePanel } from './components/HallOfFamePanel';
 import { CreateCareer } from './components/CreateCareer';
@@ -41,7 +36,7 @@ function App() {
   const [plannedAction, setPlannedAction] = useState<Action | null>(null);
   const [report, setReport] = useState<string | null>(null);
   const [tab, setTab] = useState<NavigationTab>('대시보드');
-  const [result, setResult] = useState<TournamentResult | null>(null);
+  const [result, setResult] = useState<SeasonAdvanceResult['tournamentResult']>(null);
   const [showSeasonRecap, setShowSeasonRecap] = useState(false);
   const applyGameChange = (next: NonNullable<typeof game>) => {
     setGame(next);
@@ -49,47 +44,15 @@ function App() {
   };
   if (game?.retired) return <RetiredCareer game={game} onChange={applyGameChange} />;
   if (!game) return <CreateCareer onCreate={setGame} />;
-  const playWeek = (a: Action) => {
-    let staged = game;
-    let lastResult: TournamentResult | null = null;
-    let tournamentEvents = 0;
-    if (!canEnterMasters(staged)) {
-      while (canEnterCommunityCup(staged)) {
-        staged = playCommunityCup(staged);
-        tournamentEvents++;
-      }
-    }
-    if (staged.careerLeague === 'KEL') {
-      while ((staged.kelStage ?? 0) < 7) {
-        lastResult = simulateTournament(staged, 'kel');
-        staged = recordKelStage(staged, lastResult.playerPlace);
-        tournamentEvents++;
-      }
-    } else if (canEnterMasters(staged)) {
-      while ((staged.mastersPhase ?? 0) < 3) {
-        lastResult = simulateTournament(staged, 'masters');
-        staged = recordMastersPhase(staged, lastResult.circuitPoints, lastResult.playerPlace);
-        tournamentEvents++;
-      }
-      if (!staged.mastersSeason.champion) {
-        staged = finishMastersSeason(staged);
-        tournamentEvents += 2;
-      }
-    }
-    const ran = runSeason(staged, a);
-    if (ran.lastSeasonSummary) {
-      ran.lastSeasonSummary.tournamentEvents = tournamentEvents;
-      ran.lastSeasonSummary.fameGained = ran.fame - game.fame;
-    }
-    setResult(lastResult);
-    setReport(
-      tournamentEvents ? '시즌 완료 · 공식 대회 ' + tournamentEvents + '개 일정 자동 진행' : ran.history[0],
-    );
-    notify(tournamentEvents ? `시즌 완료 · 공식 대회 ${tournamentEvents}개 일정 자동 진행` : ran.history[0]);
-    setGame(ran);
+  const playWeek = (action: Action) => {
+    const advanced = advanceCareerSeason(game, action);
+    setResult(advanced.tournamentResult);
+    setReport(advanced.report);
+    notify(advanced.report);
+    setGame(advanced.game);
     setShowSeasonRecap(true);
     setSeasonStep(0);
-    setPlannedAction(ran.lastSeasonPlan);
+    setPlannedAction(advanced.game.lastSeasonPlan);
     setTab('대시보드');
   };
   const stat = (label: string, value: number) => (

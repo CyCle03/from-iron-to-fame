@@ -11,7 +11,8 @@
     "typecheck": "tsc -b --pretty false",
     "build": "tsc -b && vite build",
     "test": "vitest run",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
+    "check": "npm run format:check && npm run architecture:check && npm run lint && npm run typecheck && npm test && npm run build",
+    "architecture:check": "node scripts/check-architecture.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "5.2.0",

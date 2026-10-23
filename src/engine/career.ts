@@ -32,53 +32,63 @@ export function retireCareer(game: Game): Game {
   return next;
 }
 
-export const hallOfFameProgress = (game: Game) => {
-  const lastSeason = game.lastSeasonSummary?.season;
-  const mastersAppearance = game.competitionHistory.some((record) =>
-    ['마스터즈', 'LCQ', '시즌 파이널'].includes(record.kind),
-  );
-  const topTierPodium = game.competitionHistory.some(
-    (record) =>
-      record.season === lastSeason &&
-      ['마스터즈', '시즌 파이널', 'KEL'].includes(record.kind) &&
-      record.place > 0 &&
-      record.place <= 3,
-  );
-  const topTierSeasons = new Set(
-    game.competitionHistory
-      .filter((record) => ['마스터즈', '시즌 파이널', 'KEL'].includes(record.kind))
-      .map((record) => record.season),
-  ).size;
-  return {
-    stars: {
-      active: !game.retired,
-      awareness: game.fame >= 70,
-      mastersAppearance,
-      topTierPodium,
-      selectable: game.lastStarsSeason !== game.season,
-    },
-    heroes: {
-      active: !game.retired,
-      majorTitles: majorTitleCount(game) >= 3,
-    },
-    honors: {
-      retired: game.retired,
-      heroes: game.hallOfFameHonors.includes('히어로즈'),
-      majorTitles: majorTitleCount(game) >= 5,
-      mvps: mvpCount(game) >= 2,
-      awareness: game.fame >= 90,
-      longevity: topTierSeasons >= 5,
-    },
-  };
-};
+export class HallOfFameCareer {
+  constructor(private readonly game: Game) {}
 
-export const canReceiveHallHonor = (game: Game, category: HallOfFameCategory) => {
-  const progress = hallOfFameProgress(game);
-  if (category === '스타즈') return Object.values(progress.stars).every(Boolean);
-  if (category === '히어로즈')
-    return !game.hallOfFameHonors.includes(category) && Object.values(progress.heroes).every(Boolean);
-  return !game.hallOfFameHonors.includes(category) && Object.values(progress.honors).every(Boolean);
-};
+  progress() {
+    const game = this.game;
+    const lastSeason = game.lastSeasonSummary?.season;
+    const mastersAppearance = game.competitionHistory.some((record) =>
+      ['마스터즈', 'LCQ', '시즌 파이널'].includes(record.kind),
+    );
+    const topTierPodium = game.competitionHistory.some(
+      (record) =>
+        record.season === lastSeason &&
+        ['마스터즈', '시즌 파이널', 'KEL'].includes(record.kind) &&
+        record.place > 0 &&
+        record.place <= 3,
+    );
+    const topTierSeasons = new Set(
+      game.competitionHistory
+        .filter((record) => ['마스터즈', '시즌 파이널', 'KEL'].includes(record.kind))
+        .map((record) => record.season),
+    ).size;
+    return {
+      stars: {
+        active: !game.retired,
+        awareness: game.fame >= 70,
+        mastersAppearance,
+        topTierPodium,
+        selectable: game.lastStarsSeason !== game.season,
+      },
+      heroes: {
+        active: !game.retired,
+        majorTitles: majorTitleCount(game) >= 3,
+      },
+      honors: {
+        retired: game.retired,
+        heroes: game.hallOfFameHonors.includes('히어로즈'),
+        majorTitles: majorTitleCount(game) >= 5,
+        mvps: mvpCount(game) >= 2,
+        awareness: game.fame >= 90,
+        longevity: topTierSeasons >= 5,
+      },
+    };
+  }
+
+  canReceive(category: HallOfFameCategory) {
+    const progress = this.progress();
+    if (category === '스타즈') return Object.values(progress.stars).every(Boolean);
+    if (category === '히어로즈')
+      return !this.game.hallOfFameHonors.includes(category) && Object.values(progress.heroes).every(Boolean);
+    return !this.game.hallOfFameHonors.includes(category) && Object.values(progress.honors).every(Boolean);
+  }
+}
+
+export const hallOfFameProgress = (game: Game) => new HallOfFameCareer(game).progress();
+
+export const canReceiveHallHonor = (game: Game, category: HallOfFameCategory) =>
+  new HallOfFameCareer(game).canReceive(category);
 
 export function receiveHallHonor(game: Game, category: HallOfFameCategory): Game {
   if (!canReceiveHallHonor(game, category)) {
