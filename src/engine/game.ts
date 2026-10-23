@@ -1,5 +1,6 @@
 import type { RandomSource } from './random';
-import { rankEntryFee, rankFor, rankScoreFor, startingRp } from './rank';
+import { rankEntryFee, rankFor, rankScoreFor, softResetRp, startingRp } from './rank';
+import { summarizeMatches } from './matchSummary';
 
 export type Rank =
   | '아이언'
@@ -182,7 +183,18 @@ export type Stats = {
   focus: number;
   adaptability: number;
 };
-export type Match = { place: number; kills: number; downs?: number; preventionDowns?: number; terminates?: number; rp: number; name: string; fee?: number; gross?: number };
+export type Match = {
+  place: number;
+  kills: number;
+  tk?: number;
+  downs?: number;
+  preventionDowns?: number;
+  terminates?: number;
+  rp: number;
+  name: string;
+  fee?: number;
+  gross?: number;
+};
 export type SeasonSummary = {
   season: number;
   plan: Action;
@@ -197,6 +209,11 @@ export type SeasonSummary = {
   seasonCondition: '집중 운영' | '균형 운영' | '회복 운영';
   conditionNote: string;
   autoRecoveryWeeks: number;
+  averagePlace: number;
+  averageTk: number;
+  wins: number;
+  top3: number;
+  totalRp: number;
 };
 export type SeasonTurningPoint = 'pool' | 'team' | 'analysis';
 export type TeamMember = {
@@ -248,7 +265,7 @@ export type CareerTotals = {
   bestPlace: number | null;
   representative: string;
 };
-export const CURRENT_SAVE_VERSION = 4 as const;
+export const CURRENT_SAVE_VERSION = 5 as const;
 export type Game = {
   lastSeasonPlan: Action;
   trainingFocus: StatKey[];
@@ -617,9 +634,11 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
       totalFee = 0,
       totalKills = 0,
       bestPlace = 8;
-    for (let gameNo = 0; gameNo < 4; gameNo++) {
+    for (let gameNo = 0; gameNo < 8; gameNo++) {
       const fee = rankEntryFee(n.rp);
+      const lowTierBoost = n.rp < 600 ? 22 : n.rp < 1400 ? 16 : n.rp < 2400 ? 10 : n.rp < 3600 ? 4 : 0;
       const power =
+        lowTierBoost +
         (s.physical + s.combat + s.macro + s.judgement + s.teamwork + s.focus) / 6 +
         (n.mastery[n.main] ?? 0) * 0.18 -
         n.fatigue * 0.28 +
@@ -646,6 +665,7 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
       const place = Math.max(1, Math.min(8, Math.round(9 - power / 12)));
       const kills = Math.max(0, Math.min(8, Math.round((power - 38) / 16 + random() * 2)));
       const downs = Math.max(0, Math.round((power - 40) / 18 + random() * 2));
+      const tk = Math.max(kills, Math.min(20, kills + 3 + Math.round(random() * 7)));
       const preventionDowns = random() > 0.68 ? 1 : 0;
       const terminates = preventionDowns && random() > 0.55 ? 1 : 0;
       const gross = rankScoreFor(place, kills, downs, preventionDowns, terminates);
@@ -661,7 +681,18 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
       if (kills >= 3) gain('physical', 0.45);
       n.credits += Math.max(20, 55 + kills * 12 + (9 - place) * 15);
       n.fame = (n.fame ?? 0) + Math.max(0, 9 - place);
-      n.matches.unshift({ place, kills, downs, preventionDowns, terminates, rp: delta, name: n.main, fee, gross });
+      n.matches.unshift({
+        place,
+        kills,
+        tk,
+        downs,
+        preventionDowns,
+        terminates,
+        rp: delta,
+        name: n.main,
+        fee,
+        gross,
+      });
       totalNet += delta;
       totalFee += fee;
       totalKills += kills;
@@ -669,7 +700,7 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
     }
     n.morale = clamp(n.morale + (totalNet >= 0 ? 4 : -5));
     log(
-      `랭크 집중 4판 · 최고 ${bestPlace}위 · ${totalKills}킬 · 입장료 ${totalFee} RP · 순변동 ${totalNet >= 0 ? '+' : ''}${totalNet} RP`,
+      `랭크 집중 8판 · 최고 ${bestPlace}위 · ${totalKills}킬 · 입장료 ${totalFee} RP · 순변동 ${totalNet >= 0 ? '+' : ''}${totalNet} RP`,
     );
   }
   for (const key of n.trainingFocus ?? []) gain(key, 0.45);
@@ -785,7 +816,11 @@ function simulateSeason(g: Game, a: Action, random: RandomSource): Game {
       n.fatigue = clamp(n.fatigue - 12);
       n.morale = clamp(n.morale + 2);
       n.history.unshift(
-        'S' + n.season + ' ' + n.week + '주 · 자동 회복 배분 · 회복일을 편성해 다음 일정의 경기력을 안정시켰습니다.',
+        'S' +
+          n.season +
+          ' ' +
+          n.week +
+          '주 · 자동 회복 배분 · 회복일을 편성해 다음 일정의 경기력을 안정시켰습니다.',
       );
     }
     n = nextWeek(n, random);
@@ -855,11 +890,12 @@ export function runSeason(g: Game, a: Action, random: RandomSource = Math.random
   n.lastSeasonPlan = a;
   n.turningPointAvailable = true;
   const recent = n.matches.slice(0, Math.max(0, n.matches.length - before.matches));
+  const matchSummary = summarizeMatches(recent);
   const autoRecoveryWeeks = n.history.filter(
     (entry) => entry.startsWith('S' + before.season + ' ') && entry.includes('자동 회복 배분'),
   ).length;
   const seasonCondition =
-    autoRecoveryWeeks >= 3 ? '회복 운영' : recent.length >= 20 ? '집중 운영' : '균형 운영';
+    recent.length >= 40 ? '집중 운영' : autoRecoveryWeeks >= 3 ? '회복 운영' : '균형 운영';
   const conditionNote =
     seasonCondition === '집중 운영'
       ? '랭크 경기 비중이 높은 시즌입니다. 누적 부담은 다음 시즌 시작 전에 자동 정비됩니다.'
@@ -880,6 +916,11 @@ export function runSeason(g: Game, a: Action, random: RandomSource = Math.random
     seasonCondition,
     conditionNote,
     autoRecoveryWeeks,
+    averagePlace: matchSummary.averagePlace,
+    averageTk: matchSummary.averageTk,
+    wins: matchSummary.wins,
+    top3: matchSummary.top3,
+    totalRp: matchSummary.totalRp,
   };
   // 피로는 시즌 안에서만 경기력에 반영한다. 다음 시즌에는 자동 정비되어 반복적인 휴식 관리가 필요 없다.
   n.fatigue = 12;
@@ -918,22 +959,24 @@ export function resolveSeasonTurningPoint(g: Game, choice: SeasonTurningPoint): 
     const target = n.experimentPool.find((experiment) => experiment !== n.main) ?? n.main;
     n.mastery[target] = clamp((n.mastery[target] ?? 0) + 7);
     n.stats.adaptability = clamp(n.stats.adaptability + 2);
-    n.history.unshift("S" + n.season + " 전환점 · " + target + " 분석을 통해 밴픽 대응 폭을 넓혔습니다.");
-    n.notices = ["전환점 완료 · " + target + " 숙련도 +7 · 적응력 +2"];
+    n.history.unshift('S' + n.season + ' 전환점 · ' + target + ' 분석을 통해 밴픽 대응 폭을 넓혔습니다.');
+    n.notices = ['전환점 완료 · ' + target + ' 숙련도 +7 · 적응력 +2'];
   }
   if (choice === 'team') {
     n.stats.teamwork = clamp(n.stats.teamwork + 4);
     n.morale = clamp(n.morale + 3);
-    n.teamMembers = n.teamMembers.map((member) => member.starter ? { ...member, form: clamp(member.form + 4) } : member);
-    n.history.unshift("S" + n.season + " 전환점 · 스쿼드 교전 콜을 맞추며 팀 호흡을 다졌습니다.");
-    n.notices = ["전환점 완료 · 팀워크 +4 · 멘탈 +3 · 주전 폼 +4"];
+    n.teamMembers = n.teamMembers.map((member) =>
+      member.starter ? { ...member, form: clamp(member.form + 4) } : member,
+    );
+    n.history.unshift('S' + n.season + ' 전환점 · 스쿼드 교전 콜을 맞추며 팀 호흡을 다졌습니다.');
+    n.notices = ['전환점 완료 · 팀워크 +4 · 멘탈 +3 · 주전 폼 +4'];
   }
   if (choice === 'analysis') {
     n.stats.macro = clamp(n.stats.macro + 3);
     n.stats.judgement = clamp(n.stats.judgement + 3);
     n.stats.mental = clamp(n.stats.mental + 1);
-    n.history.unshift("S" + n.season + " 전환점 · 안전 구역과 교전 로그를 다시 분석했습니다.");
-    n.notices = ["전환점 완료 · 운영 +3 · 판단 +3 · 멘탈 +1"];
+    n.history.unshift('S' + n.season + ' 전환점 · 안전 구역과 교전 로그를 다시 분석했습니다.');
+    n.notices = ['전환점 완료 · 운영 +3 · 판단 +3 · 멘탈 +1'];
   }
   n.turningPointAvailable = false;
   return n;
@@ -995,17 +1038,7 @@ export function changeStarter(g: Game, index: number): Game {
   return n;
 }
 const mastersPointsForPlace = (place: number) =>
-  place === 1
-    ? 400
-    : place === 2
-      ? 345
-      : place === 3
-        ? 290
-        : place === 4
-          ? 245
-          : place <= 8
-            ? 200
-            : 0;
+  place === 1 ? 400 : place === 2 ? 345 : place === 3 ? 290 : place === 4 ? 245 : place <= 8 ? 200 : 0;
 const rankMasters = (standings: MastersStanding[]) =>
   [...standings].sort((a, b) => b.points - a.points || b.wins - a.wins || a.name.localeCompare(b.name, 'ko'));
 export function recordMastersPhase(g: Game, points: number, place = 0): Game {
@@ -1139,7 +1172,7 @@ export function nextWeek(g: Game, random: RandomSource = Math.random): Game {
     const before = n.rp;
     n.week = 1;
     n.season++;
-    n.rp = Math.max(0, Math.floor(n.rp * 0.82));
+    n.rp = softResetRp(n.rp);
     n.rank = rankFor(n.rp);
     n.notices = ['시즌 ' + n.season + ' 소프트 리셋 · ' + before + ' RP → ' + n.rp + ' RP'];
   } else {

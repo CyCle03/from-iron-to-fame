@@ -195,7 +195,7 @@ export function RetiredCareer({ game, onChange }: GamePanelProps) {
   const progress = hallOfFameProgress(game);
   const requirementLabels: Record<string, string> = {
     retired: '은퇴',
-    fame: '명성 500',
+    fame: '명성 1,500',
     trophies: '우승 3회',
     kel: 'KEL 경력',
     rank: '메테오라이트 이상',

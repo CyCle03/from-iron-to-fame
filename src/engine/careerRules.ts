@@ -7,7 +7,7 @@ export const CAREER_REQUIREMENTS = {
   mastersFame: 75,
   kelFame: 180,
   kelMastersPoints: 400,
-  hallOfFameFame: 500,
+  hallOfFameFame: 1500,
   hallOfFameTrophies: 3,
   hallOfFameRp: 6400,
 } as const;
@@ -54,7 +54,7 @@ export function nextCareerGoal(game: Game): { title: string; detail: string } {
   if (!game.retired)
     return {
       title: '명예의 전당 도전',
-      detail: `명성 ${Math.max(0, 500 - game.fame)} · 우승 ${Math.max(0, 3 - game.trophies)}회 필요`,
+      detail: `명성 ${Math.max(0, CAREER_REQUIREMENTS.hallOfFameFame - game.fame)} · 우승 ${Math.max(0, 3 - game.trophies)}회 필요`,
     };
   return { title: '커리어 기록 완성', detail: '명예의 전당 심사 조건을 확인하세요' };
 }

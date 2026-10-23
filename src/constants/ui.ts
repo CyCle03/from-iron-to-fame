@@ -42,7 +42,7 @@ export const SEASON_ACTIONS: SeasonActionOption[] = [
     desc: '랭크 중심 실전 운영',
     focus: '교전 · 판단 · RP',
     load: '경기 비중 높음',
-    rankedMatches: 28,
+    rankedMatches: 56,
   },
   {
     id: 'physical',
@@ -50,7 +50,7 @@ export const SEASON_ACTIONS: SeasonActionOption[] = [
     desc: '훈련·실전·회복 균형',
     focus: '피지컬 · 교전',
     load: '균형 운영',
-    rankedMatches: 12,
+    rankedMatches: 24,
   },
   {
     id: 'macro',
@@ -58,7 +58,7 @@ export const SEASON_ACTIONS: SeasonActionOption[] = [
     desc: '분석·랭크·회복 균형',
     focus: '운영 · 판단',
     load: '균형 운영',
-    rankedMatches: 12,
+    rankedMatches: 24,
   },
   {
     id: 'specialist',
@@ -66,7 +66,7 @@ export const SEASON_ACTIONS: SeasonActionOption[] = [
     desc: '숙련도 중심 시즌 운영',
     focus: '주력 숙련도 · 집중력',
     load: '균형 운영',
-    rankedMatches: 12,
+    rankedMatches: 24,
   },
   {
     id: 'review',
@@ -74,7 +74,7 @@ export const SEASON_ACTIONS: SeasonActionOption[] = [
     desc: '리뷰·운영 중심 시즌',
     focus: '적응력 · 멘탈',
     load: '경기 비중 낮음',
-    rankedMatches: 12,
+    rankedMatches: 24,
   },
   {
     id: 'team',
@@ -82,7 +82,7 @@ export const SEASON_ACTIONS: SeasonActionOption[] = [
     desc: '합동 연습·실전 운영',
     focus: '팀워크 · 로스터 폼',
     load: '균형 운영',
-    rankedMatches: 12,
+    rankedMatches: 24,
   },
   {
     id: 'rest',
@@ -90,6 +90,6 @@ export const SEASON_ACTIONS: SeasonActionOption[] = [
     desc: '회복·재정비 시즌 운영',
     focus: '회복 · 멘탈',
     load: '회복 중심',
-    rankedMatches: 8,
+    rankedMatches: 16,
   },
 ];

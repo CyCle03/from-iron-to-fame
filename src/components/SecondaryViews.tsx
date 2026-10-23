@@ -1,5 +1,4 @@
 import { buyEquipment, equipmentCatalog, type Game } from '../engine/game';
-import { saveCareerCard } from '../utils/careerCard';
 
 type GameViewProps = { game: Game; onChange: (game: Game) => void };
 
@@ -36,77 +35,6 @@ export function EquipmentShop({ game, onChange }: GameViewProps) {
   );
 }
 
-export function PlayerRecords({ game }: Pick<GameViewProps, 'game'>) {
-  return (
-    <section className="panel">
-      <h2>최근 랭크 경기</h2>
-      {game.matches.length ? (
-        <table>
-          <thead>
-            <tr>
-              <th>실험체</th>
-              <th>순위</th>
-              <th>킬</th>
-              <th>입장료</th>
-              <th>획득 RP</th>
-              <th>순 RP</th>
-            </tr>
-          </thead>
-          <tbody>
-            {game.matches.map((match, index) => (
-              <tr key={index}>
-                <td data-label="실험체">{match.name}</td>
-                <td data-label="순위">{match.place}위</td>
-                <td data-label="킬">{match.kills}</td>
-                <td data-label="입장료">{match.fee ?? 0}</td>
-                <td data-label="획득 RP">{match.gross ?? match.rp}</td>
-                <td data-label="순 RP" className={match.rp >= 0 ? 'up' : 'down'}>
-                  {match.rp >= 0 ? '+' : ''}
-                  {match.rp}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>아직 기록된 경기가 없습니다.</p>
-      )}
-      <div className="card-export">
-        <div>
-          <p className="eyebrow">CAREER CARD</p>
-          <b>내 선수의 커리어를 PNG로 저장하세요</b>
-          <small>역할·주력 실험체·랭크·숙련도·주요 기록을 한 장에 담습니다.</small>
-        </div>
-        <button onClick={() => saveCareerCard(game)}>커리어 카드 저장</button>
-      </div>
-      <h2>대회 성적</h2>
-      {game.competitionHistory.length ? (
-        <div className="competition-list">
-          {game.competitionHistory.slice(0, 12).map((record, index) => (
-            <span key={index}>
-              <b>
-                S{record.season} {record.kind} {record.stage}
-              </b>
-              <small>
-                {record.place ? `${record.place}위` : '결과 기록'}
-                {record.points ? ` · ${record.points} CP` : ''}
-              </small>
-            </span>
-          ))}
-        </div>
-      ) : (
-        <p>아직 기록된 대회가 없습니다.</p>
-      )}
-      <h2>커리어 로그</h2>
-      <ol>
-        {game.history.slice(0, 12).map((entry, index) => (
-          <li key={index}>{entry}</li>
-        ))}
-      </ol>
-    </section>
-  );
-}
-
 export function GameGuide() {
   return (
     <section className="panel">
@@ -116,8 +44,8 @@ export function GameGuide() {
         진출합니다. KEL 출전 선수는 참가할 수 없습니다.
       </p>
       <p>
-        <b>랭크 3인 스쿼드:</b> 주간 랭크 집중은 4판을 진행합니다. 매 판 시작 시 현재 RP 구간의 1/3인 파티
-        입장료를 차감하고, 순위·처치·생존 기반 게임용 점수를 더한 순 RP를 기록합니다.
+        <b>랭크 3인 스쿼드:</b> 랭크 집중 일정 한 번은 8판을 진행합니다. 매 판 시작 시 현재 RP 구간의 1/3인
+        파티 입장료를 차감하고, 순위·처치·생존 기반 게임용 점수를 더한 순 RP를 기록합니다.
       </p>
       <p>
         <b>2026 KEL:</b> 16개 지역 대표팀이 오프닝 위크, 서킷 1~4, 미드시즌 컵, 내셔널 챔피언십을 치릅니다.

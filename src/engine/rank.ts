@@ -50,8 +50,7 @@ export const rankFor = (rp: number): Rank =>
   [...RANK_BANDS].reverse().find((band) => rp >= band.min)?.rank ?? '아이언';
 
 /** Official RP divisions through Mithril. Demigod/Eternity require live server standings and remain simulated. */
-export const rankLabel = (rp: number) =>
-  DIVISION_BANDS.find((band) => rp >= band.min)?.label ?? '아이언 4';
+export const rankLabel = (rp: number) => DIVISION_BANDS.find((band) => rp >= band.min)?.label ?? '아이언 4';
 
 export const nextRankStep = (rp: number) => {
   const ascending = [...DIVISION_BANDS].reverse();
@@ -71,6 +70,12 @@ export const startingRp = (rank: Rank) =>
     데미갓: 8400,
     이터니티: 9600,
   })[rank];
+
+/** Fan-game soft reset: lower tiers retain more progress so early careers do not stall. */
+export function softResetRp(rp: number): number {
+  const rate = rp < 2400 ? 0.96 : rp < 5000 ? 0.93 : rp < 7600 ? 0.9 : 0.88;
+  return Math.max(0, Math.floor(rp * rate));
+}
 
 /** Current official fee bands for 1/3-player premades. Top-rank cutoffs are simulated. */
 export function rankEntryFee(rp: number): number {

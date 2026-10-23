@@ -20,11 +20,13 @@ import { canEnterKelStage, canEnterMasters, nextCareerGoal } from './engine/care
 import { CareerArchivePanel, ExperimentPoolPanel, RetiredCareer } from './components/CareerPanels';
 import { CreateCareer } from './components/CreateCareer';
 import { AppNavigation } from './components/AppNavigation';
-import { EquipmentShop, GameGuide, PlayerRecords } from './components/SecondaryViews';
+import { EquipmentShop, GameGuide } from './components/SecondaryViews';
+import { RankRecords } from './components/RankRecords';
+import { RankSnapshot } from './components/RankSnapshot';
 import { SeasonCenter } from './components/SeasonCenter';
 import { TournamentView } from './components/TournamentView';
 import { SeasonPlanner, SeasonReport } from './components/SeasonPlanner';
-import { SeasonRecap } from './components/SeasonRecap';
+import { SeasonRecapSummary } from './components/SeasonRecapSummary';
 import { SeasonTurningPoint } from './components/SeasonTurningPoint';
 import { TeamHub } from './components/TeamHub';
 import { ToastProvider, useToast } from './components/ToastProvider';
@@ -178,14 +180,21 @@ function App() {
             </div>
           </section>
           <section className="next-goal-hero">
-            <div><p className="eyebrow">NEXT CAREER MOMENT</p><h2>{nextGoal.title}</h2><p>{nextGoal.detail}</p></div>
+            <div>
+              <p className="eyebrow">NEXT CAREER MOMENT</p>
+              <h2>{nextGoal.title}</h2>
+              <p>{nextGoal.detail}</p>
+            </div>
             <button onClick={() => setSeasonStep(0)}>이번 시즌으로 도전하기</button>
           </section>
           <SeasonPlanner
             game={game}
             step={seasonStep}
             selected={plannedAction ?? game.lastSeasonPlan}
-            onStepChange={(nextStep) => { if (nextStep === 0) setPlannedAction(null); setSeasonStep(nextStep); }}
+            onStepChange={(nextStep) => {
+              if (nextStep === 0) setPlannedAction(null);
+              setSeasonStep(nextStep);
+            }}
             onSelect={setPlannedAction}
             onRun={playWeek}
           />
@@ -218,6 +227,7 @@ function App() {
             <small>한 번의 선택으로 12주(1시즌)가 진행되며, 1년은 약 3개 시즌입니다.</small>
           </section>
           <SeasonReport game={game} />
+          <RankSnapshot matches={game.matches} title="최근 20경기" compact />
           <SeasonTurningPoint game={game} onChange={applyGameChange} />
           <section className="hall-panel panel">
             <div>
@@ -225,7 +235,7 @@ function App() {
               <h2>{game.hallOfFame ? '명예의 전당 헌액 완료' : '명예의 전당 도전'}</h2>
             </div>
             <div className="hof-reqs">
-              <span className={hof.fame ? 'done' : ''}>명성 500</span>
+              <span className={hof.fame ? 'done' : ''}>명성 1,500</span>
               <span className={hof.trophies ? 'done' : ''}>우승 3회</span>
               <span className={hof.kel ? 'done' : ''}>KEL 선수</span>
               <span className={hof.rank ? 'done' : ''}>메테오라이트+</span>
@@ -361,7 +371,10 @@ function App() {
             <div className="season-action-intro">
               <p className="eyebrow">SEASON PLAN</p>
               <h2>한 가지 방향으로 시즌 전체를 운영합니다</h2>
-              <p>선택한 성장 방향을 기준으로 12주 일정·회복일·경기 부담을 자동 조절합니다. 주마다 컨디션을 관리할 필요가 없습니다.</p>
+              <p>
+                선택한 성장 방향을 기준으로 12주 일정·회복일·경기 부담을 자동 조절합니다. 주마다 컨디션을
+                관리할 필요가 없습니다.
+              </p>
             </div>
             {actions.map((a) => (
               <button key={a.id} onClick={() => playWeek(a.id)}>
@@ -386,9 +399,9 @@ function App() {
           onTournament={tournament}
         />
       )}
-      {tab === '선수 기록' && <PlayerRecords game={game} />}
+      {tab === '선수 기록' && <RankRecords game={game} />}
       {tab === '게임 안내' && <GameGuide />}
-      <SeasonRecap game={game} open={showSeasonRecap} onClose={() => setShowSeasonRecap(false)} />
+      <SeasonRecapSummary game={game} open={showSeasonRecap} onClose={() => setShowSeasonRecap(false)} />
     </main>
   );
 }

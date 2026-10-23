@@ -9,3 +9,5 @@
 세부 대회 규칙은 [ESPORTS_RULES.md](ESPORTS_RULES.md), 구현 수치는 [RANK_AND_CAREER_SYSTEMS.md](RANK_AND_CAREER_SYSTEMS.md)에서 관리한다.
 
 현재 게임의 실험체별 수치, 상대 전력, 이벤트 문구와 경기 결과는 **게임용 창작 데이터**다. 실제 선수의 능력치·성격·계약·사생활을 포함하지 않는다. 대회 기능은 검증 가능한 시즌 규칙을 별도 JSON 계층으로 추가한 뒤 구현한다.
+
+- [DAK.GG 이터널 리턴 전적 화면](https://dak.gg/er) — 최근 20경기의 게임 수, 평균 순위, 평균 TK, 승률, TOP 3 집계 UI 참고. 게임 규칙 수치의 출처로 사용하지 않음.

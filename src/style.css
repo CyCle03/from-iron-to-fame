@@ -2265,43 +2265,350 @@ li {
   }
 }
 
-.season-recap-backdrop { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 18px; background: rgb(4 7 18 / 84%); backdrop-filter: blur(7px); }
-.season-recap { width: min(680px, 100%); max-height: min(780px, calc(100dvh - 36px)); overflow: hidden; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; background: linear-gradient(145deg, #172243, #11182d 65%); border: 1px solid #556b9e; border-radius: 16px; box-shadow: 0 24px 80px rgb(0 0 0 / 55%); }
-.season-recap header { position: relative; padding: 22px 24px 8px; }
-.season-recap h2 { margin: 3px 36px 0 0; font-size: clamp(24px, 5vw, 34px); }
-.recap-close { position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; color: #b7c4e6; background: #263354; border: 0; border-radius: 50%; font-size: 26px; line-height: 1; }
-.recap-scoreboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 24px; }
-.recap-scoreboard span, .recap-final span { display: grid; gap: 3px; padding: 10px; background: rgb(8 13 31 / 60%); border: 1px solid #354873; border-radius: 8px; }
-.recap-scoreboard small, .recap-final small { color: #9eacca; font-size: 11px; }
-.recap-scoreboard b, .recap-final b { color: #f8c45d; font-size: 16px; }
-.recap-progress { padding: 8px 24px 14px; }
-.recap-progress > div { display: flex; justify-content: space-between; color: #b9c6e7; font-size: 13px; }
-.recap-progress i { display: block; height: 8px; margin-top: 7px; overflow: hidden; background: #071024; border-radius: 99px; }
-.recap-progress i i { margin: 0; background: linear-gradient(90deg, #ff765d, #f4bd55); transition: width .28s ease; }
-.recap-match-list { min-height: 0; overflow: auto; padding: 0 24px 14px; }
-.recap-match { display: grid; grid-template-columns: 72px 1fr auto auto; align-items: center; gap: 10px; min-height: 43px; padding: 9px 10px; border-bottom: 1px solid #29395f; animation: recap-line .24s ease-out both; }
-.recap-match > b { color: #aeb9dc; font-size: 12px; }.recap-match strong { color: #fff; }.recap-match small { color: #94a5cd; }.recap-match em { min-width: 62px; text-align: right; font-style: normal; font-weight: 800; }
-.recap-empty { color: #9eacca; }.recap-final { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 8px; padding: 14px 24px 22px; border-top: 1px solid #40547e; }.recap-final button, .recap-skip { min-height: 46px; padding: 10px 16px; border: 0; border-radius: 8px; background: #f4bd55; color: #24192a; font-weight: 900; }.recap-skip { margin: 0 24px 22px; }
-@keyframes recap-line { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 640px) { .season-recap-backdrop { align-items: end; padding: 0; }.season-recap { width: 100%; max-height: 92dvh; border-radius: 18px 18px 0 0; }.season-recap header, .recap-scoreboard, .recap-progress, .recap-match-list, .recap-final { padding-left: 16px; padding-right: 16px; }.recap-scoreboard { gap: 5px; }.recap-scoreboard span { padding: 8px; }.recap-scoreboard b { font-size: 13px; }.recap-match { grid-template-columns: 54px 1fr auto; gap: 7px; font-size: 14px; }.recap-match small { display: none; }.recap-match em { min-width: 54px; }.recap-final { grid-template-columns: 1fr 1fr; }.recap-final span:last-of-type { display: none; }.recap-final button { grid-column: 1 / -1; }.recap-skip { margin-left: 16px; margin-right: 16px; } }
-@media (prefers-reduced-motion: reduce) { .recap-match { animation: none; }.recap-progress i i { transition: none; } }
-.recap-reset { margin: 0; padding: 10px 24px; color: #d8e4ff; background: #273454; border-top: 1px solid #40547e; border-bottom: 1px solid #40547e; font-size: 13px; font-weight: 700; }
-@media (max-width: 640px) { .recap-reset { padding-left: 16px; padding-right: 16px; } }
+.season-recap-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgb(4 7 18 / 84%);
+  backdrop-filter: blur(7px);
+}
+.season-recap {
+  width: min(680px, 100%);
+  max-height: min(780px, calc(100dvh - 36px));
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  background: linear-gradient(145deg, #172243, #11182d 65%);
+  border: 1px solid #556b9e;
+  border-radius: 16px;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 55%);
+}
+.season-recap header {
+  position: relative;
+  padding: 22px 24px 8px;
+}
+.season-recap h2 {
+  margin: 3px 36px 0 0;
+  font-size: clamp(24px, 5vw, 34px);
+}
+.recap-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  color: #b7c4e6;
+  background: #263354;
+  border: 0;
+  border-radius: 50%;
+  font-size: 26px;
+  line-height: 1;
+}
+.recap-scoreboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px 24px;
+}
+.recap-scoreboard span,
+.recap-final span {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  background: rgb(8 13 31 / 60%);
+  border: 1px solid #354873;
+  border-radius: 8px;
+}
+.recap-scoreboard small,
+.recap-final small {
+  color: #9eacca;
+  font-size: 11px;
+}
+.recap-scoreboard b,
+.recap-final b {
+  color: #f8c45d;
+  font-size: 16px;
+}
+.recap-progress {
+  padding: 8px 24px 14px;
+}
+.recap-progress > div {
+  display: flex;
+  justify-content: space-between;
+  color: #b9c6e7;
+  font-size: 13px;
+}
+.recap-progress i {
+  display: block;
+  height: 8px;
+  margin-top: 7px;
+  overflow: hidden;
+  background: #071024;
+  border-radius: 99px;
+}
+.recap-progress i i {
+  margin: 0;
+  background: linear-gradient(90deg, #ff765d, #f4bd55);
+  transition: width 0.28s ease;
+}
+.recap-match-list {
+  min-height: 0;
+  overflow: auto;
+  padding: 0 24px 14px;
+}
+.recap-match {
+  display: grid;
+  grid-template-columns: 72px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 43px;
+  padding: 9px 10px;
+  border-bottom: 1px solid #29395f;
+  animation: recap-line 0.24s ease-out both;
+}
+.recap-match > b {
+  color: #aeb9dc;
+  font-size: 12px;
+}
+.recap-match strong {
+  color: #fff;
+}
+.recap-match small {
+  color: #94a5cd;
+}
+.recap-match em {
+  min-width: 62px;
+  text-align: right;
+  font-style: normal;
+  font-weight: 800;
+}
+.recap-empty {
+  color: #9eacca;
+}
+.recap-final {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) auto;
+  gap: 8px;
+  padding: 14px 24px 22px;
+  border-top: 1px solid #40547e;
+}
+.recap-final button,
+.recap-skip {
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #f4bd55;
+  color: #24192a;
+  font-weight: 900;
+}
+.recap-skip {
+  margin: 0 24px 22px;
+}
+@keyframes recap-line {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 640px) {
+  .season-recap-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+  .season-recap {
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: 18px 18px 0 0;
+  }
+  .season-recap header,
+  .recap-scoreboard,
+  .recap-progress,
+  .recap-match-list,
+  .recap-final {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .recap-scoreboard {
+    gap: 5px;
+  }
+  .recap-scoreboard span {
+    padding: 8px;
+  }
+  .recap-scoreboard b {
+    font-size: 13px;
+  }
+  .recap-match {
+    grid-template-columns: 54px 1fr auto;
+    gap: 7px;
+    font-size: 14px;
+  }
+  .recap-match small {
+    display: none;
+  }
+  .recap-match em {
+    min-width: 54px;
+  }
+  .recap-final {
+    grid-template-columns: 1fr 1fr;
+  }
+  .recap-final span:last-of-type {
+    display: none;
+  }
+  .recap-final button {
+    grid-column: 1 / -1;
+  }
+  .recap-skip {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .recap-match {
+    animation: none;
+  }
+  .recap-progress i i {
+    transition: none;
+  }
+}
+.recap-reset {
+  margin: 0;
+  padding: 10px 24px;
+  color: #d8e4ff;
+  background: #273454;
+  border-top: 1px solid #40547e;
+  border-bottom: 1px solid #40547e;
+  font-size: 13px;
+  font-weight: 700;
+}
+@media (max-width: 640px) {
+  .recap-reset {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
 
-.next-goal-hero { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 16px; padding: 20px 22px; background: linear-gradient(115deg, #22375f, #1b2440); border: 1px solid #46659c; border-radius: 14px; }
-.next-goal-hero h2 { margin: 2px 0 6px; font-size: 23px; }.next-goal-hero p { margin: 0; color: #c7d3ef; }.next-goal-hero button { min-width: 172px; min-height: 48px; padding: 10px 14px; color: #201423; background: #f4bd55; border: 0; border-radius: 9px; font-weight: 900; }
-.carryover-plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px 0 10px; }.carryover-plan span { display: grid; gap: 4px; padding: 12px; background: #111a31; border: 1px solid #40527e; border-radius: 9px; }.carryover-plan small { color: #9eacca; }.carryover-plan b { color: #f4bd55; }
-@media (max-width: 640px) { .next-goal-hero { display: grid; margin-top: 14px; padding: 18px 16px; }.next-goal-hero h2 { font-size: 22px; }.next-goal-hero button { width: 100%; }.carryover-plan { grid-template-columns: 1fr; gap: 7px; }.carryover-plan span { grid-template-columns: 1fr auto; align-items: center; }.season-wizard .wizard-actions { display: grid; grid-template-columns: 1fr; }.season-wizard .wizard-actions button { width: 100%; } }
+.next-goal-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 16px;
+  padding: 20px 22px;
+  background: linear-gradient(115deg, #22375f, #1b2440);
+  border: 1px solid #46659c;
+  border-radius: 14px;
+}
+.next-goal-hero h2 {
+  margin: 2px 0 6px;
+  font-size: 23px;
+}
+.next-goal-hero p {
+  margin: 0;
+  color: #c7d3ef;
+}
+.next-goal-hero button {
+  min-width: 172px;
+  min-height: 48px;
+  padding: 10px 14px;
+  color: #201423;
+  background: #f4bd55;
+  border: 0;
+  border-radius: 9px;
+  font-weight: 900;
+}
+.carryover-plan {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 16px 0 10px;
+}
+.carryover-plan span {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  background: #111a31;
+  border: 1px solid #40527e;
+  border-radius: 9px;
+}
+.carryover-plan small {
+  color: #9eacca;
+}
+.carryover-plan b {
+  color: #f4bd55;
+}
+@media (max-width: 640px) {
+  .next-goal-hero {
+    display: grid;
+    margin-top: 14px;
+    padding: 18px 16px;
+  }
+  .next-goal-hero h2 {
+    font-size: 22px;
+  }
+  .next-goal-hero button {
+    width: 100%;
+  }
+  .carryover-plan {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+  .carryover-plan span {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+  .season-wizard .wizard-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .season-wizard .wizard-actions button {
+    width: 100%;
+  }
+}
 
-.season-condition-note { display: block; flex-basis: 100%; padding: 10px 11px; color: #c7d3ef; background: rgb(71 98 150 / 18%); border: 1px solid #40547e; border-radius: 8px; font-size: 12px; line-height: 1.45; }
-.season-action-intro { grid-column: 1 / -1; padding: 8px 2px 2px; }
-.season-action-intro h2 { margin: 2px 0 6px; }
-.season-action-intro p:last-child { margin: 0; color: #b7c6e9; }
-@media (max-width: 640px) { .season-condition-note { grid-column: 1 / -1; } .season-action-intro { padding: 4px 0; } }
+.season-condition-note {
+  display: block;
+  flex-basis: 100%;
+  padding: 10px 11px;
+  color: #c7d3ef;
+  background: rgb(71 98 150 / 18%);
+  border: 1px solid #40547e;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.season-action-intro {
+  grid-column: 1 / -1;
+  padding: 8px 2px 2px;
+}
+.season-action-intro h2 {
+  margin: 2px 0 6px;
+}
+.season-action-intro p:last-child {
+  margin: 0;
+  color: #b7c6e9;
+}
+@media (max-width: 640px) {
+  .season-condition-note {
+    grid-column: 1 / -1;
+  }
+  .season-action-intro {
+    padding: 4px 0;
+  }
+}
 
 /* Mobile no-horizontal-scroll pass: tables become labeled cards and dense schedules reflow. */
 @media (max-width: 640px) {
-  .panel { overflow-x: hidden; }
+  .panel {
+    overflow-x: hidden;
+  }
   .panel table,
   .panel table.responsive-table {
     width: 100%;
@@ -2343,16 +2650,181 @@ li {
     border-radius: 7px !important;
     white-space: normal;
   }
-  .milestones span::after { display: none; }
+  .milestones span::after {
+    display: none;
+  }
 }
 
-.turning-point { margin-top: 16px; }
-.turning-point h2 { margin: 3px 0 6px; }
-.turning-point > div > p:last-child { color: #b7c6e9; }
-.turning-point-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin-top: 16px; }
-.turning-point-choices button { min-height: 136px; padding: 15px; text-align: left; color: #edf2ff; background: #111a31; border: 1px solid #40547e; border-radius: 10px; }
-.turning-point-choices button:hover { border-color: #f4bd55; background: #202b4b; }
-.turning-point-choices b, .turning-point-choices small, .turning-point-choices em { display: block; }
-.turning-point-choices small { margin-top: 7px; color: #adbbdc; line-height: 1.45; }
-.turning-point-choices em { margin-top: 11px; color: #f4bd55; font-size: 12px; font-style: normal; font-weight: 700; }
-@media (max-width: 640px) { .turning-point-choices { grid-template-columns: 1fr; } .turning-point-choices button { min-height: 0; } }
+.turning-point {
+  margin-top: 16px;
+}
+.turning-point h2 {
+  margin: 3px 0 6px;
+}
+.turning-point > div > p:last-child {
+  color: #b7c6e9;
+}
+.turning-point-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 16px;
+}
+.turning-point-choices button {
+  min-height: 136px;
+  padding: 15px;
+  text-align: left;
+  color: #edf2ff;
+  background: #111a31;
+  border: 1px solid #40547e;
+  border-radius: 10px;
+}
+.turning-point-choices button:hover {
+  border-color: #f4bd55;
+  background: #202b4b;
+}
+.turning-point-choices b,
+.turning-point-choices small,
+.turning-point-choices em {
+  display: block;
+}
+.turning-point-choices small {
+  margin-top: 7px;
+  color: #adbbdc;
+  line-height: 1.45;
+}
+.turning-point-choices em {
+  margin-top: 11px;
+  color: #f4bd55;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+@media (max-width: 640px) {
+  .turning-point-choices {
+    grid-template-columns: 1fr;
+  }
+  .turning-point-choices button {
+    min-height: 0;
+  }
+}
+
+.rank-snapshot {
+  margin-top: 16px;
+}
+.rank-snapshot-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 12px;
+}
+.rank-snapshot-heading h2 {
+  margin: 3px 0 0;
+}
+.rank-snapshot-heading > b {
+  color: #f4bd55;
+}
+.rank-snapshot-stats,
+.season-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+.rank-snapshot-stats span,
+.season-summary-grid span {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  background: #111a30;
+  border: 1px solid #34466d;
+  border-radius: 9px;
+}
+.rank-snapshot-stats small,
+.season-summary-grid small {
+  color: #9eacca;
+}
+.rank-snapshot-stats b,
+.season-summary-grid b {
+  color: #f4bd55;
+  font-size: 20px;
+}
+.placement-strip {
+  display: grid;
+  grid-template-columns: repeat(20, minmax(0, 1fr));
+  gap: 3px;
+  margin-top: 9px;
+}
+.placement-strip i {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  aspect-ratio: 1;
+  color: #aeb9dc;
+  background: #18223d;
+  border-radius: 4px;
+  font-size: 11px;
+  font-style: normal;
+}
+.placement-strip .top3 {
+  color: #10172a;
+  background: #78b7ef;
+  font-weight: 800;
+}
+.placement-strip .win {
+  color: #251a0b;
+  background: #f4bd55;
+}
+.records-page > .rank-snapshot {
+  margin: 0 0 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.season-recap-summary {
+  grid-template-rows: auto auto auto auto auto auto;
+  overflow: auto;
+}
+.season-recap-summary .season-summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0 24px 14px;
+  margin: 0;
+}
+.season-summary-note {
+  display: grid;
+  gap: 3px;
+  margin: 0 24px 12px;
+  padding: 12px;
+  color: #c7d3ef;
+  background: #1b2948;
+  border-radius: 8px;
+}
+.season-summary-note b {
+  color: #f4bd55;
+}
+.recap-summary-final {
+  grid-template-columns: repeat(2, 1fr) auto;
+}
+@media (max-width: 640px) {
+  .rank-snapshot-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rank-snapshot-stats span:last-child {
+    grid-column: 1 / -1;
+  }
+  .placement-strip {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+  .season-recap-summary .season-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .season-summary-note {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+  .recap-summary-final {
+    grid-template-columns: 1fr 1fr;
+  }
+}

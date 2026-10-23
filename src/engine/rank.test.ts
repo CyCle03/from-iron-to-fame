@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { nextRankStep, rankLabel } from './rank';
+import { nextRankStep, rankLabel, softResetRp } from './rank';
 
 describe('official rank divisions', () => {
   it('maps 2,296 RP to Silver 1 and the 2,400 RP Gold threshold', () => {
@@ -23,5 +23,13 @@ describe('official rank score table', () => {
     expect(rankScoreFor(1, 2, 1, 1, 1)).toBe(71);
     expect(rankScoreFor(2, 1, 1, 0, 0)).toBe(39);
     expect(rankScoreFor(8, 1, 1, 0, 0)).toBe(6);
+  });
+});
+
+describe('fan-game rank progression', () => {
+  it('retains more low-tier RP during the soft reset', () => {
+    expect(softResetRp(2000)).toBe(1920);
+    expect(softResetRp(3000)).toBe(2790);
+    expect(softResetRp(8000)).toBe(7040);
   });
 });

@@ -26,7 +26,7 @@ export function retireCareer(game: Game): Game {
 
 export const hallOfFameProgress = (game: Game) => ({
   retired: game.retired,
-  fame: game.fame >= 500,
+  fame: game.fame >= 1500,
   trophies: game.trophies >= 3,
   kel: game.careerLeague === 'KEL' || game.teamHistory.some((team) => team.includes('KEL')),
   rank: game.rp >= 6400,
@@ -36,7 +36,7 @@ export function inductHallOfFame(game: Game): Game {
   if (!Object.values(hallOfFameProgress(game)).every(Boolean)) {
     return {
       ...game,
-      notices: ['명예의 전당 조건: 은퇴 · 명성 500 · 우승 3회 · KEL 경력 · 메테오라이트 이상'],
+      notices: ['명예의 전당 조건: 은퇴 · 명성 1,500 · 우승 3회 · KEL 경력 · 메테오라이트 이상'],
     };
   }
   const next = structuredClone(game);

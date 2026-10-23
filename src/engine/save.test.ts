@@ -17,7 +17,18 @@ describe('save migration', () => {
     delete oldSave.awards;
     delete oldSave.teamHistory;
     delete oldSave.experimentPool;
-    oldSave.lastSeasonSummary = { season: 11, plan: 'rank', rpBefore: 2400, rpAfter: 2500, rankBefore: '골드', rankAfter: '골드', fameGained: 4, matches: 4, bestPlace: 1, tournamentEvents: 0 };
+    oldSave.lastSeasonSummary = {
+      season: 11,
+      plan: 'rank',
+      rpBefore: 2400,
+      rpAfter: 2500,
+      rankBefore: '골드',
+      rankAfter: '골드',
+      fameGained: 4,
+      matches: 4,
+      bestPlace: 1,
+      tournamentEvents: 0,
+    };
 
     const migrated = migrateGameSave(oldSave);
 

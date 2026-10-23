@@ -71,14 +71,20 @@ describe('career engine', () => {
     const after = runSeason(before, 'rank');
     expect(after.season).toBe(before.season + 1);
     expect(after.trainingFocus).toHaveLength(2);
-    expect(after.matches).toHaveLength(28);
-    expect(after.lastSeasonSummary?.matches).toBe(28);
+    expect(after.matches).toHaveLength(56);
+    expect(after.lastSeasonSummary?.matches).toBe(56);
     expect(after.lastSeasonPlan).toBe('rank');
     expect(after.fatigue).toBe(12);
     expect(after.lastSeasonSummary?.seasonCondition).toBe('집중 운영');
     expect(after.lastSeasonSummary?.autoRecoveryWeeks).toBeGreaterThan(0);
     expect(after.mastersPhase).toBe(0);
     expect(after.kelStage).toBe(0);
+  });
+  it('lets a low-tier rank-focused career make visible progress in one season', () => {
+    const before = createGame('등반', '아이언', '일반 유저', '유키');
+    const after = runSeason(before, 'rank', createSeededRandom(20261023));
+    expect(after.rp).toBeGreaterThanOrEqual(600);
+    expect(after.lastSeasonSummary?.matches).toBe(56);
   });
   it('applies one turning-point choice after a season', () => {
     const completed = runSeason(createGame('테스트', '골드', '일반 유저', '유키'), 'rank');
@@ -91,7 +97,7 @@ describe('career engine', () => {
   it('soft-resets RP and unlocks career progression', () => {
     const base = { ...createGame('테스트', '골드', '일반 유저', '유키'), week: 12, rp: 3000 };
     const reset = nextWeek(base);
-    expect(reset.rp).toBe(2460);
+    expect(reset.rp).toBe(2790);
     const cup = playCommunityCup({ ...reset, rp: 1400 });
     expect(cup.fame).toBeGreaterThan(0);
     expect(cup.competitionHistory[0].place).toBeGreaterThanOrEqual(1);
@@ -118,7 +124,7 @@ describe('career engine', () => {
     let g: Game = {
       ...createGame('전설', '메테오라이트', '일반 유저', '유키'),
       rp: 7000,
-      fame: 500,
+      fame: 1500,
       trophies: 3,
       careerLeague: 'KEL' as const,
       retired: true,
@@ -141,7 +147,7 @@ describe('career engine', () => {
   it('records rank games and grows practical skills', () => {
     const before = createGame('테스트', '골드', '일반 유저', '유키');
     const g = act(before, 'rank');
-    expect(g.matches).toHaveLength(4);
+    expect(g.matches).toHaveLength(8);
     expect(g.matches.every((m) => typeof m.fee === 'number' && typeof m.gross === 'number')).toBe(true);
     expect(g.matches.every((m) => m.place >= 1 && m.place <= 8)).toBe(true);
     expect(g.rank).toBeTruthy();
@@ -269,7 +275,7 @@ describe('career archive', () => {
     const active: Game = {
       ...createGame('전설', '메테오라이트', '일반 유저', '유키'),
       rp: 7000,
-      fame: 500,
+      fame: 1500,
       trophies: 3,
       careerLeague: 'KEL',
       teamName: 'KEL 시티 유나이티드',

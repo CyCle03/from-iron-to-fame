@@ -104,7 +104,14 @@ export function migrateGameSave(raw: unknown): Game | null {
             ? savedSummary.conditionNote
             : '시즌 종료 후 다음 시즌을 위한 자동 정비가 완료되었습니다.',
         autoRecoveryWeeks:
-          typeof savedSummary.autoRecoveryWeeks === 'number' ? Math.max(0, Math.floor(savedSummary.autoRecoveryWeeks)) : 0,
+          typeof savedSummary.autoRecoveryWeeks === 'number'
+            ? Math.max(0, Math.floor(savedSummary.autoRecoveryWeeks))
+            : 0,
+        averagePlace: typeof savedSummary.averagePlace === 'number' ? savedSummary.averagePlace : 0,
+        averageTk: typeof savedSummary.averageTk === 'number' ? savedSummary.averageTk : 0,
+        wins: typeof savedSummary.wins === 'number' ? savedSummary.wins : 0,
+        top3: typeof savedSummary.top3 === 'number' ? savedSummary.top3 : 0,
+        totalRp: typeof savedSummary.totalRp === 'number' ? savedSummary.totalRp : 0,
       } as Game['lastSeasonSummary'])
     : null;
 
@@ -118,7 +125,10 @@ export function migrateGameSave(raw: unknown): Game | null {
     main,
     season,
     trainingFocus: trainingFocus.length === 2 ? trainingFocus : DEFAULT_FOCUS,
-    lastSeasonPlan: typeof raw.lastSeasonPlan === 'string' && ACTIONS.has(raw.lastSeasonPlan) ? raw.lastSeasonPlan as Game['lastSeasonPlan'] : baseline.lastSeasonPlan,
+    lastSeasonPlan:
+      typeof raw.lastSeasonPlan === 'string' && ACTIONS.has(raw.lastSeasonPlan)
+        ? (raw.lastSeasonPlan as Game['lastSeasonPlan'])
+        : baseline.lastSeasonPlan,
     turningPointAvailable: raw.turningPointAvailable === true,
     lastSeasonSummary,
     experimentPool: experimentPool.slice(0, 3),
