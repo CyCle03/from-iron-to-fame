@@ -198,6 +198,7 @@ export type SeasonSummary = {
   conditionNote: string;
   autoRecoveryWeeks: number;
 };
+export type SeasonTurningPoint = 'pool' | 'team' | 'analysis';
 export type TeamMember = {
   nickname: string;
   experiment: string;
@@ -247,11 +248,12 @@ export type CareerTotals = {
   bestPlace: number | null;
   representative: string;
 };
-export const CURRENT_SAVE_VERSION = 3 as const;
+export const CURRENT_SAVE_VERSION = 4 as const;
 export type Game = {
   lastSeasonPlan: Action;
   trainingFocus: StatKey[];
   seasonEvent: string;
+  turningPointAvailable: boolean;
   teammateRoles: Role[];
   teammateExperiments: string[];
   experimentPool: string[];
@@ -530,6 +532,7 @@ export function createGame(
     competitionHistory: [],
     mastersSeason: createMastersSeason(11, null),
     seasonEvent: '시즌 시작 이벤트: 코치진이 성장 중점을 점검했습니다.',
+    turningPointAvailable: false,
     version: CURRENT_SAVE_VERSION,
     name,
     rank,
@@ -850,6 +853,7 @@ export function runSeason(g: Game, a: Action, random: RandomSource = Math.random
   const before = { season: g.season, rp: g.rp, rank: g.rank, fame: g.fame, matches: g.matches.length };
   const n = simulateSeason(g, a, random);
   n.lastSeasonPlan = a;
+  n.turningPointAvailable = true;
   const recent = n.matches.slice(0, Math.max(0, n.matches.length - before.matches));
   const autoRecoveryWeeks = n.history.filter(
     (entry) => entry.startsWith('S' + before.season + ' ') && entry.includes('자동 회복 배분'),
@@ -907,6 +911,34 @@ export function runSeason(g: Game, a: Action, random: RandomSource = Math.random
   n.history.unshift('새 시즌 개막 · ' + n.seasonMeta.name + ' · 마스터즈와 KEL 일정이 초기화되었습니다.');
   return n;
 }
+export function resolveSeasonTurningPoint(g: Game, choice: SeasonTurningPoint): Game {
+  if (!g.turningPointAvailable) return g;
+  const n = structuredClone(g);
+  if (choice === 'pool') {
+    const target = n.experimentPool.find((experiment) => experiment !== n.main) ?? n.main;
+    n.mastery[target] = clamp((n.mastery[target] ?? 0) + 7);
+    n.stats.adaptability = clamp(n.stats.adaptability + 2);
+    n.history.unshift("S" + n.season + " 전환점 · " + target + " 분석을 통해 밴픽 대응 폭을 넓혔습니다.");
+    n.notices = ["전환점 완료 · " + target + " 숙련도 +7 · 적응력 +2"];
+  }
+  if (choice === 'team') {
+    n.stats.teamwork = clamp(n.stats.teamwork + 4);
+    n.morale = clamp(n.morale + 3);
+    n.teamMembers = n.teamMembers.map((member) => member.starter ? { ...member, form: clamp(member.form + 4) } : member);
+    n.history.unshift("S" + n.season + " 전환점 · 스쿼드 교전 콜을 맞추며 팀 호흡을 다졌습니다.");
+    n.notices = ["전환점 완료 · 팀워크 +4 · 멘탈 +3 · 주전 폼 +4"];
+  }
+  if (choice === 'analysis') {
+    n.stats.macro = clamp(n.stats.macro + 3);
+    n.stats.judgement = clamp(n.stats.judgement + 3);
+    n.stats.mental = clamp(n.stats.mental + 1);
+    n.history.unshift("S" + n.season + " 전환점 · 안전 구역과 교전 로그를 다시 분석했습니다.");
+    n.notices = ["전환점 완료 · 운영 +3 · 판단 +3 · 멘탈 +1"];
+  }
+  n.turningPointAvailable = false;
+  return n;
+}
+
 export function buyEquipment(g: Game, id: string): Game {
   const item = equipmentById.get(id);
   if (!item || g.credits < item.cost || (g.equipment ?? []).includes(id)) return g;

@@ -2345,3 +2345,14 @@ li {
   }
   .milestones span::after { display: none; }
 }
+
+.turning-point { margin-top: 16px; }
+.turning-point h2 { margin: 3px 0 6px; }
+.turning-point > div > p:last-child { color: #b7c6e9; }
+.turning-point-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin-top: 16px; }
+.turning-point-choices button { min-height: 136px; padding: 15px; text-align: left; color: #edf2ff; background: #111a31; border: 1px solid #40547e; border-radius: 10px; }
+.turning-point-choices button:hover { border-color: #f4bd55; background: #202b4b; }
+.turning-point-choices b, .turning-point-choices small, .turning-point-choices em { display: block; }
+.turning-point-choices small { margin-top: 7px; color: #adbbdc; line-height: 1.45; }
+.turning-point-choices em { margin-top: 11px; color: #f4bd55; font-size: 12px; font-style: normal; font-weight: 700; }
+@media (max-width: 640px) { .turning-point-choices { grid-template-columns: 1fr; } .turning-point-choices button { min-height: 0; } }

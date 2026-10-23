@@ -119,6 +119,7 @@ export function migrateGameSave(raw: unknown): Game | null {
     season,
     trainingFocus: trainingFocus.length === 2 ? trainingFocus : DEFAULT_FOCUS,
     lastSeasonPlan: typeof raw.lastSeasonPlan === 'string' && ACTIONS.has(raw.lastSeasonPlan) ? raw.lastSeasonPlan as Game['lastSeasonPlan'] : baseline.lastSeasonPlan,
+    turningPointAvailable: raw.turningPointAvailable === true,
     lastSeasonSummary,
     experimentPool: experimentPool.slice(0, 3),
     mastery,

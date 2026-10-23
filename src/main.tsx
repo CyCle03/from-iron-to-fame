@@ -25,6 +25,7 @@ import { SeasonCenter } from './components/SeasonCenter';
 import { TournamentView } from './components/TournamentView';
 import { SeasonPlanner, SeasonReport } from './components/SeasonPlanner';
 import { SeasonRecap } from './components/SeasonRecap';
+import { SeasonTurningPoint } from './components/SeasonTurningPoint';
 import { TeamHub } from './components/TeamHub';
 import { ToastProvider, useToast } from './components/ToastProvider';
 import { SEASON_ACTIONS, type NavigationTab } from './constants/ui';
@@ -217,6 +218,7 @@ function App() {
             <small>한 번의 선택으로 12주(1시즌)가 진행되며, 1년은 약 3개 시즌입니다.</small>
           </section>
           <SeasonReport game={game} />
+          <SeasonTurningPoint game={game} onChange={applyGameChange} />
           <section className="hall-panel panel">
             <div>
               <p className="eyebrow">HALL OF FAME</p>

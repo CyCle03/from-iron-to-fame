@@ -29,6 +29,7 @@ import {
   hasExperimentTag,
   hallOfFameProgress,
   inductHallOfFame,
+  resolveSeasonTurningPoint,
   type Game,
 } from './game';
 import { createSeededRandom } from './random';
@@ -78,6 +79,14 @@ describe('career engine', () => {
     expect(after.lastSeasonSummary?.autoRecoveryWeeks).toBeGreaterThan(0);
     expect(after.mastersPhase).toBe(0);
     expect(after.kelStage).toBe(0);
+  });
+  it('applies one turning-point choice after a season', () => {
+    const completed = runSeason(createGame('테스트', '골드', '일반 유저', '유키'), 'rank');
+    const before = completed.stats.macro;
+    const resolved = resolveSeasonTurningPoint(completed, 'analysis');
+    expect(resolved.turningPointAvailable).toBe(false);
+    expect(resolved.stats.macro).toBe(before + 3);
+    expect(resolveSeasonTurningPoint(resolved, 'team')).toEqual(resolved);
   });
   it('soft-resets RP and unlocks career progression', () => {
     const base = { ...createGame('테스트', '골드', '일반 유저', '유키'), week: 12, rp: 3000 };
