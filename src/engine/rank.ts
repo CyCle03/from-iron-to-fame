@@ -84,3 +84,29 @@ export function rankEntryFee(rp: number): number {
   if (rp < 9600) return 58;
   return 58 + Math.floor((rp - 9600) / 250) * 2;
 }
+
+const SURVIVAL_POINTS = [40, 25, 20, 10, 5, 5, 0, 0];
+const ELIMINATION_POINTS = [10, 9, 8, 7, 6, 6, 4, 4];
+const DOWN_POINTS = [5, 4.5, 4, 3.5, 3, 3, 2, 2];
+
+/**
+ * Official rank score table for an eight-team squad match.
+ * The simulator uses a 1.0 match-tier modifier because it has no live matchmaking average.
+ */
+export const rankScoreFor = (
+  place: number,
+  eliminations: number,
+  normalDowns: number,
+  preventionDowns: number,
+  preventionTerminates: number,
+  matchTierModifier = 1,
+) => {
+  const index = Math.max(0, Math.min(7, Math.floor(place) - 1));
+  const score =
+    SURVIVAL_POINTS[index] +
+    eliminations * ELIMINATION_POINTS[index] * matchTierModifier +
+    normalDowns * DOWN_POINTS[index] * matchTierModifier +
+    preventionDowns * 3 * matchTierModifier +
+    preventionTerminates * 3 * matchTierModifier;
+  return Math.round(score);
+};

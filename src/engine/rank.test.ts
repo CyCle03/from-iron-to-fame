@@ -16,3 +16,12 @@ describe('official rank divisions', () => {
     expect(rankLabel(7600)).toBe('미스릴');
   });
 });
+
+describe('official rank score table', () => {
+  it('adds survival, elimination, normal down, prevention down and terminate scores', async () => {
+    const { rankScoreFor } = await import('./rank');
+    expect(rankScoreFor(1, 2, 1, 1, 1)).toBe(71);
+    expect(rankScoreFor(2, 1, 1, 0, 0)).toBe(39);
+    expect(rankScoreFor(8, 1, 1, 0, 0)).toBe(6);
+  });
+});

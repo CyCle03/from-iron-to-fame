@@ -1,5 +1,5 @@
 import type { RandomSource } from './random';
-import { rankEntryFee, rankFor, startingRp } from './rank';
+import { rankEntryFee, rankFor, rankScoreFor, startingRp } from './rank';
 
 export type Rank =
   | '아이언'
@@ -182,7 +182,7 @@ export type Stats = {
   focus: number;
   adaptability: number;
 };
-export type Match = { place: number; kills: number; rp: number; name: string; fee?: number; gross?: number };
+export type Match = { place: number; kills: number; downs?: number; preventionDowns?: number; terminates?: number; rp: number; name: string; fee?: number; gross?: number };
 export type SeasonSummary = {
   season: number;
   plan: Action;
@@ -638,8 +638,11 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
           ? 5
           : 0);
       const place = Math.max(1, Math.min(8, Math.round(9 - power / 12)));
-      const kills = Math.max(0, Math.round((power - 36) / 16 + random() * 3));
-      const gross = Math.max(0, Math.round((9 - place) * 14 + kills * 6 + (random() - 0.5) * 10));
+      const kills = Math.max(0, Math.min(8, Math.round((power - 38) / 16 + random() * 2)));
+      const downs = Math.max(0, Math.round((power - 40) / 18 + random() * 2));
+      const preventionDowns = random() > 0.68 ? 1 : 0;
+      const terminates = preventionDowns && random() > 0.55 ? 1 : 0;
+      const gross = rankScoreFor(place, kills, downs, preventionDowns, terminates);
       const delta = gross - fee;
       n.rp = Math.max(0, n.rp + delta);
       n.rank = rankFor(n.rp);
@@ -652,7 +655,7 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
       if (kills >= 3) gain('physical', 0.45);
       n.credits += Math.max(20, 55 + kills * 12 + (9 - place) * 15);
       n.fame = (n.fame ?? 0) + Math.max(0, 9 - place);
-      n.matches.unshift({ place, kills, rp: delta, name: n.main, fee, gross });
+      n.matches.unshift({ place, kills, downs, preventionDowns, terminates, rp: delta, name: n.main, fee, gross });
       totalNet += delta;
       totalFee += fee;
       totalKills += kills;
@@ -1243,4 +1246,4 @@ export function renewContract(g: Game): Game {
 }
 
 export { careerTotals, hallOfFameProgress, inductHallOfFame, retireCareer } from './career';
-export { rankEntryFee, rankLabel, nextRankStep } from './rank';
+export { rankEntryFee, rankLabel, nextRankStep, rankScoreFor } from './rank';

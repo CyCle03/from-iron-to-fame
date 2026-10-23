@@ -50,8 +50,8 @@ export function SeasonRecap({ game, open, onClose }: Props) {
           {visible.map((match, index) => (
             <div className="recap-match" key={`${index}-${match.place}-${match.rp}`}>
               <b>{String(index + 1).padStart(2, '0')}경기</b>
-              <span><strong>{match.place}등</strong> · {match.kills}킬</span>
-              <small>입장료 {match.fee ?? 0} RP</small>
+              <span><strong>{match.place}등</strong> · 제거 {match.kills} · 빈사 {match.downs ?? 0}</span>
+              <small>획득 {match.gross ?? 0} · 입장료 {match.fee ?? 0} RP</small>
               <em className={match.rp >= 0 ? 'up' : 'down'}>{match.rp >= 0 ? '+' : ''}{match.rp} RP</em>
             </div>
           ))}
