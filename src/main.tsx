@@ -147,10 +147,6 @@ function App() {
             <b>{game.rp.toLocaleString()} RP</b>
           </div>
           <div>
-            <small>컨디션</small>
-            <b>{100 - game.fatigue}/100</b>
-          </div>
-          <div>
             <small>다음 승급</small>
             <b>{rankStep ? rankStep.label + '까지 ' + (rankStep.min - game.rp) + ' RP' : '서버 순위'}</b>
           </div>
@@ -243,11 +239,11 @@ function App() {
             <div className="portrait">{game.main.slice(0, 1)}</div>
             <div className="hud-bars">
               <div>
-                <span>컨디션</span>
-                <i>
-                  <i style={{ width: 100 - game.fatigue + '%' }} />
+                <span>시즌 운영</span>
+                <i className="mental">
+                  <i style={{ width: '100%' }} />
                 </i>
-                <b>{100 - game.fatigue}</b>
+                <b>{game.lastSeasonSummary?.seasonCondition ?? '준비'}</b>
               </div>
               <div>
                 <span>멘탈</span>
@@ -277,9 +273,6 @@ function App() {
             <article>
               <h2>선수 상태</h2>
               <div className="status">
-                <span>
-                  피로도 <b>{game.fatigue}</b>
-                </span>
                 <span>
                   멘탈 <b>{game.morale}</b>
                 </span>
@@ -331,8 +324,8 @@ function App() {
               <h2>다음 목표</h2>
               <p>{nextGoal.title}</p>
               <small>{nextGoal.detail}</small>
-              <button className="goal-cta" onClick={() => setTab('주간 행동')}>
-                이번 주 계획 세우기 →
+              <button className="goal-cta" onClick={() => setTab('시즌 플랜')}>
+                시즌 계획 세우기 →
               </button>
             </article>
           </section>
@@ -360,9 +353,14 @@ function App() {
           onTournament={tournament}
         />
       )}
-      {tab === '주간 행동' && (
+      {tab === '시즌 플랜' && (
         <>
           <section className="actions">
+            <div className="season-action-intro">
+              <p className="eyebrow">SEASON PLAN</p>
+              <h2>한 가지 방향으로 시즌 전체를 운영합니다</h2>
+              <p>선택하면 12주 일정과 회복은 자동 배분됩니다. 주마다 컨디션을 관리할 필요가 없습니다.</p>
+            </div>
             {actions.map((a) => (
               <button key={a.id} onClick={() => playWeek(a.id)}>
                 <b>{a.title}</b>

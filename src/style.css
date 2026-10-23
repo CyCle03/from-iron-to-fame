@@ -2292,3 +2292,9 @@ li {
 .next-goal-hero h2 { margin: 2px 0 6px; font-size: 23px; }.next-goal-hero p { margin: 0; color: #c7d3ef; }.next-goal-hero button { min-width: 172px; min-height: 48px; padding: 10px 14px; color: #201423; background: #f4bd55; border: 0; border-radius: 9px; font-weight: 900; }
 .carryover-plan { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px 0 10px; }.carryover-plan span { display: grid; gap: 4px; padding: 12px; background: #111a31; border: 1px solid #40527e; border-radius: 9px; }.carryover-plan small { color: #9eacca; }.carryover-plan b { color: #f4bd55; }
 @media (max-width: 640px) { .next-goal-hero { display: grid; margin-top: 14px; padding: 18px 16px; }.next-goal-hero h2 { font-size: 22px; }.next-goal-hero button { width: 100%; }.carryover-plan { grid-template-columns: 1fr; gap: 7px; }.carryover-plan span { grid-template-columns: 1fr auto; align-items: center; }.season-wizard .wizard-actions { display: grid; grid-template-columns: 1fr; }.season-wizard .wizard-actions button { width: 100%; } }
+
+.season-condition-note { display: block; flex-basis: 100%; padding: 10px 11px; color: #c7d3ef; background: rgb(71 98 150 / 18%); border: 1px solid #40547e; border-radius: 8px; font-size: 12px; line-height: 1.45; }
+.season-action-intro { grid-column: 1 / -1; padding: 8px 2px 2px; }
+.season-action-intro h2 { margin: 2px 0 6px; }
+.season-action-intro p:last-child { margin: 0; color: #b7c6e9; }
+@media (max-width: 640px) { .season-condition-note { grid-column: 1 / -1; } .season-action-intro { padding: 4px 0; } }

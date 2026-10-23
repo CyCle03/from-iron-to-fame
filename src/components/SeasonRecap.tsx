@@ -62,6 +62,7 @@ export function SeasonRecap({ game, open, onClose }: Props) {
             <span><small>최종 티어</small><b>{rankLabel(summary.rpBefore)} → {rankLabel(summary.rpAfter)}</b></span>
             <span><small>최고 순위</small><b>{summary.bestPlace ? `${summary.bestPlace}등` : '-'}</b></span>
             <span><small>명성</small><b>+{summary.fameGained}</b></span>
+            <span><small>시즌 운영</small><b>{summary.seasonCondition}</b></span>
             <button onClick={onClose}>결산 확인</button>
           </footer></>
         ) : <button className="recap-skip" onClick={() => setRevealed(matches.length)}>빠르게 결과 보기</button>}

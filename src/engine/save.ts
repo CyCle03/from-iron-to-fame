@@ -91,6 +91,20 @@ export function migrateGameSave(raw: unknown): Game | null {
   const season =
     typeof raw.season === 'number' && Number.isFinite(raw.season) ? Math.max(11, Math.floor(raw.season)) : 11;
   const teamName = typeof raw.teamName === 'string' ? raw.teamName : null;
+  const savedSummary = isRecord(raw.lastSeasonSummary) ? raw.lastSeasonSummary : null;
+  const lastSeasonSummary = savedSummary
+    ? ({
+        ...savedSummary,
+        seasonCondition:
+          savedSummary.seasonCondition === '집중 운영' || savedSummary.seasonCondition === '회복 운영'
+            ? savedSummary.seasonCondition
+            : '균형 운영',
+        conditionNote:
+          typeof savedSummary.conditionNote === 'string'
+            ? savedSummary.conditionNote
+            : '시즌 종료 후 다음 시즌을 위한 자동 정비가 완료되었습니다.',
+      } as Game['lastSeasonSummary'])
+    : null;
 
   return {
     ...baseline,
@@ -103,6 +117,7 @@ export function migrateGameSave(raw: unknown): Game | null {
     season,
     trainingFocus: trainingFocus.length === 2 ? trainingFocus : DEFAULT_FOCUS,
     lastSeasonPlan: typeof raw.lastSeasonPlan === 'string' && ACTIONS.has(raw.lastSeasonPlan) ? raw.lastSeasonPlan as Game['lastSeasonPlan'] : baseline.lastSeasonPlan,
+    lastSeasonSummary,
     experimentPool: experimentPool.slice(0, 3),
     mastery,
     teammateExperiments,

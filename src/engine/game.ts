@@ -194,6 +194,8 @@ export type SeasonSummary = {
   matches: number;
   bestPlace: number | null;
   tournamentEvents: number;
+  seasonCondition: '집중 운영' | '균형 운영' | '회복 운영';
+  conditionNote: string;
 };
 export type TeamMember = {
   nickname: string;
@@ -244,7 +246,7 @@ export type CareerTotals = {
   bestPlace: number | null;
   representative: string;
 };
-export const CURRENT_SAVE_VERSION = 2 as const;
+export const CURRENT_SAVE_VERSION = 3 as const;
 export type Game = {
   lastSeasonPlan: Action;
   trainingFocus: StatKey[];
@@ -841,6 +843,14 @@ export function runSeason(g: Game, a: Action, random: RandomSource = Math.random
   const n = simulateSeason(g, a, random);
   n.lastSeasonPlan = a;
   const recent = n.matches.slice(0, Math.max(0, n.matches.length - before.matches));
+  const seasonCondition =
+    a === 'rank' ? '집중 운영' : a === 'rest' || a === 'review' || a === 'macro' ? '회복 운영' : '균형 운영';
+  const conditionNote =
+    seasonCondition === '집중 운영'
+      ? '랭크 경기 비중이 높은 시즌입니다. 누적 부담은 다음 시즌 시작 전에 자동 정비됩니다.'
+      : seasonCondition === '회복 운영'
+        ? '분석과 회복을 우선해 다음 시즌을 위한 기반을 다졌습니다.'
+        : '훈련·팀 연습·실전을 균형 있게 배분했습니다.';
   n.lastSeasonSummary = {
     season: before.season,
     plan: a,
@@ -852,12 +862,16 @@ export function runSeason(g: Game, a: Action, random: RandomSource = Math.random
     matches: recent.length,
     bestPlace: recent.length ? Math.min(...recent.map((m) => m.place)) : null,
     tournamentEvents: 0,
+    seasonCondition,
+    conditionNote,
   };
+  // 피로는 시즌 안에서만 경기력에 반영한다. 다음 시즌에는 자동 정비되어 반복적인 휴식 관리가 필요 없다.
+  n.fatigue = 12;
   n.teamMembers = (n.teamMembers ?? []).map((member) => ({
     ...member,
     skill: clamp(member.skill + (a === 'team' ? 3 : 1)),
     form: clamp(48 + random() * 18),
-    fatigue: clamp(a === 'rest' ? member.fatigue - 15 : member.fatigue + 4),
+    fatigue: 12,
   }));
   if (n.contract) {
     n.credits += n.contract.salary;
@@ -1086,11 +1100,9 @@ export function nextWeek(g: Game, random: RandomSource = Math.random): Game {
     n.notices = ['시즌 ' + n.season + ' 소프트 리셋 · ' + before + ' RP → ' + n.rp + ' RP'];
   } else {
     const e =
-      n.fatigue > 75
-        ? '피로가 누적되었습니다. 휴식도 성장의 일부입니다.'
-        : random() > 0.75
-          ? '스카우트가 최근 경기 기록을 주목합니다.'
-          : '다음 대회까지 랭크와 연습으로 기반을 다져보세요.';
+      random() > 0.75
+        ? '스카우트가 최근 경기 기록을 주목합니다.'
+        : '다음 대회까지 랭크와 연습으로 기반을 다져보세요.';
     n.notices = [e];
   }
   n.actionPoints = 3;

@@ -66,7 +66,7 @@ export function SeasonPlanner({ game, step, selected, onStepChange, onSelect, on
             <span><small>랭크 경기</small><b>약 {plan.rankedMatches}판</b></span>
             <span><small>공식 일정</small><b>{officialSchedule}</b></span>
           </div>
-          <p className="preview-note">선수 능력치, 메타, 피로와 경기 결과에 따라 시즌 결과가 달라집니다.</p>
+          <p className="preview-note">선수 능력치, 메타, 시즌 계획과 경기 결과에 따라 시즌 결과가 달라집니다.</p>
           <div className="wizard-actions">
             <button onClick={() => onStepChange(1)}>다시 고르기</button>
             <button className="primary" onClick={() => onRun(plan.id)}>이 계획으로 시즌 진행</button>
@@ -95,6 +95,8 @@ export function SeasonReport({ game }: { game: Game }) {
         <span>랭크 경기 <b>{summary.matches}판</b></span>
         <span>최고 순위 <b>{summary.bestPlace ? String(summary.bestPlace) + '위' : '-'}</b></span>
         <span>공식 일정 <b>{summary.tournamentEvents}개</b></span>
+        <span>시즌 운영 <b>{summary.seasonCondition}</b></span>
+        <small className="season-condition-note">{summary.conditionNote}</small>
       </div>
     </section>
   );

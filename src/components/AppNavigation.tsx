@@ -13,7 +13,7 @@ type AppNavigationProps = {
 const labels: Record<NavigationTab, string> = {
   대시보드: '홈',
   '시즌 센터': '시즌',
-  '주간 행동': '훈련',
+  '시즌 플랜': '훈련',
   팀: '팀',
   '장비 상점': '장비',
   대회: '대회',

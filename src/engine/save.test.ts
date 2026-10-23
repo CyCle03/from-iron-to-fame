@@ -17,12 +17,14 @@ describe('save migration', () => {
     delete oldSave.awards;
     delete oldSave.teamHistory;
     delete oldSave.experimentPool;
+    oldSave.lastSeasonSummary = { season: 11, plan: 'rank', rpBefore: 2400, rpAfter: 2500, rankBefore: '골드', rankAfter: '골드', fameGained: 4, matches: 4, bestPlace: 1, tournamentEvents: 0 };
 
     const migrated = migrateGameSave(oldSave);
 
     expect(migrated?.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated?.awards).toEqual([]);
     expect(migrated?.experimentPool).toHaveLength(3);
+    expect(migrated?.lastSeasonSummary?.seasonCondition).toBe('균형 운영');
     expect(migrated && validateGameState(migrated)).toEqual([]);
   });
 

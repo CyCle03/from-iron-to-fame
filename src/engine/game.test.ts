@@ -73,7 +73,8 @@ describe('career engine', () => {
     expect(after.matches).toHaveLength(28);
     expect(after.lastSeasonSummary?.matches).toBe(28);
     expect(after.lastSeasonPlan).toBe('rank');
-    expect(after.fatigue).toBeLessThanOrEqual(65);
+    expect(after.fatigue).toBe(12);
+    expect(after.lastSeasonSummary?.seasonCondition).toBe('집중 운영');
     expect(after.mastersPhase).toBe(0);
     expect(after.kelStage).toBe(0);
   });
