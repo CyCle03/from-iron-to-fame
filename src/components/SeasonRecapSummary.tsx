@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { rankLabel, type Game } from '../engine/game';
+import { buildSeasonRecapView } from '../engine/seasonRecap';
 
 type Props = { game: Game; open: boolean; onClose: () => void };
 
@@ -12,11 +13,7 @@ export function SeasonRecapSummary({ game, open, onClose }: Props) {
   };
   if (!open || !summary) return null;
 
-  const preResetRp = summary.rpBefore + summary.totalRp;
-  const resetApplied = preResetRp !== summary.rpAfter;
-  const winRate = summary.matches ? Math.round((summary.wins / summary.matches) * 1000) / 10 : 0;
-  const top3Rate = summary.matches ? Math.round((summary.top3 / summary.matches) * 1000) / 10 : 0;
-  const seasonEvents = game.competitionHistory.filter((event) => event.season === summary.season);
+  const view = buildSeasonRecapView(game)!;
   const title = step === 0 ? '시즌의 결론' : step === 1 ? '랭크 경기 리포트' : '다음 이야기가 도착했습니다';
 
   return (
@@ -65,9 +62,10 @@ export function SeasonRecapSummary({ game, open, onClose }: Props) {
                 <b>{rankLabel(summary.rpAfter)}</b>
               </span>
             </div>
-            {resetApplied && (
+            {view.resetApplied && (
               <p className="recap-reset">
-                시즌 소프트 리셋 · {preResetRp.toLocaleString()} RP → {summary.rpAfter.toLocaleString()} RP
+                시즌 소프트 리셋 · {view.preResetRp.toLocaleString()} RP → {summary.rpAfter.toLocaleString()}{' '}
+                RP
               </p>
             )}
           </div>
@@ -88,13 +86,13 @@ export function SeasonRecapSummary({ game, open, onClose }: Props) {
               <span>
                 <small>우승</small>
                 <b>
-                  {summary.wins}회 · {winRate}%
+                  {summary.wins}회 · {view.winRate}%
                 </b>
               </span>
               <span>
                 <small>TOP 3</small>
                 <b>
-                  {summary.top3}회 · {top3Rate}%
+                  {summary.top3}회 · {view.top3Rate}%
                 </b>
               </span>
               <span>
@@ -117,11 +115,7 @@ export function SeasonRecapSummary({ game, open, onClose }: Props) {
 
         {step === 2 && (
           <div className="recap-page recap-next-story">
-            <h3>
-              확인할 일{' '}
-              {Number(game.turningPointAvailable) + game.scoutOffers.length + Number(seasonEvents.length > 0)}
-              개
-            </h3>
+            <h3>확인할 일 {view.pendingCount}개</h3>
             <div className="recap-inbox">
               {game.turningPointAvailable && (
                 <span>
@@ -135,13 +129,13 @@ export function SeasonRecapSummary({ game, open, onClose }: Props) {
                   <small>예상 역할·보상·리그를 팀 화면에서 비교하세요.</small>
                 </span>
               )}
-              {seasonEvents.length > 0 && (
+              {view.seasonEventCount > 0 && (
                 <span>
-                  <b>공식 대회 기록 {seasonEvents.length}개</b>
+                  <b>공식 대회 기록 {view.seasonEventCount}개</b>
                   <small>이번 시즌의 팀 대회 결과가 커리어 기록에 저장됐어요.</small>
                 </span>
               )}
-              {!game.turningPointAvailable && !game.scoutOffers.length && !seasonEvents.length && (
+              {!game.turningPointAvailable && !game.scoutOffers.length && !view.seasonEventCount && (
                 <span>
                   <b>새 시즌 준비 완료</b>
                   <small>지난 육성 계획을 유지하거나 새 계획을 고를 수 있어요.</small>

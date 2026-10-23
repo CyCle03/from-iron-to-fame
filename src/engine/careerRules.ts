@@ -73,3 +73,27 @@ export function starterSwapImpact(game: Game, targetIndex: number) {
     teamworkChange: -3,
   };
 }
+
+export type ScoutOfferContext = {
+  role: string;
+  path: string;
+  fit: '즉시 전력' | '적합' | '도전적' | '성장 필요' | '안정적';
+};
+
+export function scoutOfferContext(game: Game, league: Game['careerLeague']): ScoutOfferContext {
+  const values = Object.values(game.stats);
+  const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+  if (league === 'KEL')
+    return {
+      role: '4인 로스터 주전 경쟁',
+      path: 'KEL 정규 일정·메이저 우승 도전',
+      fit: average >= 68 ? '즉시 전력' : '도전적',
+    };
+  if (league === '마스터즈')
+    return {
+      role: '3인 스쿼드 핵심 로테이션',
+      path: '서킷 포인트→시즌 파이널',
+      fit: average >= 55 ? '적합' : '성장 필요',
+    };
+  return { role: '육성 로스터 주전', path: '지역 컵→마스터즈 진출', fit: '안정적' };
+}

@@ -12,13 +12,11 @@ import {
   recordMastersPhase,
   recordKelStage,
   finishMastersSeason,
-  hallOfFameProgress,
-  majorTitleCount,
-  receiveHallHonor,
 } from './engine/game';
 import { simulateTournament, type TournamentKind, type TournamentResult } from './engine/tournament';
 import { canEnterKelStage, canEnterMasters, nextCareerGoal } from './engine/careerRules';
 import { CareerArchivePanel, ExperimentPoolPanel, RetiredCareer } from './components/CareerPanels';
+import { HallOfFamePanel } from './components/HallOfFamePanel';
 import { CreateCareer } from './components/CreateCareer';
 import { AppNavigation } from './components/AppNavigation';
 import { EquipmentShop, GameGuide } from './components/SecondaryViews';
@@ -96,8 +94,6 @@ function App() {
       </i>
     </div>
   );
-  const hof = hallOfFameProgress(game);
-  const majorTitles = majorTitleCount(game);
   const rankStep = nextRankStep(game.rp);
   const nextGoal = nextCareerGoal(game);
   const mastersEligible = canEnterMasters(game);
@@ -231,54 +227,7 @@ function App() {
           <SeasonReport game={game} />
           <RankSnapshot matches={game.matches} title="최근 20경기" compact />
           <SeasonTurningPoint game={game} onChange={applyGameChange} />
-          <section className="hall-panel panel hall-categories">
-            <div className="hall-heading">
-              <p className="eyebrow">ESPORTS HALL OF FAME</p>
-              <h2>세 가지 선정 기록</h2>
-              <small>스타즈·히어로즈·아너스는 순차 승급이 아닌 서로 다른 선정 부문입니다.</small>
-            </div>
-            <div className="hall-category-grid">
-              <article>
-                <strong>스타즈</strong>
-                <em>올해의 팬 선택</em>
-                <div className="hof-reqs">
-                  <span className={hof.stars.fame ? 'done' : ''}>명성 750</span>
-                  <span className={hof.stars.seasonPerformance ? 'done' : ''}>시즌 3승 또는 TOP3 12회</span>
-                </div>
-                <button
-                  disabled={!Object.values(hof.stars).every(Boolean)}
-                  onClick={() => applyGameChange(receiveHallHonor(game, '스타즈'))}
-                >
-                  {game.lastStarsSeason === game.season
-                    ? 'S' + game.season + ' 선정 완료'
-                    : '스타즈 심사 · 통산 ' + game.starsSelections + '회'}
-                </button>
-              </article>
-              <article>
-                <strong>히어로즈</strong>
-                <em>현역 메이저 업적</em>
-                <div className="hof-reqs">
-                  <span className={hof.heroes.majorTitles ? 'done' : ''}>메이저 우승 {majorTitles}/3</span>
-                </div>
-                <button
-                  disabled={
-                    game.hallOfFameHonors.includes('히어로즈') || !Object.values(hof.heroes).every(Boolean)
-                  }
-                  onClick={() => applyGameChange(receiveHallHonor(game, '히어로즈'))}
-                >
-                  {game.hallOfFameHonors.includes('히어로즈') ? '히어로즈 선정 완료' : '히어로즈 심사'}
-                </button>
-              </article>
-              <article>
-                <strong>아너스</strong>
-                <em>은퇴 선수 영구 헌액</em>
-                <div className="hof-reqs">
-                  <span>은퇴 후 기록 보관소에서 심사</span>
-                </div>
-                <button disabled>아너스는 은퇴 후</button>
-              </article>
-            </div>
-          </section>
+          <HallOfFamePanel game={game} onChange={applyGameChange} />
           <section className="er-hud">
             <div className="portrait">{game.main.slice(0, 1)}</div>
             <div className="hud-bars">

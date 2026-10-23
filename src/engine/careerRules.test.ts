@@ -8,6 +8,7 @@ import {
   canJoinKel,
   canPromoteTeamToKel,
   nextCareerGoal,
+  scoutOfferContext,
   starterSwapImpact,
 } from './careerRules';
 
@@ -41,6 +42,27 @@ describe('career rules', () => {
     expect(
       nextCareerGoal(career({ teamName: '테스트 팀', careerLeague: '아마추어', rp: 2300, fame: 70 })).detail,
     ).toContain('RP 100');
+  });
+
+  it('derives comparable role, path and fit labels for scout offers', () => {
+    expect(scoutOfferContext(career(), '아마추어').role).toContain('육성');
+    expect(
+      scoutOfferContext(
+        career({
+          stats: {
+            physical: 80,
+            combat: 80,
+            macro: 80,
+            judgement: 80,
+            teamwork: 80,
+            mental: 80,
+            focus: 80,
+            adaptability: 80,
+          },
+        }),
+        'KEL',
+      ).fit,
+    ).toBe('즉시 전력');
   });
 
   it('previews the same weakest-starter swap used by roster changes', () => {

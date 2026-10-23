@@ -8,10 +8,13 @@
 - `src/engine/tournament.ts`: 마스터즈·KEL 라운드 시뮬레이션과 픽 제한
 - `src/engine/save.ts`: 저장 데이터 검증·마이그레이션·기본값 보완
 - `src/engine/random.ts`: 재현 가능한 시뮬레이션을 위한 난수 소스
-- `src/engine/careerRules.ts`: 대회·팀 진입 조건을 계산하는 순수 정책
+- `src/engine/careerRules.ts`: 대회·팀 진입 조건과 스카우트 제안 맥락을 계산하는 순수 정책
+- `src/engine/seasonRecap.ts`: 시즌 결산의 승률·소프트리셋·다음 할 일 뷰모델
 - `src/components/CreateCareer.tsx`: 신규 커리어 생성 마법사
 - `src/components/CareerPanels.tsx`: 계약·로스터·실험체 풀·기록 패널
 - `src/components/SaveControls.tsx`: 저장 관리 모달·JSON 가져오기 미리보기·초기화 확인·토스트 피드백
+- `src/components/HallOfFamePanel.tsx`: 스타즈·히어로즈·아너스 진행 상태와 심사 UI
+- `src/components/SeasonRecapSummary.tsx`: 3단계 시즌 결산 브리핑
 - `src/components/ToastProvider.tsx`: 게임 전역 알림 수명주기와 접근성 라이브 영역
 - `src/components/SecondaryViews.tsx`: 장비 상점·선수 기록·게임 안내 화면
 - `src/components/SeasonCenter.tsx`: 마스터즈·KEL 시즌 일정과 누적 순위 화면
@@ -42,7 +45,7 @@ UI는 게임 규칙을 직접 계산하지 않고 엔진 함수를 호출한다.
 npm run check
 ```
 
-`check`는 Prettier 형식, ESLint 정적 규칙, TypeScript 타입, 단위 테스트와 배포 빌드를 순서대로 검증한다. 단위 테스트는 진입 조건, 대회 규칙, 계약·로스터·은퇴 상태 전이를 검증한다. 장기 회귀 테스트는 고정 난수로 30시즌을 진행하며 능력치, 재화, 주차, 실험체 풀과 주전 인원 불변식을 확인한다. jsdom 기반 UI 테스트는 저장 가져오기 미리보기·적용, 초기화 확인과 키보드 포커스 복귀를 실제 사용자 입력 흐름으로 검증한다.
+`check`는 Prettier 형식, ESLint 정적 규칙, TypeScript 타입, 단위 테스트와 배포 빌드를 순서대로 검증한다. 단위 테스트는 진입 조건, 대회 규칙, 계약·로스터·은퇴 상태 전이를 검증한다. 장기 회귀 테스트는 고정 난수로 30시즌을 진행하며 능력치, 재화, 주차, 실험체 풀과 주전 인원 불변식을 확인한다. jsdom 기반 UI 테스트는 저장 흐름과 키보드 포커스뿐 아니라 시즌 결산의 3단계 이동과 다음 이야기 연결도 실제 사용자 입력으로 검증한다.
 
 ## 변경 원칙
 
