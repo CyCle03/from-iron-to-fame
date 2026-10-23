@@ -38,6 +38,7 @@ describe('save migration', () => {
     expect(migrated?.rank).toBe('아이언');
     expect(migrated?.main).toBeTruthy();
     expect(migrated?.trainingFocus).toEqual(['physical', 'macro']);
+    expect(migrated?.lastSeasonPlan).toBe('rank');
   });
 
   it('round-trips an exported save and rejects malformed JSON', () => {

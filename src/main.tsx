@@ -78,7 +78,7 @@ function App() {
     setGame(ran);
     setShowSeasonRecap(true);
     setSeasonStep(0);
-    setPlannedAction(null);
+    setPlannedAction(ran.lastSeasonPlan);
     setTab('대시보드');
   };
   const stat = (label: string, value: number) => (
@@ -173,11 +173,15 @@ function App() {
               <span className={game.hallOfFame ? 'done' : ''}>명예의 전당</span>
             </div>
           </section>
+          <section className="next-goal-hero">
+            <div><p className="eyebrow">NEXT CAREER MOMENT</p><h2>{nextGoal.title}</h2><p>{nextGoal.detail}</p></div>
+            <button onClick={() => setSeasonStep(0)}>이번 시즌으로 도전하기</button>
+          </section>
           <SeasonPlanner
             game={game}
             step={seasonStep}
-            selected={plannedAction}
-            onStepChange={setSeasonStep}
+            selected={plannedAction ?? game.lastSeasonPlan}
+            onStepChange={(nextStep) => { if (nextStep === 0) setPlannedAction(null); setSeasonStep(nextStep); }}
             onSelect={setPlannedAction}
             onRun={playWeek}
           />

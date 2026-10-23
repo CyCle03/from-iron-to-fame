@@ -246,6 +246,7 @@ export type CareerTotals = {
 };
 export const CURRENT_SAVE_VERSION = 2 as const;
 export type Game = {
+  lastSeasonPlan: Action;
   trainingFocus: StatKey[];
   seasonEvent: string;
   teammateRoles: Role[];
@@ -499,6 +500,7 @@ export function createGame(
     experimentPool.map((name, index) => [name, index === 0 ? 28 : 18 - index * 4]),
   );
   return {
+    lastSeasonPlan: 'rank',
     trainingFocus,
     teammateRoles,
     teammateExperiments,
@@ -834,6 +836,7 @@ function createScoutOffers(g: Game): ScoutOffer[] {
 export function runSeason(g: Game, a: Action, random: RandomSource = Math.random): Game {
   const before = { season: g.season, rp: g.rp, rank: g.rank, fame: g.fame, matches: g.matches.length };
   const n = simulateSeason(g, a, random);
+  n.lastSeasonPlan = a;
   const recent = n.matches.slice(0, Math.max(0, n.matches.length - before.matches));
   n.lastSeasonSummary = {
     season: before.season,

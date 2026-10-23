@@ -72,6 +72,7 @@ describe('career engine', () => {
     expect(after.trainingFocus).toHaveLength(2);
     expect(after.matches).toHaveLength(28);
     expect(after.lastSeasonSummary?.matches).toBe(28);
+    expect(after.lastSeasonPlan).toBe('rank');
     expect(after.mastersPhase).toBe(0);
     expect(after.kelStage).toBe(0);
   });

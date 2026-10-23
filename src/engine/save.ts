@@ -17,6 +17,7 @@ import {
 } from './game';
 
 const DEFAULT_FOCUS: StatKey[] = ['physical', 'macro'];
+const ACTIONS = new Set(['rank', 'physical', 'macro', 'specialist', 'review', 'team', 'rest']);
 const STAT_KEYS = new Set<StatKey>([
   'physical',
   'combat',
@@ -101,6 +102,7 @@ export function migrateGameSave(raw: unknown): Game | null {
     main,
     season,
     trainingFocus: trainingFocus.length === 2 ? trainingFocus : DEFAULT_FOCUS,
+    lastSeasonPlan: typeof raw.lastSeasonPlan === 'string' && ACTIONS.has(raw.lastSeasonPlan) ? raw.lastSeasonPlan as Game['lastSeasonPlan'] : baseline.lastSeasonPlan,
     experimentPool: experimentPool.slice(0, 3),
     mastery,
     teammateExperiments,
