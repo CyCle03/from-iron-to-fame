@@ -22,6 +22,7 @@ import { EquipmentShop, GameGuide, PlayerRecords } from './components/SecondaryV
 import { SeasonCenter } from './components/SeasonCenter';
 import { TournamentView } from './components/TournamentView';
 import { SeasonPlanner, SeasonReport } from './components/SeasonPlanner';
+import { SeasonRecap } from './components/SeasonRecap';
 import { TeamHub } from './components/TeamHub';
 import { ToastProvider, useToast } from './components/ToastProvider';
 import { SEASON_ACTIONS, type NavigationTab } from './constants/ui';
@@ -36,6 +37,7 @@ function App() {
   const [report, setReport] = useState<string | null>(null);
   const [tab, setTab] = useState<NavigationTab>('대시보드');
   const [result, setResult] = useState<TournamentResult | null>(null);
+  const [showSeasonRecap, setShowSeasonRecap] = useState(false);
   const applyGameChange = (next: NonNullable<typeof game>) => {
     setGame(next);
     if (next.notices[0]) notify(next.notices[0]);
@@ -74,6 +76,7 @@ function App() {
     );
     notify(tournamentEvents ? `시즌 완료 · 공식 대회 ${tournamentEvents}개 일정 자동 진행` : ran.history[0]);
     setGame(ran);
+    setShowSeasonRecap(true);
     setSeasonStep(0);
     setPlannedAction(null);
     setTab('대시보드');
@@ -374,6 +377,7 @@ function App() {
       )}
       {tab === '선수 기록' && <PlayerRecords game={game} />}
       {tab === '게임 안내' && <GameGuide />}
+      <SeasonRecap game={game} open={showSeasonRecap} onClose={() => setShowSeasonRecap(false)} />
     </main>
   );
 }

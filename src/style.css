@@ -2264,3 +2264,26 @@ li {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.season-recap-backdrop { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 18px; background: rgb(4 7 18 / 84%); backdrop-filter: blur(7px); }
+.season-recap { width: min(680px, 100%); max-height: min(780px, calc(100dvh - 36px)); overflow: hidden; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; background: linear-gradient(145deg, #172243, #11182d 65%); border: 1px solid #556b9e; border-radius: 16px; box-shadow: 0 24px 80px rgb(0 0 0 / 55%); }
+.season-recap header { position: relative; padding: 22px 24px 8px; }
+.season-recap h2 { margin: 3px 36px 0 0; font-size: clamp(24px, 5vw, 34px); }
+.recap-close { position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; color: #b7c4e6; background: #263354; border: 0; border-radius: 50%; font-size: 26px; line-height: 1; }
+.recap-scoreboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 24px; }
+.recap-scoreboard span, .recap-final span { display: grid; gap: 3px; padding: 10px; background: rgb(8 13 31 / 60%); border: 1px solid #354873; border-radius: 8px; }
+.recap-scoreboard small, .recap-final small { color: #9eacca; font-size: 11px; }
+.recap-scoreboard b, .recap-final b { color: #f8c45d; font-size: 16px; }
+.recap-progress { padding: 8px 24px 14px; }
+.recap-progress > div { display: flex; justify-content: space-between; color: #b9c6e7; font-size: 13px; }
+.recap-progress i { display: block; height: 8px; margin-top: 7px; overflow: hidden; background: #071024; border-radius: 99px; }
+.recap-progress i i { margin: 0; background: linear-gradient(90deg, #ff765d, #f4bd55); transition: width .28s ease; }
+.recap-match-list { min-height: 0; overflow: auto; padding: 0 24px 14px; }
+.recap-match { display: grid; grid-template-columns: 72px 1fr auto auto; align-items: center; gap: 10px; min-height: 43px; padding: 9px 10px; border-bottom: 1px solid #29395f; animation: recap-line .24s ease-out both; }
+.recap-match > b { color: #aeb9dc; font-size: 12px; }.recap-match strong { color: #fff; }.recap-match small { color: #94a5cd; }.recap-match em { min-width: 62px; text-align: right; font-style: normal; font-weight: 800; }
+.recap-empty { color: #9eacca; }.recap-final { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 8px; padding: 14px 24px 22px; border-top: 1px solid #40547e; }.recap-final button, .recap-skip { min-height: 46px; padding: 10px 16px; border: 0; border-radius: 8px; background: #f4bd55; color: #24192a; font-weight: 900; }.recap-skip { margin: 0 24px 22px; }
+@keyframes recap-line { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 640px) { .season-recap-backdrop { align-items: end; padding: 0; }.season-recap { width: 100%; max-height: 92dvh; border-radius: 18px 18px 0 0; }.season-recap header, .recap-scoreboard, .recap-progress, .recap-match-list, .recap-final { padding-left: 16px; padding-right: 16px; }.recap-scoreboard { gap: 5px; }.recap-scoreboard span { padding: 8px; }.recap-scoreboard b { font-size: 13px; }.recap-match { grid-template-columns: 54px 1fr auto; gap: 7px; font-size: 14px; }.recap-match small { display: none; }.recap-match em { min-width: 54px; }.recap-final { grid-template-columns: 1fr 1fr; }.recap-final span:last-of-type { display: none; }.recap-final button { grid-column: 1 / -1; }.recap-skip { margin-left: 16px; margin-right: 16px; } }
+@media (prefers-reduced-motion: reduce) { .recap-match { animation: none; }.recap-progress i i { transition: none; } }
+.recap-reset { margin: 0; padding: 10px 24px; color: #d8e4ff; background: #273454; border-top: 1px solid #40547e; border-bottom: 1px solid #40547e; font-size: 13px; font-weight: 700; }
+@media (max-width: 640px) { .recap-reset { padding-left: 16px; padding-right: 16px; } }
