@@ -2298,3 +2298,50 @@ li {
 .season-action-intro h2 { margin: 2px 0 6px; }
 .season-action-intro p:last-child { margin: 0; color: #b7c6e9; }
 @media (max-width: 640px) { .season-condition-note { grid-column: 1 / -1; } .season-action-intro { padding: 4px 0; } }
+
+/* Mobile no-horizontal-scroll pass: tables become labeled cards and dense schedules reflow. */
+@media (max-width: 640px) {
+  .panel { overflow-x: hidden; }
+  .panel table,
+  .panel table.responsive-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+  }
+  .panel table td {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .season-flow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    gap: 6px;
+  }
+  .season-flow span {
+    min-width: 0;
+    border-radius: 7px;
+  }
+  .standings {
+    min-width: 0;
+    padding: 13px 10px;
+  }
+  .standings > div {
+    grid-template-columns: 24px minmax(0, 1fr) 58px 30px;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .milestones {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    gap: 6px;
+    padding: 0;
+  }
+  .milestones span {
+    min-width: 0;
+    border-radius: 7px !important;
+    white-space: normal;
+  }
+  .milestones span::after { display: none; }
+}
