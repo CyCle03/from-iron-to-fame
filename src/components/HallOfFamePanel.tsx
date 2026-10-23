@@ -22,11 +22,11 @@ export function HallOfFamePanel({ game, onChange }: Props) {
       <div className="hall-category-grid">
         <article>
           <strong>스타즈</strong>
-          <em>올해의 팬 선택</em>
+          <em>연간 팬 투표 선정</em>
           <div className="hof-reqs">
-            <span className={progress.stars.awareness ? 'done' : ''}>인지도 60/100</span>
+            <span className={progress.stars.awareness ? 'done' : ''}>인지도 70/100</span>
             <span className={progress.stars.mastersAppearance ? 'done' : ''}>마스터즈 출전 경력</span>
-            <span className={progress.stars.officialPodium ? 'done' : ''}>직전 시즌 공식 대회 TOP3</span>
+            <span className={progress.stars.topTierPodium ? 'done' : ''}>직전 시즌 마스터즈·KEL TOP3</span>
           </div>
           <button
             disabled={!allComplete(progress.stars)}
@@ -34,7 +34,7 @@ export function HallOfFamePanel({ game, onChange }: Props) {
           >
             {game.lastStarsSeason === game.season
               ? `S${game.season} 선정 완료`
-              : `스타즈 심사 · 통산 ${game.starsSelections}회`}
+              : `팬 투표 결과 · 통산 ${game.starsSelections}회`}
           </button>
         </article>
         <article>

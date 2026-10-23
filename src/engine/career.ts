@@ -37,19 +37,24 @@ export const hallOfFameProgress = (game: Game) => {
   const mastersAppearance = game.competitionHistory.some((record) =>
     ['마스터즈', 'LCQ', '시즌 파이널'].includes(record.kind),
   );
-  const officialPodium = game.competitionHistory.some(
+  const topTierPodium = game.competitionHistory.some(
     (record) =>
       record.season === lastSeason &&
-      ['지역 컵', '마스터즈', '시즌 파이널', 'KEL'].includes(record.kind) &&
+      ['마스터즈', '시즌 파이널', 'KEL'].includes(record.kind) &&
       record.place > 0 &&
       record.place <= 3,
   );
+  const topTierSeasons = new Set(
+    game.competitionHistory
+      .filter((record) => ['마스터즈', '시즌 파이널', 'KEL'].includes(record.kind))
+      .map((record) => record.season),
+  ).size;
   return {
     stars: {
       active: !game.retired,
-      awareness: game.fame >= 60,
+      awareness: game.fame >= 70,
       mastersAppearance,
-      officialPodium,
+      topTierPodium,
       selectable: game.lastStarsSeason !== game.season,
     },
     heroes: {
@@ -62,6 +67,7 @@ export const hallOfFameProgress = (game: Game) => {
       majorTitles: majorTitleCount(game) >= 5,
       mvps: mvpCount(game) >= 2,
       awareness: game.fame >= 90,
+      longevity: topTierSeasons >= 5,
     },
   };
 };

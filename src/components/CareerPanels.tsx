@@ -221,6 +221,7 @@ export function RetiredCareer({ game, onChange }: GamePanelProps) {
     majorTitles: '메이저 우승 5회',
     mvps: 'MVP 2회',
     awareness: '인지도 90/100',
+    longevity: '최상위 무대 5시즌',
   };
   const missing = Object.entries(progress.honors)
     .filter(([, done]) => !done)

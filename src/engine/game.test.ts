@@ -163,7 +163,7 @@ describe('career engine', () => {
       competitionHistory: [
         {
           season: completed.lastSeasonSummary!.season,
-          kind: '지역 컵' as const,
+          kind: '마스터즈' as const,
           stage: 1,
           place: 2,
           points: 0,

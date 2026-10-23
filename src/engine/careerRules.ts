@@ -9,7 +9,7 @@ export const CAREER_REQUIREMENTS = {
   mastersFame: 15,
   kelFame: 50,
   kelMastersPoints: 400,
-  hallOfFameStarsFame: 60,
+  hallOfFameStarsFame: 70,
   hallOfFameHeroesMajorTitles: 3,
   hallOfFameHonorsFame: 90,
   hallOfFameHonorsMajorTitles: 5,
