@@ -359,7 +359,7 @@ function App() {
             <div className="season-action-intro">
               <p className="eyebrow">SEASON PLAN</p>
               <h2>한 가지 방향으로 시즌 전체를 운영합니다</h2>
-              <p>선택하면 12주 일정과 회복은 자동 배분됩니다. 주마다 컨디션을 관리할 필요가 없습니다.</p>
+              <p>선택한 성장 방향을 기준으로 12주 일정·회복일·경기 부담을 자동 조절합니다. 주마다 컨디션을 관리할 필요가 없습니다.</p>
             </div>
             {actions.map((a) => (
               <button key={a.id} onClick={() => playWeek(a.id)}>

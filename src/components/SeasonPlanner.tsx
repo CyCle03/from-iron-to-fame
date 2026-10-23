@@ -96,7 +96,7 @@ export function SeasonReport({ game }: { game: Game }) {
         <span>최고 순위 <b>{summary.bestPlace ? String(summary.bestPlace) + '위' : '-'}</b></span>
         <span>공식 일정 <b>{summary.tournamentEvents}개</b></span>
         <span>시즌 운영 <b>{summary.seasonCondition}</b></span>
-        <small className="season-condition-note">{summary.conditionNote}</small>
+        <small className="season-condition-note">{summary.conditionNote} · 자동 회복 {summary.autoRecoveryWeeks}회</small>
       </div>
     </section>
   );

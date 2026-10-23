@@ -196,6 +196,7 @@ export type SeasonSummary = {
   tournamentEvents: number;
   seasonCondition: '집중 운영' | '균형 운영' | '회복 운영';
   conditionNote: string;
+  autoRecoveryWeeks: number;
 };
 export type TeamMember = {
   nickname: string;
@@ -777,6 +778,13 @@ function simulateSeason(g: Game, a: Action, random: RandomSource): Game {
   const startSeason = n.season;
   for (const weekAction of plans[a]) {
     n = act({ ...n, actionPoints: 1 }, weekAction, random);
+    if (n.fatigue >= 22 || n.morale <= 35) {
+      n.fatigue = clamp(n.fatigue - 12);
+      n.morale = clamp(n.morale + 2);
+      n.history.unshift(
+        'S' + n.season + ' ' + n.week + '주 · 자동 회복 배분 · 회복일을 편성해 다음 일정의 경기력을 안정시켰습니다.',
+      );
+    }
     n = nextWeek(n, random);
   }
   const statKeys: StatKey[] = [
@@ -843,8 +851,11 @@ export function runSeason(g: Game, a: Action, random: RandomSource = Math.random
   const n = simulateSeason(g, a, random);
   n.lastSeasonPlan = a;
   const recent = n.matches.slice(0, Math.max(0, n.matches.length - before.matches));
+  const autoRecoveryWeeks = n.history.filter(
+    (entry) => entry.startsWith('S' + before.season + ' ') && entry.includes('자동 회복 배분'),
+  ).length;
   const seasonCondition =
-    a === 'rank' ? '집중 운영' : a === 'rest' || a === 'review' || a === 'macro' ? '회복 운영' : '균형 운영';
+    autoRecoveryWeeks >= 3 ? '회복 운영' : recent.length >= 20 ? '집중 운영' : '균형 운영';
   const conditionNote =
     seasonCondition === '집중 운영'
       ? '랭크 경기 비중이 높은 시즌입니다. 누적 부담은 다음 시즌 시작 전에 자동 정비됩니다.'
@@ -864,6 +875,7 @@ export function runSeason(g: Game, a: Action, random: RandomSource = Math.random
     tournamentEvents: 0,
     seasonCondition,
     conditionNote,
+    autoRecoveryWeeks,
   };
   // 피로는 시즌 안에서만 경기력에 반영한다. 다음 시즌에는 자동 정비되어 반복적인 휴식 관리가 필요 없다.
   n.fatigue = 12;

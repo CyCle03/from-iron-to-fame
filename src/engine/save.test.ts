@@ -25,6 +25,7 @@ describe('save migration', () => {
     expect(migrated?.awards).toEqual([]);
     expect(migrated?.experimentPool).toHaveLength(3);
     expect(migrated?.lastSeasonSummary?.seasonCondition).toBe('균형 운영');
+    expect(migrated?.lastSeasonSummary?.autoRecoveryWeeks).toBe(0);
     expect(migrated && validateGameState(migrated)).toEqual([]);
   });
 

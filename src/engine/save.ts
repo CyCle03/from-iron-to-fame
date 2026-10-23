@@ -103,6 +103,8 @@ export function migrateGameSave(raw: unknown): Game | null {
           typeof savedSummary.conditionNote === 'string'
             ? savedSummary.conditionNote
             : '시즌 종료 후 다음 시즌을 위한 자동 정비가 완료되었습니다.',
+        autoRecoveryWeeks:
+          typeof savedSummary.autoRecoveryWeeks === 'number' ? Math.max(0, Math.floor(savedSummary.autoRecoveryWeeks)) : 0,
       } as Game['lastSeasonSummary'])
     : null;
 
