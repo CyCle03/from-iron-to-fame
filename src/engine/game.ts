@@ -646,7 +646,7 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
       const delta = gross - fee;
       n.rp = Math.max(0, n.rp + delta);
       n.rank = rankFor(n.rp);
-      n.fatigue = clamp(n.fatigue + 7);
+      n.fatigue = clamp(n.fatigue + 3);
       n.mastery[n.main] = clamp((n.mastery[n.main] ?? 0) + 2);
       gain('combat', 0.7 + Math.max(0, kills - 1) * 0.25);
       gain('teamwork', place <= 4 ? 0.7 : 0.3);
@@ -1094,7 +1094,7 @@ export function nextWeek(g: Game, random: RandomSource = Math.random): Game {
     n.notices = [e];
   }
   n.actionPoints = 3;
-  n.fatigue = clamp(n.fatigue - 5);
+  n.fatigue = clamp(n.fatigue - 8);
   return n;
 }
 export function playCommunityCup(g: Game, random: RandomSource = Math.random): Game {
