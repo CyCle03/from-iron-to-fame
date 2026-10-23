@@ -88,7 +88,7 @@ export function ContractPanel({ game, onChange }: GamePanelProps) {
           </button>
         </div>
       ) : (
-        <p>현재 무소속입니다. 지역 컵에서 명성을 쌓거나 스카우트 제안을 선택하세요.</p>
+        <p>현재 무소속입니다. 전국 아마추어 대회에서 인지도를 쌓거나 스카우트 제안을 선택하세요.</p>
       )}
       <div className="offer-grid">
         {game.scoutOffers.map((offer, index) => {
@@ -220,7 +220,7 @@ export function RetiredCareer({ game, onChange }: GamePanelProps) {
     heroes: '히어로즈 선정',
     majorTitles: '메이저 우승 5회',
     mvps: 'MVP 2회',
-    fame: '명성 2,500',
+    awareness: '인지도 90/100',
   };
   const missing = Object.entries(progress.honors)
     .filter(([, done]) => !done)

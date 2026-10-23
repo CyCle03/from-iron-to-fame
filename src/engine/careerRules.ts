@@ -4,19 +4,29 @@ import { COMPETITION_RP } from './competitionRules';
 export const CAREER_REQUIREMENTS = {
   communityCupRp: COMPETITION_RP.nationalAmateur,
   teamFormationRp: COMPETITION_RP.teamFormation,
-  amateurTeamFame: 45,
+  amateurTeamFame: 5,
   mastersRp: COMPETITION_RP.masters,
-  mastersFame: 75,
-  kelFame: 180,
+  mastersFame: 15,
+  kelFame: 50,
   kelMastersPoints: 400,
-  hallOfFameStarsFame: 750,
+  hallOfFameStarsFame: 60,
   hallOfFameHeroesMajorTitles: 3,
-  hallOfFameHonorsFame: 2500,
+  hallOfFameHonorsFame: 90,
   hallOfFameHonorsMajorTitles: 5,
 } as const;
 
 export const canEnterCommunityCup = (game: Game) =>
-  game.careerLeague !== 'KEL' && game.rp >= CAREER_REQUIREMENTS.communityCupRp && game.seasonCupEntries < 2;
+  game.careerLeague !== 'KEL' &&
+  game.rp >= CAREER_REQUIREMENTS.communityCupRp &&
+  (game.seasonCupEntries === 0 ||
+    (game.seasonCupEntries === 1 &&
+      game.competitionHistory.some(
+        (record) =>
+          record.season === game.season &&
+          record.kind === '지역 컵' &&
+          record.stage === 1 &&
+          record.place === 1,
+      )));
 
 export const canEnterMasters = (game: Game) =>
   game.careerLeague !== '솔로' &&
@@ -36,7 +46,7 @@ export const canJoinKel = (game: Game) =>
   game.fame >= CAREER_REQUIREMENTS.kelFame && game.mastersPoints >= CAREER_REQUIREMENTS.kelMastersPoints;
 
 export const canPromoteTeamToKel = (game: Game) =>
-  ['아마추어', '마스터즈'].includes(game.careerLeague) && game.fame >= 240 && game.mastersPoints >= 600;
+  ['아마추어', '마스터즈'].includes(game.careerLeague) && game.fame >= 60 && game.mastersPoints >= 600;
 
 export function nextCareerGoal(game: Game): { title: string; detail: string } {
   if (!game.teamName) {
@@ -45,7 +55,7 @@ export function nextCareerGoal(game: Game): { title: string; detail: string } {
     return {
       title: '아마추어 팀 합류',
       detail:
-        [rp ? '미스릴까지 ' + rp + ' RP' : '', fame ? '명성 ' + fame : ''].filter(Boolean).join(' · ') ||
+        [rp ? '미스릴까지 ' + rp + ' RP' : '', fame ? '인지도 ' + fame : ''].filter(Boolean).join(' · ') ||
         '팀 화면에서 제안을 수락하세요',
     };
   }
@@ -56,7 +66,7 @@ export function nextCareerGoal(game: Game): { title: string; detail: string } {
       return {
         title: '마스터즈 진출',
         detail:
-          [rp ? '데미갓까지 ' + rp + ' RP' : '', fame ? '명성 ' + fame : ''].filter(Boolean).join(' · ') +
+          [rp ? '데미갓까지 ' + rp + ' RP' : '', fame ? '인지도 ' + fame : ''].filter(Boolean).join(' · ') +
           ' 필요',
       };
     return { title: '마스터즈 진출', detail: '다음 시즌 진행 시 자동 참가합니다' };

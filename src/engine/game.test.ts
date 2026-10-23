@@ -102,6 +102,7 @@ describe('career engine', () => {
     expect(cup.fame).toBeGreaterThan(0);
     expect(cup.competitionHistory[0].place).toBeGreaterThanOrEqual(1);
     expect(cup.competitionHistory[0].place).toBeLessThanOrEqual(8);
+    expect(playCommunityCup({ ...reset, rp: 7600, fame: 99 }).fame).toBeLessThanOrEqual(100);
     const team = joinAmateurTeam({ ...cup, fame: 50 });
     expect(team.careerLeague).toBe('아마추어');
     const kel = joinKel({ ...team, fame: 180, mastersPoints: 400 });
@@ -153,6 +154,31 @@ describe('career engine', () => {
     expect(playCommunityCup(cupBase).communityCups).toBe(cupBase.communityCups);
     expect(recordKelStage({ ...g, kelStage: 0 }, 1).trophies).toBe(4);
   });
+  it('requires Masters experience and an official podium for Stars', () => {
+    const completed = runSeason(createGame('스타 후보', '플래티넘', '일반 유저', '유키'), 'rank');
+    const unknown = { ...completed, fame: 100 };
+    expect(hallOfFameProgress(unknown).stars.mastersAppearance).toBe(false);
+    const qualified = {
+      ...unknown,
+      competitionHistory: [
+        {
+          season: completed.lastSeasonSummary!.season,
+          kind: '지역 컵' as const,
+          stage: 1,
+          place: 2,
+          points: 0,
+        },
+        {
+          season: completed.lastSeasonSummary!.season,
+          kind: '마스터즈' as const,
+          stage: 1,
+          place: 12,
+          points: 0,
+        },
+      ],
+    };
+    expect(Object.values(hallOfFameProgress(qualified).stars).every(Boolean)).toBe(true);
+  });
   it('uses an action and advances the week', () => {
     const g = act(createGame('테스트', '골드', '일반 유저', '유키'), 'physical');
     expect(g.actionPoints).toBe(2);
@@ -166,6 +192,7 @@ describe('career engine', () => {
     expect(g.matches.every((m) => typeof m.fee === 'number' && typeof m.gross === 'number')).toBe(true);
     expect(g.matches.every((m) => m.place >= 1 && m.place <= 8)).toBe(true);
     expect(g.rank).toBeTruthy();
+    expect(g.fame).toBe(before.fame);
     expect(g.stats.combat).toBeGreaterThan(before.stats.combat);
     expect(g.mastery.유키).toBeGreaterThan(before.mastery.유키);
   });

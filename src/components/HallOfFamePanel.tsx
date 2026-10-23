@@ -24,8 +24,9 @@ export function HallOfFamePanel({ game, onChange }: Props) {
           <strong>스타즈</strong>
           <em>올해의 팬 선택</em>
           <div className="hof-reqs">
-            <span className={progress.stars.fame ? 'done' : ''}>명성 750</span>
-            <span className={progress.stars.seasonPerformance ? 'done' : ''}>시즌 3승 또는 TOP3 12회</span>
+            <span className={progress.stars.awareness ? 'done' : ''}>인지도 60/100</span>
+            <span className={progress.stars.mastersAppearance ? 'done' : ''}>마스터즈 출전 경력</span>
+            <span className={progress.stars.officialPodium ? 'done' : ''}>직전 시즌 공식 대회 TOP3</span>
           </div>
           <button
             disabled={!allComplete(progress.stars)}

@@ -341,6 +341,7 @@ export function validateGameState(g: Game): string[] {
     ...Object.entries(g.stats),
     ['fatigue', g.fatigue],
     ['morale', g.morale],
+    ['fame', g.fame],
     ...Object.entries(g.mastery),
   ];
   for (const [key, value] of bounded)
@@ -688,7 +689,6 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
       gain('mental', delta >= 0 ? 0.55 : -0.25);
       if (kills >= 3) gain('physical', 0.45);
       n.credits += Math.max(20, 55 + kills * 12 + (9 - place) * 15);
-      n.fame = (n.fame ?? 0) + Math.max(0, 9 - place);
       n.matches.unshift({
         place,
         kills,
@@ -864,7 +864,7 @@ function simulateSeason(g: Game, a: Action, random: RandomSource): Game {
   return n;
 }
 function createScoutOffers(g: Game): ScoutOffer[] {
-  if (g.rp < COMPETITION_RP.teamFormation || g.fame < 45) return [];
+  if (g.rp < COMPETITION_RP.teamFormation || g.fame < 5) return [];
   const offers: ScoutOffer[] = [
     {
       team: '네온 폭스',
@@ -874,7 +874,7 @@ function createScoutOffers(g: Game): ScoutOffer[] {
       signingBonus: 220,
     },
   ];
-  if (g.fame >= 120)
+  if (g.fame >= 30)
     offers.push({
       team: '아스트라 나이츠',
       league: '마스터즈',
@@ -882,7 +882,7 @@ function createScoutOffers(g: Game): ScoutOffer[] {
       seasonsRemaining: 2,
       signingBonus: 400,
     });
-  if (g.fame >= 180 && g.mastersPoints >= 400)
+  if (g.fame >= 50 && g.mastersPoints >= 400)
     offers.push({
       team: 'KEL 블루 피닉스',
       league: 'KEL',
@@ -1050,8 +1050,8 @@ const mastersPointsForPlace = (place: number) =>
 const rankMasters = (standings: MastersStanding[]) =>
   [...standings].sort((a, b) => b.points - a.points || b.wins - a.wins || a.name.localeCompare(b.name, 'ko'));
 export function recordMastersPhase(g: Game, points: number, place = 0): Game {
-  if (g.careerLeague === '솔로' || g.rp < COMPETITION_RP.masters || (g.fame ?? 0) < 75)
-    return { ...g, notices: ['마스터즈 레이팅 컷: 데미갓 이상 · 명성 75 · 소속 팀'] };
+  if (g.careerLeague === '솔로' || g.rp < COMPETITION_RP.masters || (g.fame ?? 0) < 15)
+    return { ...g, notices: ['마스터즈 레이팅 컷: 데미갓 이상 · 인지도 15 · 소속 팀'] };
   if (g.careerLeague === 'KEL') return { ...g, notices: ['KEL 등록 선수는 마스터즈에 참가할 수 없습니다.'] };
   if ((g.mastersPhase ?? 0) >= 3)
     return { ...g, notices: ['이번 시즌 마스터즈 3개 페이즈를 모두 완료했습니다.'] };
@@ -1059,7 +1059,8 @@ export function recordMastersPhase(g: Game, points: number, place = 0): Game {
   n.careerLeague = '마스터즈';
   n.mastersPhase = (n.mastersPhase ?? 0) + 1;
   n.mastersPoints = (n.mastersPoints ?? 0) + points;
-  n.fame = (n.fame ?? 0) + Math.max(8, Math.round(points / 12));
+  const awareness = place === 1 ? 8 : place <= 3 ? 6 : place <= 8 ? 4 : 2;
+  n.fame = clamp((n.fame ?? 0) + awareness);
   n.credits += 150 + points;
   const season =
     n.mastersSeason?.season === n.season ? n.mastersSeason : createMastersSeason(n.season, n.teamName);
@@ -1139,7 +1140,16 @@ export function finishMastersSeason(g: Game): Game {
     n.awards = [`S${n.season} 마스터즈 파이널 MVP`, ...n.awards];
   } else if (season.playerFinalPlace && season.playerFinalPlace <= 3)
     n.awards = [`S${n.season} 마스터즈 시즌 베스트`, ...n.awards];
-  n.fame += season.playerFinalPlace ? Math.max(12, 50 - season.playerFinalPlace * 4) : 8;
+  n.fame = clamp(
+    n.fame +
+      (season.playerFinalPlace === 1
+        ? 15
+        : season.playerFinalPlace && season.playerFinalPlace <= 3
+          ? 10
+          : season.playerFinalPlace
+            ? 6
+            : 2),
+  );
   n.competitionHistory = [
     { season: n.season, kind: '시즌 파이널', stage: 1, place: season.playerFinalPlace ?? 0, points: 0 },
     { season: n.season, kind: 'LCQ', stage: 1, place: lcqWinner.id === 'player' ? 1 : 0, points: 0 },
@@ -1163,7 +1173,7 @@ export function recordKelStage(g: Game, place: number): Game {
     n.trophies = (n.trophies ?? 0) + 1;
     n.awards = [`S${n.season} KEL ${n.kelStage}차 일정 MVP`, ...n.awards];
   }
-  n.fame = (n.fame ?? 0) + Math.max(6, 18 - place);
+  n.fame = clamp((n.fame ?? 0) + (place === 1 ? 8 : place <= 3 ? 6 : place <= 8 ? 4 : 2));
   n.credits += Math.max(100, 350 - place * 25);
   n.competitionHistory = [
     { season: n.season, kind: 'KEL', stage: n.kelStage, place, points: 0 },
@@ -1196,17 +1206,18 @@ export function nextWeek(g: Game, random: RandomSource = Math.random): Game {
 }
 export function playCommunityCup(g: Game, random: RandomSource = Math.random): Game {
   if ((g.seasonCupEntries ?? 0) >= 2)
-    return { ...g, notices: ['지역 컵은 시즌당 최대 2회 참가할 수 있습니다.'] };
+    return { ...g, notices: ['이번 시즌 대통령배 KeG 일정을 모두 마쳤습니다.'] };
   if (g.rp < COMPETITION_RP.nationalAmateur)
     return { ...g, notices: ['전국 아마추어 대회는 미스릴 이상부터 자동 참가합니다.'] };
   const n = structuredClone(g);
+  const eventName = n.seasonCupEntries === 0 ? '대통령배 KeG 지역대표선발전' : '대통령배 KeG 전국결선';
   const power =
     (n.stats.combat + n.stats.macro + n.stats.teamwork + n.stats.focus) / 4 +
     (n.mastery[n.main] ?? 0) * 0.2 +
     (random() - 0.5) * 24;
   const place = Math.max(1, Math.min(8, Math.round(9 - power / 9)));
-  const fame = place === 1 ? 38 : place <= 3 ? 24 : place <= 5 ? 12 : 5;
-  n.fame = (n.fame ?? 0) + fame;
+  const fame = place === 1 ? 8 : place <= 3 ? 5 : place <= 5 ? 3 : 1;
+  n.fame = clamp((n.fame ?? 0) + fame);
   n.communityCups = (n.communityCups ?? 0) + 1;
   n.seasonCupEntries = (n.seasonCupEntries ?? 0) + 1;
   n.competitionHistory = [
@@ -1214,8 +1225,8 @@ export function playCommunityCup(g: Game, random: RandomSource = Math.random): G
     ...(n.competitionHistory ?? []),
   ];
   n.credits += fame * 18;
-  n.history.unshift('지역 컵 ' + place + '위 · 명성 +' + fame);
-  n.notices = ['지역 컵 ' + place + '위! 명성 +' + fame];
+  n.history.unshift(eventName + ' ' + place + '위 · 인지도 +' + fame);
+  n.notices = [eventName + ' ' + place + '위! 인지도 +' + fame];
   return n;
 }
 function ensureBench(n: Game, random: RandomSource) {
@@ -1239,15 +1250,14 @@ function ensureBench(n: Game, random: RandomSource) {
     });
 }
 export function joinAmateurTeam(g: Game, random: RandomSource = Math.random): Game {
-  if (g.rp < COMPETITION_RP.teamFormation || (g.fame ?? 0) < 45 || g.teamName)
-    return { ...g, notices: ['미스릴 이상 · 명성 45부터 아마추어 팀 제안이 옵니다.'] };
+  if (g.rp < COMPETITION_RP.teamFormation || (g.fame ?? 0) < 5 || g.teamName)
+    return { ...g, notices: ['미스릴 이상 · 인지도 5부터 아마추어 팀 제안이 옵니다.'] };
   const n = structuredClone(g);
   n.teamName = '루미아 웨이브';
   n.careerLeague = '아마추어';
   n.contract = { team: n.teamName, league: '아마추어', salary: 400, seasonsRemaining: 2 };
   n.teamHistory = [n.teamName, ...n.teamHistory];
   ensureBench(n, random);
-  n.fame += 10;
   n.history.unshift('아마추어 팀 루미아 웨이브 합류 · 2시즌 계약');
   n.notices = ['루미아 웨이브에 합류했습니다.'];
   return n;
@@ -1281,8 +1291,8 @@ function completeKelRoster(n: Game, random: RandomSource) {
   n.kelRosterSize = 4;
 }
 export function joinKel(g: Game, random: RandomSource = Math.random): Game {
-  if ((g.fame ?? 0) < 180 || (g.mastersPoints ?? 0) < 400)
-    return { ...g, notices: ['KEL 스카우트 조건: 명성 180 · 마스터즈 CP 400'] };
+  if ((g.fame ?? 0) < 50 || (g.mastersPoints ?? 0) < 400)
+    return { ...g, notices: ['KEL 스카우트 조건: 인지도 50 · 마스터즈 CP 400'] };
   const n = structuredClone(g);
   n.teamName = 'KEL 시티 유나이티드';
   n.careerLeague = 'KEL';
@@ -1296,10 +1306,10 @@ export function joinKel(g: Game, random: RandomSource = Math.random): Game {
 export function promoteTeamToKel(g: Game, random: RandomSource = Math.random): Game {
   if (
     !['아마추어', '마스터즈'].includes(g.careerLeague) ||
-    (g.fame ?? 0) < 240 ||
+    (g.fame ?? 0) < 60 ||
     (g.mastersPoints ?? 0) < 600
   )
-    return { ...g, notices: ['팀 KEL 승격 조건: 아마추어 팀 · 명성 240 · 마스터즈 CP 600'] };
+    return { ...g, notices: ['팀 KEL 승격 조건: 아마추어 팀 · 인지도 60 · 마스터즈 CP 600'] };
   const n = structuredClone(g);
   n.careerLeague = 'KEL';
   n.teamName = '루미아 웨이브 KEL';

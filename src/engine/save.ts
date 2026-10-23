@@ -119,6 +119,7 @@ export function migrateGameSave(raw: unknown): Game | null {
     ...baseline,
     ...(raw as Partial<Game>),
     version: CURRENT_SAVE_VERSION,
+    fame: typeof raw.fame === 'number' ? Math.max(0, Math.min(100, Math.round(raw.fame))) : 0,
     rank,
     background,
     role,

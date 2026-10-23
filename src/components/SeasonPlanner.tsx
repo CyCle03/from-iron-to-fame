@@ -141,7 +141,7 @@ export function SeasonReport({ game }: { game: Game }) {
           </b>
         </span>
         <span>
-          명성 <b>+{summary.fameGained}</b>
+          인지도 <b>+{summary.fameGained}</b>
         </span>
         <span>
           랭크 경기 <b>{summary.matches}판</b>

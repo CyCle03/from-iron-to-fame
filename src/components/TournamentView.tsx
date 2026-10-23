@@ -11,14 +11,14 @@ type TournamentViewProps = {
 export function TournamentView({ game, result, onChange }: TournamentViewProps) {
   const competitionName = (kind: Game['competitionHistory'][number]['kind'], stage: number) => {
     if (kind !== '지역 컵') return kind;
-    return stage === 1 ? '동호인 오픈' : '전국 아마추어 대회';
+    return stage === 1 ? '대통령배 KeG 지역대표선발전' : '대통령배 KeG 전국결선';
   };
 
   return (
     <section className="tournament panel">
       <h2>커리어 경쟁 무대</h2>
       <div className="career-progress">
-        <b>명성 {game.fame}</b>
+        <b>인지도 {game.fame}/100</b>
         <span>
           {game.teamName ?? '무소속'} · {game.careerLeague}
           {game.careerLeague === 'KEL' ? ' · 4인 로스터' : ''}
@@ -51,18 +51,18 @@ export function TournamentView({ game, result, onChange }: TournamentViewProps) 
       <div className="tournament-buttons">
         <button disabled={!canJoinAmateurTeam(game)} onClick={() => onChange(joinAmateurTeam(game))}>
           <b>아마추어 팀 합류</b>
-          <small>미스릴 이상 · 명성 45 · 팀 결성</small>
+          <small>미스릴 이상 · 인지도 5 · 팀 결성</small>
         </button>
         <button disabled={!canPromoteTeamToKel(game)} onClick={() => onChange(promoteTeamToKel(game))}>
           <b>팀 전체 KEL 승격</b>
-          <small>아마추어 팀 · 명성 240 · CP 600</small>
+          <small>아마추어 팀 · 인지도 60 · CP 600</small>
         </button>
         <button
           disabled={!canJoinKel(game) || game.careerLeague === 'KEL'}
           onClick={() => onChange(joinKel(game))}
         >
           <b>KEL 4인 로스터 합류</b>
-          <small>명성 180 · 마스터즈 CP 400</small>
+          <small>인지도 50 · 마스터즈 CP 400</small>
         </button>
       </div>
       <h2>자동 참가 결과</h2>

@@ -41,7 +41,7 @@ export function TeamHub({ game, onChange }: TeamHubProps) {
       </section>
       {!game.teamName && (
         <p className="team-empty panel">
-          대회에서 명성을 쌓아 팀 제안을 받으세요. 계약 후 이 화면에서 로스터와 이적 제안을 함께 관리할 수
+          대회에서 인지도를 쌓아 팀 제안을 받으세요. 계약 후 이 화면에서 로스터와 이적 제안을 함께 관리할 수
           있습니다.
         </p>
       )}

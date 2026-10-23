@@ -96,7 +96,7 @@ export function SeasonRecapSummary({ game, open, onClose }: Props) {
                 </b>
               </span>
               <span>
-                <small>명성 획득</small>
+                <small>인지도 획득</small>
                 <b>+{summary.fameGained}</b>
               </span>
               <span>

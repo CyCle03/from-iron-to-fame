@@ -21,28 +21,38 @@ describe('career rules', () => {
   it('keeps tournament eligibility in pure selectors', () => {
     expect(canEnterCommunityCup(career({ rp: 7599 }))).toBe(false);
     expect(canEnterCommunityCup(career({ rp: 7600 }))).toBe(true);
-    expect(canEnterMasters(career({ rp: 8399, fame: 75, teamName: '팀', careerLeague: '아마추어' }))).toBe(
+    expect(canEnterCommunityCup(career({ rp: 7600, seasonCupEntries: 1 }))).toBe(false);
+    expect(
+      canEnterCommunityCup(
+        career({
+          rp: 7600,
+          seasonCupEntries: 1,
+          competitionHistory: [{ season: 11, kind: '지역 컵', stage: 1, place: 1, points: 0 }],
+        }),
+      ),
+    ).toBe(true);
+    expect(canEnterMasters(career({ rp: 8399, fame: 15, teamName: '팀', careerLeague: '아마추어' }))).toBe(
       false,
     );
-    expect(canEnterMasters(career({ rp: 8400, fame: 75, teamName: '팀', careerLeague: '아마추어' }))).toBe(
+    expect(canEnterMasters(career({ rp: 8400, fame: 15, teamName: '팀', careerLeague: '아마추어' }))).toBe(
       true,
     );
     expect(canEnterKelStage(career({ careerLeague: 'KEL', kelStage: 6 }))).toBe(true);
   });
 
   it('reports team progression eligibility', () => {
-    expect(canJoinAmateurTeam(career({ rp: 7599, fame: 45 }))).toBe(false);
-    expect(canJoinAmateurTeam(career({ rp: 7600, fame: 45 }))).toBe(true);
-    expect(canJoinKel(career({ fame: 180, mastersPoints: 400 }))).toBe(true);
-    expect(canPromoteTeamToKel(career({ fame: 240, mastersPoints: 600, careerLeague: '마스터즈' }))).toBe(
+    expect(canJoinAmateurTeam(career({ rp: 7599, fame: 5 }))).toBe(false);
+    expect(canJoinAmateurTeam(career({ rp: 7600, fame: 5 }))).toBe(true);
+    expect(canJoinKel(career({ fame: 50, mastersPoints: 400 }))).toBe(true);
+    expect(canPromoteTeamToKel(career({ fame: 60, mastersPoints: 600, careerLeague: '마스터즈' }))).toBe(
       true,
     );
   });
 
   it('describes the next unmet career goal', () => {
-    expect(nextCareerGoal(career({ rp: 7600, fame: 20 }))).toEqual({
+    expect(nextCareerGoal(career({ rp: 7600, fame: 0 }))).toEqual({
       title: '아마추어 팀 합류',
-      detail: '명성 25',
+      detail: '인지도 5',
     });
     expect(
       nextCareerGoal(career({ teamName: '테스트 팀', careerLeague: '아마추어', rp: 8300, fame: 70 })).detail,

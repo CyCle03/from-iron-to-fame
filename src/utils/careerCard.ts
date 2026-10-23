@@ -70,7 +70,7 @@ export function saveCareerCard(game: Game) {
     650,
     y,
   );
-  y += drawText(ctx, `• 트로피 ${game.trophies}개 · 명성 ${game.fame}`, 650, y);
+  y += drawText(ctx, `• 트로피 ${game.trophies}개 · 인지도 ${game.fame}`, 650, y);
   drawText(ctx, game.awards[0] ? `• 대표 수상: ${game.awards[0]}` : '• 아직 수상 기록 없음', 650, y);
   ctx.font = '500 17px sans-serif';
   ctx.fillStyle = '#9aa9cb';

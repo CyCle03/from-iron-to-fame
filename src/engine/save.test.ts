@@ -14,6 +14,7 @@ describe('save migration', () => {
       unknown
     >;
     oldSave.version = 1;
+    oldSave.fame = 2500;
     delete oldSave.awards;
     delete oldSave.teamHistory;
     delete oldSave.experimentPool;
@@ -33,6 +34,7 @@ describe('save migration', () => {
     const migrated = migrateGameSave(oldSave);
 
     expect(migrated?.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated?.fame).toBe(100);
     expect(migrated?.awards).toEqual([]);
     expect(migrated?.experimentPool).toHaveLength(3);
     expect(migrated?.turningPointAvailable).toBe(false);

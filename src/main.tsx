@@ -122,8 +122,8 @@ function App() {
         <small className="save-indicator">✓ 이 브라우저에 자동 저장됨</small>
         <div className="credits">C {game.credits.toLocaleString()}</div>
         <div className="fame-hud">
-          <small>명성</small>
-          <b>{game.fame ?? 0}</b>
+          <small>인지도</small>
+          <b>{game.fame ?? 0}/100</b>
           <small>{game.teamName ?? '무소속'}</small>
         </div>
         <div className="rank-hud">
