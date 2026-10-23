@@ -16,6 +16,7 @@ import {
 } from '../engine/game';
 import { saveCareerCard } from '../utils/careerCard';
 import { scoutOfferContext, starterSwapImpact } from '../engine/careerRules';
+import { SaveControls } from './SaveControls';
 
 type GamePanelProps = {
   game: Game;
@@ -210,7 +211,12 @@ export function CareerArchivePanel({ game, onChange }: GamePanelProps) {
   );
 }
 
-export function RetiredCareer({ game, onChange }: GamePanelProps) {
+type RetiredCareerProps = GamePanelProps & {
+  onImport: (game: Game) => void;
+  onReset: () => void;
+};
+
+export function RetiredCareer({ game, onChange, onImport, onReset }: RetiredCareerProps) {
   const totals = careerTotals(game);
   const progress = hallOfFameProgress(game);
   const majorTitles = majorTitleCount(game);
@@ -232,6 +238,9 @@ export function RetiredCareer({ game, onChange }: GamePanelProps) {
       <h1>
         {game.name} <em>{game.hallOfFame ? '명예의 전당' : '은퇴 선수'}</em>
       </h1>
+      <div className="retired-career-actions">
+        <SaveControls game={game} onImport={onImport} onReset={onReset} />
+      </div>
       <section className="panel">
         <h2>커리어 기록 보관소</h2>
         <div className="archive-stats">

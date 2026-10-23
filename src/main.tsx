@@ -8,6 +8,7 @@ import {
   hasExperimentTag,
   hyperCarryTankers,
   seasonInfo,
+  retireCareer,
 } from './engine/game';
 import { nextCareerGoal } from './engine/careerRules';
 import { advanceCareerSeason, type SeasonAdvanceResult } from './application/advanceCareerSeason';
@@ -42,7 +43,8 @@ function App() {
     setGame(next);
     if (next.notices[0]) notify(next.notices[0]);
   };
-  if (game?.retired) return <RetiredCareer game={game} onChange={applyGameChange} />;
+  if (game?.retired)
+    return <RetiredCareer game={game} onChange={applyGameChange} onImport={setGame} onReset={resetGame} />;
   if (!game) return <CreateCareer onCreate={setGame} />;
   const playWeek = (action: Action) => {
     const advanced = advanceCareerSeason(game, action);
@@ -108,7 +110,14 @@ function App() {
           </div>
         </div>
       </header>
-      <AppNavigation game={game} activeTab={tab} onNavigate={setTab} onImport={setGame} onReset={resetGame} />
+      <AppNavigation
+        game={game}
+        activeTab={tab}
+        onNavigate={setTab}
+        onImport={setGame}
+        onReset={resetGame}
+        onRetire={() => applyGameChange(retireCareer(game))}
+      />
       <div className="notice">✦ {report ?? game.notices[0]}</div>
       {tab === '대시보드' && (
         <>

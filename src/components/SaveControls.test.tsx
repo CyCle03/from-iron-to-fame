@@ -13,13 +13,14 @@ afterEach(cleanup);
 const renderControls = () => {
   const onImport = vi.fn();
   const onReset = vi.fn();
+  const onRetire = vi.fn();
   const game = createGame('현재 선수', '아이언', '일반 유저', '유키');
   render(
     <ToastProvider>
-      <SaveControls game={game} onImport={onImport} onReset={onReset} />
+      <SaveControls game={game} onImport={onImport} onReset={onReset} onRetire={onRetire} />
     </ToastProvider>,
   );
-  return { game, onImport, onReset };
+  return { game, onImport, onReset, onRetire };
 };
 
 describe('SaveControls user flow', () => {
@@ -30,8 +31,8 @@ describe('SaveControls user flow', () => {
     const file = new File([serializeGameSave(imported)], 'career.json', { type: 'application/json' });
     Object.defineProperty(file, 'text', { value: async () => serializeGameSave(imported) });
 
-    await user.click(screen.getByRole('button', { name: '저장·새 커리어' }));
-    expect(screen.getByRole('button', { name: '저장 관리 닫기' })).toBe(document.activeElement);
+    await user.click(screen.getByRole('button', { name: '커리어 관리' }));
+    expect(screen.getByRole('button', { name: '커리어 관리 닫기' })).toBe(document.activeElement);
     await user.upload(document.querySelector('input[type="file"]') as HTMLInputElement, file);
 
     expect(await screen.findByText('가져온 선수')).toBeTruthy();
@@ -44,14 +45,10 @@ describe('SaveControls user flow', () => {
   it('supports cancelling reset and returns focus after Escape', async () => {
     const user = userEvent.setup();
     const { onReset } = renderControls();
-    const trigger = screen.getByRole('button', { name: '저장·새 커리어' });
+    const trigger = screen.getByRole('button', { name: '커리어 관리' });
 
     await user.click(trigger);
-    await user.tab({ shift: true });
-    expect(screen.getByRole('button', { name: '새 커리어 시작' })).toBe(document.activeElement);
-    await user.tab();
-    expect(screen.getByRole('button', { name: '저장 관리 닫기' })).toBe(document.activeElement);
-    await user.click(screen.getByRole('button', { name: '새 커리어 시작' }));
+    await user.click(screen.getByRole('button', { name: '데이터 삭제 후 새 커리어' }));
     await user.click(screen.getByRole('button', { name: '취소' }));
     expect(onReset).not.toHaveBeenCalled();
 
@@ -60,14 +57,26 @@ describe('SaveControls user flow', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('requires a second action before resetting the career', async () => {
+  it('requires a second action before deleting the career data', async () => {
     const user = userEvent.setup();
     const { onReset } = renderControls();
 
-    await user.click(screen.getByRole('button', { name: '저장·새 커리어' }));
-    await user.click(screen.getByRole('button', { name: '새 커리어 시작' }));
+    await user.click(screen.getByRole('button', { name: '커리어 관리' }));
+    await user.click(screen.getByRole('button', { name: '데이터 삭제 후 새 커리어' }));
     expect(onReset).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('button', { name: '진행 삭제' }));
+    await user.click(screen.getByRole('button', { name: '데이터 삭제 확정' }));
     expect(onReset).toHaveBeenCalledOnce();
+  });
+
+  it('requires confirmation before preserving and retiring a career', async () => {
+    const user = userEvent.setup();
+    const { onRetire, onReset } = renderControls();
+
+    await user.click(screen.getByRole('button', { name: '커리어 관리' }));
+    await user.click(screen.getByRole('button', { name: '선수 은퇴' }));
+    expect(onRetire).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: '은퇴 확정' }));
+    expect(onRetire).toHaveBeenCalledOnce();
+    expect(onReset).not.toHaveBeenCalled();
   });
 });

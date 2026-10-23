@@ -8,6 +8,7 @@ type AppNavigationProps = {
   onNavigate: (tab: NavigationTab) => void;
   onImport: (game: Game) => void;
   onReset: () => void;
+  onRetire: () => void;
 };
 
 const labels: Record<NavigationTab, string> = {
@@ -21,7 +22,14 @@ const labels: Record<NavigationTab, string> = {
   '게임 안내': '안내',
 };
 
-export function AppNavigation({ game, activeTab, onNavigate, onImport, onReset }: AppNavigationProps) {
+export function AppNavigation({
+  game,
+  activeTab,
+  onNavigate,
+  onImport,
+  onReset,
+  onRetire,
+}: AppNavigationProps) {
   return (
     <nav className="app-navigation" aria-label="주요 메뉴">
       <div className="navigation-tabs">
@@ -46,7 +54,7 @@ export function AppNavigation({ game, activeTab, onNavigate, onImport, onReset }
           <button className="mobile-secondary" onClick={() => onNavigate('게임 안내')}>
             게임 안내
           </button>
-          <SaveControls game={game} onImport={onImport} onReset={onReset} />
+          <SaveControls game={game} onImport={onImport} onReset={onReset} onRetire={onRetire} />
         </div>
       </details>
     </nav>

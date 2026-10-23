@@ -3,12 +3,18 @@ import type { Game } from '../engine/game';
 import { getSavePreview, parseGameSave, serializeGameSave } from '../engine/save';
 import { useToast } from './ToastProvider';
 
-type SaveControlsProps = { game: Game; onImport: (game: Game) => void; onReset: () => void };
+type SaveControlsProps = {
+  game: Game;
+  onImport: (game: Game) => void;
+  onReset: () => void;
+  onRetire?: () => void;
+};
 
-export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
+export function SaveControls({ game, onImport, onReset, onRetire }: SaveControlsProps) {
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState<Game | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmRetire, setConfirmRetire] = useState(false);
   const { notify } = useToast();
   const triggerButton = useRef<HTMLButtonElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -17,6 +23,7 @@ export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
   const closeModal = useCallback(() => {
     setOpen(false);
     setConfirmReset(false);
+    setConfirmRetire(false);
     window.setTimeout(() => triggerButton.current?.focus());
   }, []);
 
@@ -81,12 +88,18 @@ export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
     setConfirmReset(false);
   };
 
+  const retire = () => {
+    onRetire?.();
+    setOpen(false);
+    setConfirmRetire(false);
+  };
+
   const importSummary = preview ? getSavePreview(preview) : null;
 
   return (
     <>
       <button ref={triggerButton} onClick={() => setOpen(true)}>
-        저장·새 커리어
+        커리어 관리
       </button>
       {open && (
         <div
@@ -98,10 +111,10 @@ export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
           <section className="save-modal" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
             <div className="modal-heading">
               <div>
-                <p className="eyebrow">SAVE MANAGER</p>
-                <h2 id="save-modal-title">저장 관리</h2>
+                <p className="eyebrow">CAREER MANAGER</p>
+                <h2 id="save-modal-title">커리어 관리</h2>
               </div>
-              <button ref={closeButton} aria-label="저장 관리 닫기" onClick={closeModal}>
+              <button ref={closeButton} aria-label="커리어 관리 닫기" onClick={closeModal}>
                 ×
               </button>
             </div>
@@ -150,18 +163,37 @@ export function SaveControls({ game, onImport, onReset }: SaveControlsProps) {
                 </div>
               </div>
             )}
+            {onRetire && !game.retired && (
+              <div className="reset-zone">
+                <b>선수 은퇴</b>
+                <p>현재 커리어를 종료하되 통산 기록과 수상 내역은 이 브라우저에 그대로 보존합니다.</p>
+                {confirmRetire ? (
+                  <div>
+                    <button onClick={() => setConfirmRetire(false)}>취소</button>
+                    <button className="danger" onClick={retire}>
+                      은퇴 확정
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => setConfirmRetire(true)}>선수 은퇴</button>
+                )}
+              </div>
+            )}
             <div className="reset-zone">
-              <b>새 커리어</b>
-              <p>현재 브라우저의 진행을 지웁니다. 먼저 JSON 백업을 내려받을 수 있습니다.</p>
+              <b>데이터 삭제</b>
+              <p>
+                현재 브라우저의 저장 데이터를 삭제하고 선수 생성 화면으로 돌아갑니다. 필요하면 먼저 JSON
+                백업을 내려받으세요.
+              </p>
               {confirmReset ? (
                 <div>
                   <button onClick={() => setConfirmReset(false)}>취소</button>
                   <button className="danger" onClick={reset}>
-                    진행 삭제
+                    데이터 삭제 확정
                   </button>
                 </div>
               ) : (
-                <button onClick={() => setConfirmReset(true)}>새 커리어 시작</button>
+                <button onClick={() => setConfirmReset(true)}>데이터 삭제 후 새 커리어</button>
               )}
             </div>
           </section>

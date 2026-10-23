@@ -2058,6 +2058,10 @@ li {
 .retired-career .panel {
   margin-top: 20px;
 }
+.retired-career-actions {
+  display: flex;
+  justify-content: flex-end;
+}
 .retired-career button:disabled {
   background: #30384e;
   color: #8994ad;
