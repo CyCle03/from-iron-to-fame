@@ -2867,3 +2867,159 @@ li {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Staged season briefing: one decision-sized page at a time. */
+.recap-story {
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  min-height: min(650px, calc(100dvh - 36px));
+  overflow: hidden;
+}
+.recap-story > .recap-progress {
+  display: flex;
+  gap: 6px;
+  padding: 18px 24px 0;
+}
+.recap-story > .recap-progress i {
+  flex: 1;
+  height: 4px;
+  margin: 0;
+  background: #35405b;
+}
+.recap-story > .recap-progress i.active {
+  background: #f4bd55;
+}
+.recap-page {
+  min-height: 0;
+  overflow: auto;
+  padding: 28px 24px;
+  animation: recap-line 0.22s ease-out both;
+}
+.recap-page > h3 {
+  margin: 0 0 22px;
+  font-size: clamp(24px, 4vw, 32px);
+}
+.recap-hero-page {
+  display: grid;
+  align-content: center;
+}
+.recap-hero-page > p {
+  margin: 0;
+  color: #9eacca;
+}
+.recap-hero-page > h3 {
+  max-width: 480px;
+  margin: 8px 0 30px;
+  font-size: clamp(30px, 6vw, 46px);
+  line-height: 1.16;
+}
+.recap-hero-page > h3 strong {
+  color: #f4bd55;
+}
+.recap-metric-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+}
+.recap-story .season-summary-note {
+  margin: 14px 0 0;
+}
+.recap-inbox {
+  display: grid;
+  gap: 10px;
+}
+.recap-inbox span {
+  display: grid;
+  gap: 5px;
+  padding: 16px;
+  background: #111a30;
+  border: 1px solid #34466d;
+  border-radius: 10px;
+}
+.recap-inbox b {
+  color: #f4bd55;
+  font-size: 18px;
+}
+.recap-inbox small {
+  color: #b7c4df;
+  line-height: 1.5;
+}
+.recap-story-actions {
+  display: flex;
+  gap: 10px;
+  padding: 16px 24px 22px;
+  border-top: 1px solid #40547e;
+}
+.recap-story-actions button {
+  flex: 1;
+  min-height: 52px;
+  border: 0;
+  border-radius: 9px;
+  background: #f4bd55;
+  color: #24192a;
+  font-weight: 900;
+}
+.recap-story-actions .secondary {
+  flex: 0 0 120px;
+  color: #dbe4fa;
+  background: #303c60;
+}
+@media (max-width: 640px) {
+  .recap-story {
+    min-height: 82dvh;
+  }
+  .recap-story > .recap-progress,
+  .recap-page,
+  .recap-story-actions {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .recap-page {
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+  .recap-hero-page .recap-scoreboard {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .recap-metric-list {
+    grid-template-columns: 1fr 1fr !important;
+    padding: 0 !important;
+  }
+  .recap-story-actions .secondary {
+    flex-basis: 92px;
+  }
+}
+
+.offer-terms {
+  display: grid;
+  gap: 7px;
+  margin: 4px 0;
+}
+.offer-terms div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 8px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid #29395f;
+}
+.offer-terms dt {
+  color: #8f9dbd;
+  font-size: 12px;
+}
+.offer-terms dd {
+  min-width: 0;
+  margin: 0;
+  color: #dbe4fa;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .offer-terms div {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+  .offer-terms dt,
+  .offer-terms dd {
+    font-size: 14px;
+  }
+}

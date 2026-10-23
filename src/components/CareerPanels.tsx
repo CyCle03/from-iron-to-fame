@@ -71,6 +71,24 @@ export function ExperimentPoolPanel({ game, onChange }: GamePanelProps) {
   );
 }
 
+const offerContext = (league: Game['careerLeague'], game: Game) => {
+  const average =
+    Object.values(game.stats).reduce((sum, value) => sum + value, 0) / Object.values(game.stats).length;
+  if (league === 'KEL')
+    return {
+      role: '4인 로스터 주전 경쟁',
+      path: 'KEL 정규 일정·메이저 우승 도전',
+      fit: average >= 68 ? '즉시 전력' : '도전적',
+    };
+  if (league === '마스터즈')
+    return {
+      role: '3인 스쿼드 핵심 로테이션',
+      path: '서킷 포인트→시즌 파이널',
+      fit: average >= 55 ? '적합' : '성장 필요',
+    };
+  return { role: '육성 로스터 주전', path: '지역 컵→마스터즈 진출', fit: '안정적' };
+};
+
 export function ContractPanel({ game, onChange }: GamePanelProps) {
   return (
     <section className="panel contract-panel">
@@ -93,15 +111,33 @@ export function ContractPanel({ game, onChange }: GamePanelProps) {
       <div className="offer-grid">
         {game.scoutOffers.map((offer, index) => {
           const salaryChange = offer.salary - (game.contract?.salary ?? 0);
+          const context = offerContext(offer.league, game);
           return (
             <article key={offer.team}>
               <b>{offer.team}</b>
               <span>
                 {offer.league} · {offer.seasonsRemaining}시즌
               </span>
-              <small>
-                급여 {offer.salary} C · 계약금 {offer.signingBonus} C
-              </small>
+              <dl className="offer-terms">
+                <div>
+                  <dt>예상 역할</dt>
+                  <dd>{context.role}</dd>
+                </div>
+                <div>
+                  <dt>경쟁 무대</dt>
+                  <dd>{context.path}</dd>
+                </div>
+                <div>
+                  <dt>팀 적합도</dt>
+                  <dd>{context.fit}</dd>
+                </div>
+                <div>
+                  <dt>계약</dt>
+                  <dd>
+                    {offer.seasonsRemaining}시즌 · 급여 {offer.salary} C · 계약금 {offer.signingBonus} C
+                  </dd>
+                </div>
+              </dl>
               <div className="contract-comparison">
                 <span className={salaryChange >= 0 ? 'up' : 'down'}>
                   현재 대비 급여 {salaryChange >= 0 ? '+' : ''}
