@@ -610,7 +610,7 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
     let totalNet = 0,
       totalFee = 0,
       totalKills = 0,
-      bestPlace = 24;
+      bestPlace = 8;
     for (let gameNo = 0; gameNo < 4; gameNo++) {
       const fee = rankEntryFee(n.rp);
       const power =
@@ -637,20 +637,20 @@ export function act(g: Game, a: Action, random: RandomSource = Math.random): Gam
         (n.teammateRoles ?? []).includes('근거리 딜러')
           ? 5
           : 0);
-      const place = Math.max(1, Math.min(24, Math.round(22 - power / 6)));
+      const place = Math.max(1, Math.min(8, Math.round(9 - power / 12)));
       const kills = Math.max(0, Math.round((power - 36) / 16 + random() * 3));
-      const gross = Math.max(0, Math.round((25 - place) * 7 + kills * 9 + (random() - 0.5) * 14));
+      const gross = Math.max(0, Math.round((9 - place) * 14 + kills * 6 + (random() - 0.5) * 10));
       const delta = gross - fee;
       n.rp = Math.max(0, n.rp + delta);
       n.rank = rankFor(n.rp);
       n.fatigue = clamp(n.fatigue + 7);
       n.mastery[n.main] = clamp((n.mastery[n.main] ?? 0) + 2);
       gain('combat', 0.7 + Math.max(0, kills - 1) * 0.25);
-      gain('teamwork', place <= 8 ? 0.7 : 0.3);
-      gain('judgement', place <= 5 ? 1 : 0.35);
+      gain('teamwork', place <= 4 ? 0.7 : 0.3);
+      gain('judgement', place <= 3 ? 1 : 0.35);
       gain('mental', delta >= 0 ? 0.55 : -0.25);
       if (kills >= 3) gain('physical', 0.45);
-      n.credits += Math.max(20, 55 + kills * 12 + (25 - place) * 5);
+      n.credits += Math.max(20, 55 + kills * 12 + (9 - place) * 15);
       n.fame = (n.fame ?? 0) + Math.max(0, 9 - place);
       n.matches.unshift({ place, kills, rp: delta, name: n.main, fee, gross });
       totalNet += delta;
@@ -944,11 +944,7 @@ const mastersPointsForPlace = (place: number) =>
           ? 245
           : place <= 8
             ? 200
-            : place <= 16
-              ? 120
-              : place <= 24
-                ? 70
-                : 30;
+            : 0;
 const rankMasters = (standings: MastersStanding[]) =>
   [...standings].sort((a, b) => b.points - a.points || b.wins - a.wins || a.name.localeCompare(b.name, 'ko'));
 export function recordMastersPhase(g: Game, points: number, place = 0): Game {
@@ -1107,8 +1103,8 @@ export function playCommunityCup(g: Game, random: RandomSource = Math.random): G
     (n.stats.combat + n.stats.macro + n.stats.teamwork + n.stats.focus) / 4 +
     (n.mastery[n.main] ?? 0) * 0.2 +
     (random() - 0.5) * 24;
-  const place = Math.max(1, Math.min(16, Math.round(15 - power / 7)));
-  const fame = place === 1 ? 38 : place <= 3 ? 24 : place <= 8 ? 12 : 5;
+  const place = Math.max(1, Math.min(8, Math.round(9 - power / 9)));
+  const fame = place === 1 ? 38 : place <= 3 ? 24 : place <= 5 ? 12 : 5;
   n.fame = (n.fame ?? 0) + fame;
   n.communityCups = (n.communityCups ?? 0) + 1;
   n.seasonCupEntries = (n.seasonCupEntries ?? 0) + 1;

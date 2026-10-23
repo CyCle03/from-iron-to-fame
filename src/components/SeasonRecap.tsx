@@ -33,7 +33,7 @@ export function SeasonRecap({ game, open, onClose }: Props) {
     <div className="season-recap-backdrop" role="dialog" aria-modal="true" aria-labelledby="season-recap-title">
       <section className="season-recap">
         <header>
-          <p className="eyebrow">SEASON COMPLETE · S{summary.season}</p>
+          <p className="eyebrow">SEASON COMPLETE · S{summary.season} · 8팀 3인 스쿼드</p>
           <h2 id="season-recap-title">{game.name}의 시즌 결산</h2>
           <button className="recap-close" onClick={onClose} aria-label="시즌 결산 닫기">×</button>
         </header>

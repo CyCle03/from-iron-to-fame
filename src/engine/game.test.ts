@@ -82,6 +82,8 @@ describe('career engine', () => {
     expect(reset.rp).toBe(2460);
     const cup = playCommunityCup({ ...reset, rp: 1400 });
     expect(cup.fame).toBeGreaterThan(0);
+    expect(cup.competitionHistory[0].place).toBeGreaterThanOrEqual(1);
+    expect(cup.competitionHistory[0].place).toBeLessThanOrEqual(8);
     const team = joinAmateurTeam({ ...cup, fame: 50 });
     expect(team.careerLeague).toBe('아마추어');
     const kel = joinKel({ ...team, fame: 180, mastersPoints: 400 });
@@ -129,6 +131,7 @@ describe('career engine', () => {
     const g = act(before, 'rank');
     expect(g.matches).toHaveLength(4);
     expect(g.matches.every((m) => typeof m.fee === 'number' && typeof m.gross === 'number')).toBe(true);
+    expect(g.matches.every((m) => m.place >= 1 && m.place <= 8)).toBe(true);
     expect(g.rank).toBeTruthy();
     expect(g.stats.combat).toBeGreaterThan(before.stats.combat);
     expect(g.mastery.유키).toBeGreaterThan(before.mastery.유키);

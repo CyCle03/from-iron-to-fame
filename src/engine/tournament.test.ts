@@ -11,6 +11,7 @@ describe('tournament engine', () => {
     );
     expect(Object.values(picks).every((x) => x <= 2)).toBe(true);
     expect(r.rounds.length).toBeLessThanOrEqual(9);
+    expect(r.rounds.every((round) => round.place >= 1 && round.place <= 8)).toBe(true);
   });
   it('models masters as a phase with circuit points', () => {
     const r = simulateTournament(createGame('테스트', '골드', '일반 유저', '유키'), 'masters');

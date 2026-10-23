@@ -100,7 +100,7 @@ function App() {
       return;
     }
     if (kind === 'kel' && !kelEligible) {
-      applyGameChange(recordKelStage(game, 24));
+      applyGameChange(recordKelStage(game, 8));
       return;
     }
     const r = simulateTournament(game, kind);
