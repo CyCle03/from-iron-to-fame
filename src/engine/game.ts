@@ -267,7 +267,7 @@ export type CareerTotals = {
   representative: string;
 };
 export type HallOfFameCategory = '스타즈' | '히어로즈' | '아너스';
-export const CURRENT_SAVE_VERSION = 6 as const;
+export const CURRENT_SAVE_VERSION = 7 as const;
 export type Game = {
   lastSeasonPlan: Action;
   trainingFocus: StatKey[];

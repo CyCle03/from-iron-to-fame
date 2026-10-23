@@ -11,6 +11,13 @@ export function HallOfFamePanel({ game, onChange }: Props) {
   const progress = hallOfFameProgress(game);
   const majorTitles = majorTitleCount(game);
   const isHero = game.hallOfFameHonors.includes('히어로즈');
+  const starsComplete = allComplete(progress.stars);
+  const starsLabel =
+    game.lastStarsSeason === game.season
+      ? 'S' + game.season + ' 선정 완료'
+      : starsComplete
+        ? '팬 투표 결과 · 통산 ' + game.starsSelections + '회'
+        : '선정 조건 미충족';
 
   return (
     <section className="hall-panel panel hall-categories">
@@ -24,17 +31,15 @@ export function HallOfFamePanel({ game, onChange }: Props) {
           <strong>스타즈</strong>
           <em>연간 팬 투표 선정</em>
           <div className="hof-reqs">
+            <span className={progress.stars.currentMastersLevel ? 'done' : ''}>
+              현재 데미갓 이상 · 소속 팀
+            </span>
             <span className={progress.stars.awareness ? 'done' : ''}>인지도 70/100</span>
             <span className={progress.stars.mastersAppearance ? 'done' : ''}>마스터즈 출전 경력</span>
             <span className={progress.stars.topTierPodium ? 'done' : ''}>직전 시즌 마스터즈·KEL TOP3</span>
           </div>
-          <button
-            disabled={!allComplete(progress.stars)}
-            onClick={() => onChange(receiveHallHonor(game, '스타즈'))}
-          >
-            {game.lastStarsSeason === game.season
-              ? `S${game.season} 선정 완료`
-              : `팬 투표 결과 · 통산 ${game.starsSelections}회`}
+          <button disabled={!starsComplete} onClick={() => onChange(receiveHallHonor(game, '스타즈'))}>
+            {starsLabel}
           </button>
         </article>
         <article>

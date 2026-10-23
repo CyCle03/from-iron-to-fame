@@ -35,6 +35,13 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const stringArray = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 
+const recognitionCap = (history: Game['competitionHistory']) => {
+  if (history.some((record) => record.kind === 'KEL' || record.kind === '시즌 파이널')) return 100;
+  if (history.some((record) => record.kind === '마스터즈' || record.kind === 'LCQ')) return 90;
+  if (history.some((record) => record.kind === '지역 컵')) return 40;
+  return 4;
+};
+
 export function migrateGameSave(raw: unknown): Game | null {
   if (!isRecord(raw)) return null;
 
@@ -114,12 +121,16 @@ export function migrateGameSave(raw: unknown): Game | null {
         totalRp: typeof savedSummary.totalRp === 'number' ? savedSummary.totalRp : 0,
       } as Game['lastSeasonSummary'])
     : null;
+  const competitionHistory = Array.isArray(raw.competitionHistory)
+    ? (raw.competitionHistory as Game['competitionHistory'])
+    : [];
+  const savedFame = typeof raw.fame === 'number' ? Math.max(0, Math.round(raw.fame)) : 0;
 
   return {
     ...baseline,
     ...(raw as Partial<Game>),
     version: CURRENT_SAVE_VERSION,
-    fame: typeof raw.fame === 'number' ? Math.max(0, Math.min(100, Math.round(raw.fame))) : 0,
+    fame: Math.min(100, recognitionCap(competitionHistory), savedFame),
     rank,
     background,
     role,
@@ -160,9 +171,7 @@ export function migrateGameSave(raw: unknown): Game | null {
     equipment: stringArray(raw.equipment),
     history: stringArray(raw.history).length ? stringArray(raw.history) : baseline.history,
     notices: stringArray(raw.notices).length ? stringArray(raw.notices) : baseline.notices,
-    competitionHistory: Array.isArray(raw.competitionHistory)
-      ? (raw.competitionHistory as Game['competitionHistory'])
-      : [],
+    competitionHistory,
     matches: Array.isArray(raw.matches) ? (raw.matches as Game['matches']) : [],
     contract: isRecord(raw.contract) ? (raw.contract as Game['contract']) : null,
     scoutOffers: Array.isArray(raw.scoutOffers) ? (raw.scoutOffers as Game['scoutOffers']) : [],

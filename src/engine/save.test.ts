@@ -34,13 +34,25 @@ describe('save migration', () => {
     const migrated = migrateGameSave(oldSave);
 
     expect(migrated?.version).toBe(CURRENT_SAVE_VERSION);
-    expect(migrated?.fame).toBe(100);
+    expect(migrated?.fame).toBe(4);
     expect(migrated?.awards).toEqual([]);
     expect(migrated?.experimentPool).toHaveLength(3);
     expect(migrated?.turningPointAvailable).toBe(false);
     expect(migrated?.lastSeasonSummary?.seasonCondition).toBe('균형 운영');
     expect(migrated?.lastSeasonSummary?.autoRecoveryWeeks).toBe(0);
     expect(migrated && validateGameState(migrated)).toEqual([]);
+  });
+
+  it('caps recognition by verified official competition history', () => {
+    const base = createGame('인지도 검증', '플래티넘', '일반 유저', '유키');
+    expect(migrateGameSave({ ...base, fame: 100 })?.fame).toBe(4);
+    expect(
+      migrateGameSave({
+        ...base,
+        fame: 100,
+        competitionHistory: [{ season: 11, kind: '지역 컵', stage: 1, place: 1, points: 0 }],
+      })?.fame,
+    ).toBe(40);
   });
 
   it('repairs invalid profile choices without losing a valid name', () => {

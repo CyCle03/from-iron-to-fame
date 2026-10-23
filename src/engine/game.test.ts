@@ -160,6 +160,8 @@ describe('career engine', () => {
     expect(hallOfFameProgress(unknown).stars.mastersAppearance).toBe(false);
     const qualified = {
       ...unknown,
+      rp: 8400,
+      teamName: '스타 후보 팀',
       competitionHistory: [
         {
           season: completed.lastSeasonSummary!.season,
@@ -178,6 +180,7 @@ describe('career engine', () => {
       ],
     };
     expect(Object.values(hallOfFameProgress(qualified).stars).every(Boolean)).toBe(true);
+    expect(hallOfFameProgress({ ...qualified, rp: 8399 }).stars.currentMastersLevel).toBe(false);
   });
   it('uses an action and advances the week', () => {
     const g = act(createGame('테스트', '골드', '일반 유저', '유키'), 'physical');

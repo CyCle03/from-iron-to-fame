@@ -1,4 +1,5 @@
 import type { CareerTotals, Game, HallOfFameCategory } from './game';
+import { COMPETITION_RP } from './competitionRules';
 
 export function careerTotals(game: Game): CareerTotals {
   const placed = game.competitionHistory.filter((record) => record.place > 0);
@@ -56,6 +57,7 @@ export class HallOfFameCareer {
     return {
       stars: {
         active: !game.retired,
+        currentMastersLevel: game.rp >= COMPETITION_RP.masters && game.teamName !== null,
         awareness: game.fame >= 70,
         mastersAppearance,
         topTierPodium,
