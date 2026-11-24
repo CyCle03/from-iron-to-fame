@@ -1,5 +1,5 @@
 import type { CareerTotals, Game, HallOfFameCategory } from './game';
-import { seasonQualificationRp } from './careerRules';
+import { CAREER_REQUIREMENTS, seasonQualificationRp } from './careerRules';
 import { COMPETITION_RP } from './competitionRules';
 
 export function careerTotals(game: Game): CareerTotals {
@@ -39,6 +39,7 @@ export class HallOfFameCareer {
 
   progress() {
     const game = this.game;
+    const requirements = CAREER_REQUIREMENTS;
     const lastSeason = game.lastSeasonSummary?.season;
     const mastersAppearance = game.competitionHistory.some((record) =>
       ['마스터즈', 'LCQ', '시즌 파이널'].includes(record.kind),
@@ -59,22 +60,22 @@ export class HallOfFameCareer {
       stars: {
         active: !game.retired,
         currentMastersLevel: seasonQualificationRp(game) >= COMPETITION_RP.masters && game.teamName !== null,
-        awareness: game.fame >= 70,
+        awareness: game.fame >= requirements.hallOfFameStarsFame,
         mastersAppearance,
         topTierPodium,
         selectable: game.lastStarsSeason !== game.season,
       },
       heroes: {
         active: !game.retired,
-        majorTitles: majorTitleCount(game) >= 3,
+        majorTitles: majorTitleCount(game) >= requirements.hallOfFameHeroesMajorTitles,
       },
       honors: {
         retired: game.retired,
         heroes: game.hallOfFameHonors.includes('히어로즈'),
-        majorTitles: majorTitleCount(game) >= 5,
-        mvps: mvpCount(game) >= 2,
-        awareness: game.fame >= 90,
-        longevity: topTierSeasons >= 5,
+        majorTitles: majorTitleCount(game) >= requirements.hallOfFameHonorsMajorTitles,
+        mvps: mvpCount(game) >= requirements.hallOfFameHonorsMvps,
+        awareness: game.fame >= requirements.hallOfFameHonorsFame,
+        longevity: topTierSeasons >= requirements.hallOfFameHonorsTopTierSeasons,
       },
     };
   }

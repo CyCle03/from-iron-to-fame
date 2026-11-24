@@ -9,6 +9,7 @@ import {
   playCommunityCup,
   joinAmateurTeam,
   joinKel,
+  promoteTeamToKel,
   recordMastersPhase,
   recordKelStage,
   finishMastersSeason,
@@ -111,10 +112,49 @@ describe('career engine', () => {
     expect(playCommunityCup({ ...reset, rp: 7600, fame: 99 }).fame).toBeLessThanOrEqual(100);
     const team = joinAmateurTeam({ ...cup, fame: 50 });
     expect(team.careerLeague).toBe('아마추어');
-    const kel = joinKel({ ...team, fame: 180, mastersPoints: 400 });
+    const kelReady = {
+      ...team,
+      fame: 180,
+      mastersPoints: 400,
+      competitionHistory: [
+        { season: team.season - 1, kind: '시즌 파이널' as const, stage: 1, place: 2, points: 0 },
+      ],
+    };
+    const kel = joinKel(kelReady);
     expect(kel.careerLeague).toBe('KEL');
     expect(kel.kelRosterSize).toBe(4);
     expect(kel.teammateExperiments).toHaveLength(3);
+  });
+  it('applies the KEL recent-final policy to every entry path', () => {
+    const base = joinAmateurTeam({
+      ...createGame('KEL 경로', '미스릴', '일반 유저', '유키'),
+      rp: 7600,
+      fame: 60,
+    });
+    const noFinal = { ...base, fame: 60, mastersPoints: 600 };
+    const kelOffer = {
+      team: 'KEL 블루 피닉스',
+      league: 'KEL' as const,
+      salary: 1050,
+      seasonsRemaining: 3,
+      signingBonus: 700,
+    };
+
+    expect(joinKel(noFinal).careerLeague).toBe('아마추어');
+    expect(promoteTeamToKel(noFinal).careerLeague).toBe('아마추어');
+    const rejected = acceptScoutOffer({ ...noFinal, scoutOffers: [kelOffer] }, 0);
+    expect(rejected.careerLeague).toBe('아마추어');
+    expect(rejected.scoutOffers).toHaveLength(1);
+
+    const eligible = {
+      ...noFinal,
+      competitionHistory: [
+        { season: noFinal.season - 1, kind: '시즌 파이널' as const, stage: 1, place: 2, points: 0 },
+      ],
+    };
+    expect(joinKel(eligible).careerLeague).toBe('KEL');
+    expect(promoteTeamToKel(eligible).careerLeague).toBe('KEL');
+    expect(acceptScoutOffer({ ...eligible, scoutOffers: [kelOffer] }, 0).careerLeague).toBe('KEL');
   });
   it('enforces esports eligibility in the engine', () => {
     const solo = createGame('테스트', '골드', '일반 유저', '유키');

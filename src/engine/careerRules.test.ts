@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { createGame, runSeason, type Game } from './game';
 import {
+  CAREER_REQUIREMENTS,
+  KEL_SELECTION_LEGACY,
   canEnterCommunityCup,
   canEnterKelStage,
   canEnterMasters,
   canJoinAmateurTeam,
   canJoinKel,
   canPromoteTeamToKel,
+  recentTopTierFinalPlace,
   seasonQualificationRp,
   nextCareerGoal,
   scoutOfferContext,
@@ -17,6 +20,25 @@ const career = (overrides: Partial<Game> = {}) => ({
   ...createGame('정책 테스트', '골드', '일반 유저', '유키'),
   ...overrides,
 });
+
+const withRecentFinal = (place: number, overrides: Partial<Game> = {}): Game => {
+  const completed = runSeason(career(), 'review', () => 0.5);
+  return {
+    ...completed,
+    fame: 50,
+    mastersPoints: 400,
+    competitionHistory: [
+      {
+        season: completed.lastSeasonSummary!.season,
+        kind: '시즌 파이널',
+        stage: 1,
+        place,
+        points: 0,
+      },
+    ],
+    ...overrides,
+  };
+};
 
 describe('career rules', () => {
   it('keeps tournament eligibility in pure selectors', () => {
@@ -60,10 +82,39 @@ describe('career rules', () => {
   it('reports team progression eligibility', () => {
     expect(canJoinAmateurTeam(career({ rp: 7599, fame: 5 }))).toBe(false);
     expect(canJoinAmateurTeam(career({ rp: 7600, fame: 5 }))).toBe(true);
-    expect(canJoinKel(career({ fame: 50, mastersPoints: 400 }))).toBe(true);
+    expect(canJoinKel(career({ fame: 50, mastersPoints: 400 }))).toBe(false);
+    expect(canJoinKel(withRecentFinal(3))).toBe(true);
     expect(canPromoteTeamToKel(career({ fame: 60, mastersPoints: 600, careerLeague: '마스터즈' }))).toBe(
-      true,
+      false,
     );
+    expect(
+      canPromoteTeamToKel(withRecentFinal(3, { fame: 60, mastersPoints: 600, careerLeague: '마스터즈' })),
+    ).toBe(true);
+  });
+
+  it('selects KEL from the most recent top-tier final result', () => {
+    expect(CAREER_REQUIREMENTS.kelRecentFinalPlace).toBe(3);
+    expect(recentTopTierFinalPlace(withRecentFinal(2))).toBe(2);
+    expect(canJoinKel(withRecentFinal(4))).toBe(false);
+    expect(canJoinKel(withRecentFinal(3))).toBe(true);
+    expect(canJoinKel(withRecentFinal(3, { careerLeague: 'KEL' }))).toBe(false);
+    const kelFinal = {
+      ...withRecentFinal(4),
+      competitionHistory: [{ season: 11, kind: 'KEL' as const, stage: 7, place: 2, points: 0 }],
+    };
+    expect(recentTopTierFinalPlace(kelFinal)).toBe(2);
+    expect(canJoinKel(kelFinal)).toBe(true);
+  });
+
+  it('preserves the pre-change CP-only KEL baseline separately', () => {
+    expect(KEL_SELECTION_LEGACY).toEqual({ ...CAREER_REQUIREMENTS, kelRecentFinalPlace: null });
+    expect(canJoinKel(career({ fame: 50, mastersPoints: 400 }), KEL_SELECTION_LEGACY)).toBe(true);
+    expect(
+      canPromoteTeamToKel(
+        career({ fame: 60, mastersPoints: 600, careerLeague: '마스터즈' }),
+        KEL_SELECTION_LEGACY,
+      ),
+    ).toBe(true);
   });
 
   it('describes the next unmet career goal', () => {

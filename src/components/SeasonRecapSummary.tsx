@@ -1,23 +1,30 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { rankLabel, type Game } from '../engine/game';
 import { buildSeasonRecapView } from '../engine/seasonRecap';
+import { useModalDialog } from '../hooks/useModalDialog';
 
 type Props = { game: Game; open: boolean; onClose: () => void };
 
 export function SeasonRecapSummary({ game, open, onClose }: Props) {
   const [step, setStep] = useState(0);
   const summary = game.lastSeasonSummary;
+  const closeButton = useRef<HTMLButtonElement>(null);
   const close = () => {
     setStep(0);
     onClose();
   };
-  if (!open || !summary) return null;
+  const isOpen = open && Boolean(summary);
+  const { ref: dialogRef } = useModalDialog<HTMLDivElement>(isOpen, close, {
+    initialFocusRef: closeButton,
+  });
+  if (!isOpen || !summary) return null;
 
   const view = buildSeasonRecapView(game)!;
   const title = step === 0 ? '시즌의 결론' : step === 1 ? '랭크 경기 리포트' : '다음 이야기가 도착했습니다';
 
   return (
     <div
+      ref={dialogRef}
       className="season-recap-backdrop"
       role="dialog"
       aria-modal="true"
@@ -34,7 +41,7 @@ export function SeasonRecapSummary({ game, open, onClose }: Props) {
             <p className="eyebrow">SEASON COMPLETE · S{summary.season}</p>
             <h2 id="season-recap-title">{title}</h2>
           </div>
-          <button className="recap-close" onClick={close} aria-label="시즌 결산 닫기">
+          <button ref={closeButton} className="recap-close" onClick={close} aria-label="시즌 결산 닫기">
             ×
           </button>
         </header>

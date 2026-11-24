@@ -28,6 +28,8 @@ import { TeamHub } from './components/TeamHub';
 import { ToastProvider, useToast } from './components/ToastProvider';
 import { SEASON_ACTIONS, type NavigationTab } from './constants/ui';
 import { useCareerGame } from './hooks/useCareerGame';
+import { careerAchievements, type CareerAchievement } from './application/careerAchievements';
+import { AchievementSequence } from './components/AchievementSequence';
 import './style.css';
 const actions = SEASON_ACTIONS;
 function App() {
@@ -39,15 +41,25 @@ function App() {
   const [tab, setTab] = useState<NavigationTab>('대시보드');
   const [result, setResult] = useState<SeasonAdvanceResult['tournamentResult']>(null);
   const [showSeasonRecap, setShowSeasonRecap] = useState(false);
+  const [achievements, setAchievements] = useState<CareerAchievement[]>([]);
   const applyGameChange = (next: NonNullable<typeof game>) => {
+    if (game) setAchievements(careerAchievements(game, next));
     setGame(next);
     if (next.notices[0]) notify(next.notices[0]);
   };
   if (game?.retired)
-    return <RetiredCareer game={game} onChange={applyGameChange} onImport={setGame} onReset={resetGame} />;
+    return (
+      <>
+        <RetiredCareer game={game} onChange={applyGameChange} onImport={setGame} onReset={resetGame} />
+        {achievements.length > 0 && (
+          <AchievementSequence events={achievements} onClose={() => setAchievements([])} />
+        )}
+      </>
+    );
   if (!game) return <CreateCareer onCreate={setGame} />;
   const playWeek = (action: Action) => {
     const advanced = advanceCareerSeason(game, action);
+    setAchievements(careerAchievements(game, advanced.game));
     setResult(advanced.tournamentResult);
     setReport(advanced.report);
     notify(advanced.report);
@@ -325,7 +337,14 @@ function App() {
       {tab === '대회' && <TournamentView game={game} result={result} onChange={applyGameChange} />}
       {tab === '선수 기록' && <RankRecords game={game} />}
       {tab === '게임 안내' && <GameGuide />}
-      <SeasonRecapSummary game={game} open={showSeasonRecap} onClose={() => setShowSeasonRecap(false)} />
+      {achievements.length > 0 && (
+        <AchievementSequence events={achievements} onClose={() => setAchievements([])} />
+      )}
+      <SeasonRecapSummary
+        game={game}
+        open={showSeasonRecap && achievements.length === 0}
+        onClose={() => setShowSeasonRecap(false)}
+      />
     </main>
   );
 }

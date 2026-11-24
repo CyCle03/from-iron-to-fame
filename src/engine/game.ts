@@ -3,7 +3,15 @@ import { COMPETITION_RP } from './competitionRules';
 import { rankEntryFee, rankFor, rankScoreFor, startingRp } from './rank';
 import { summarizeMatches } from './matchSummary';
 import { nextWeek } from './seasonProgress';
-import { seasonQualificationRp } from './careerRules';
+import {
+  CAREER_REQUIREMENTS,
+  canJoinKel,
+  canPromoteTeamToKel,
+  kelSelectionRequirementLabel,
+  kelTeamPromotionRequirementLabel,
+  seasonQualificationRp,
+  type CareerRequirements,
+} from './careerRules';
 import { createMastersSeason } from './mastersProgress';
 
 export type Rank =
@@ -846,7 +854,7 @@ function createScoutOffers(g: Game): ScoutOffer[] {
       seasonsRemaining: 2,
       signingBonus: 400,
     });
-  if (g.fame >= 50 && g.mastersPoints >= 400)
+  if (canJoinKel(g))
     offers.push({
       team: 'KEL 블루 피닉스',
       league: 'KEL',
@@ -1050,9 +1058,13 @@ function completeKelRoster(n: Game, random: RandomSource) {
   }
   n.kelRosterSize = 4;
 }
-export function joinKel(g: Game, random: RandomSource = Math.random): Game {
-  if ((g.fame ?? 0) < 50 || (g.mastersPoints ?? 0) < 400)
-    return { ...g, notices: ['KEL 스카우트 조건: 인지도 50 · 마스터즈 CP 400'] };
+export function joinKel(
+  g: Game,
+  random: RandomSource = Math.random,
+  requirements: CareerRequirements = CAREER_REQUIREMENTS,
+): Game {
+  if (!canJoinKel(g, requirements))
+    return { ...g, notices: [`KEL 스카우트 조건: ${kelSelectionRequirementLabel(requirements)}`] };
   const n = structuredClone(g);
   n.teamName = 'KEL 시티 유나이티드';
   n.careerLeague = 'KEL';
@@ -1063,13 +1075,13 @@ export function joinKel(g: Game, random: RandomSource = Math.random): Game {
   n.notices = ['KEL 4인 로스터에 등록되었습니다!'];
   return n;
 }
-export function promoteTeamToKel(g: Game, random: RandomSource = Math.random): Game {
-  if (
-    !['아마추어', '마스터즈'].includes(g.careerLeague) ||
-    (g.fame ?? 0) < 60 ||
-    (g.mastersPoints ?? 0) < 600
-  )
-    return { ...g, notices: ['팀 KEL 승격 조건: 아마추어 팀 · 인지도 60 · 마스터즈 CP 600'] };
+export function promoteTeamToKel(
+  g: Game,
+  random: RandomSource = Math.random,
+  requirements: CareerRequirements = CAREER_REQUIREMENTS,
+): Game {
+  if (!canPromoteTeamToKel(g, requirements))
+    return { ...g, notices: [`팀 KEL 승격 조건: ${kelTeamPromotionRequirementLabel(requirements)}`] };
   const n = structuredClone(g);
   n.careerLeague = 'KEL';
   n.teamName = '루미아 웨이브 KEL';
@@ -1080,9 +1092,16 @@ export function promoteTeamToKel(g: Game, random: RandomSource = Math.random): G
   n.notices = ['팀 전체가 KEL 신규 팀으로 승격했습니다!'];
   return n;
 }
-export function acceptScoutOffer(g: Game, index: number, random: RandomSource = Math.random): Game {
+export function acceptScoutOffer(
+  g: Game,
+  index: number,
+  random: RandomSource = Math.random,
+  requirements: CareerRequirements = CAREER_REQUIREMENTS,
+): Game {
   const offer = g.scoutOffers[index];
   if (!offer) return { ...g, notices: ['선택할 수 있는 스카우트 제안이 없습니다.'] };
+  if (offer.league === 'KEL' && !canJoinKel(g, requirements))
+    return { ...g, notices: [`KEL 스카우트 조건: ${kelSelectionRequirementLabel(requirements)}`] };
   const n = structuredClone(g);
   n.teamName = offer.team;
   n.careerLeague = offer.league;

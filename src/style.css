@@ -488,7 +488,8 @@ li {
   padding-top: var(--space-4);
   border-top: 1px solid var(--color-border);
 }
-.save-modal .danger {
+.save-modal .danger,
+.archive-panel > .danger {
   color: #fff;
   background: #9c3345;
   border-color: #c95568;
@@ -2376,8 +2377,8 @@ li {
   position: absolute;
   top: 16px;
   right: 16px;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   color: #b7c4e6;
   background: #263354;
   border: 0;
@@ -3001,6 +3002,9 @@ li {
   flex: 0 0 120px;
   color: #dbe4fa;
   background: #303c60;
+}
+.achievement-sequence {
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 @media (max-width: 640px) {
   .recap-story {

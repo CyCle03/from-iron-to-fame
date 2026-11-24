@@ -9,7 +9,7 @@ import {
 } from '../engine/game';
 import { canEnterCommunityCup, canEnterMasters } from '../engine/careerRules';
 import type { RandomSource } from '../engine/random';
-import { simulateTournament, type TournamentResult } from '../engine/tournament';
+import { simulateTournament, TOURNAMENT_DIFFICULTY, type TournamentResult } from '../engine/tournament';
 
 export type SeasonAdvanceResult = {
   game: Game;
@@ -22,6 +22,7 @@ export function advanceCareerSeason(
   game: Game,
   action: Action,
   random: RandomSource = Math.random,
+  difficulty: number = TOURNAMENT_DIFFICULTY,
 ): SeasonAdvanceResult {
   let staged = game;
   let tournamentResult: TournamentResult | null = null;
@@ -36,13 +37,13 @@ export function advanceCareerSeason(
 
   if (staged.careerLeague === 'KEL') {
     while ((staged.kelStage ?? 0) < 7) {
-      tournamentResult = simulateTournament(staged, 'kel', random);
+      tournamentResult = simulateTournament(staged, 'kel', random, difficulty);
       staged = recordKelStage(staged, tournamentResult.playerPlace);
       tournamentEvents++;
     }
   } else if (canEnterMasters(staged)) {
     while ((staged.mastersPhase ?? 0) < 3) {
-      tournamentResult = simulateTournament(staged, 'masters', random);
+      tournamentResult = simulateTournament(staged, 'masters', random, difficulty);
       staged = recordMastersPhase(staged, tournamentResult.circuitPoints, tournamentResult.playerPlace);
       tournamentEvents++;
     }

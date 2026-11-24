@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { Game } from '../engine/game';
 import { getSavePreview, parseGameSave, serializeGameSave } from '../engine/save';
+import { useModalDialog } from '../hooks/useModalDialog';
 import { useToast } from './ToastProvider';
 
 type SaveControlsProps = {
@@ -24,36 +25,12 @@ export function SaveControls({ game, onImport, onReset, onRetire }: SaveControls
     setOpen(false);
     setConfirmReset(false);
     setConfirmRetire(false);
-    window.setTimeout(() => triggerButton.current?.focus());
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    closeButton.current?.focus();
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const handleKeyboard = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeModal();
-      if (event.key !== 'Tab') return;
-      const modal = closeButton.current?.closest('[role="dialog"]');
-      const focusable = modal?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled)');
-      if (!focusable?.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener('keydown', handleKeyboard);
-    return () => {
-      window.removeEventListener('keydown', handleKeyboard);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [closeModal, open]);
+  const { ref: dialogRef, onBackdropMouseDown } = useModalDialog(open, closeModal, {
+    initialFocusRef: closeButton,
+    restoreFocusRef: triggerButton,
+  });
 
   const exportSave = () => {
     const blob = new Blob([serializeGameSave(game)], { type: 'application/json' });
@@ -84,14 +61,12 @@ export function SaveControls({ game, onImport, onReset, onRetire }: SaveControls
 
   const reset = () => {
     onReset();
-    setOpen(false);
-    setConfirmReset(false);
+    closeModal();
   };
 
   const retire = () => {
     onRetire?.();
-    setOpen(false);
-    setConfirmRetire(false);
+    closeModal();
   };
 
   const importSummary = preview ? getSavePreview(preview) : null;
@@ -102,13 +77,14 @@ export function SaveControls({ game, onImport, onReset, onRetire }: SaveControls
         커리어 관리
       </button>
       {open && (
-        <div
-          className="modal-backdrop"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeModal();
-          }}
-        >
-          <section className="save-modal" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
+        <div className="modal-backdrop" onMouseDown={onBackdropMouseDown}>
+          <section
+            ref={dialogRef}
+            className="save-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="save-modal-title"
+          >
             <div className="modal-heading">
               <div>
                 <p className="eyebrow">CAREER MANAGER</p>

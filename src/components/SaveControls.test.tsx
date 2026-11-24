@@ -57,6 +57,35 @@ describe('SaveControls user flow', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  it('keeps Tab focus cycling inside the modal', async () => {
+    const user = userEvent.setup();
+    renderControls();
+
+    await user.click(screen.getByRole('button', { name: '커리어 관리' }));
+    const closeButton = screen.getByRole('button', { name: '커리어 관리 닫기' });
+    expect(closeButton).toBe(document.activeElement);
+
+    await user.tab({ shift: true });
+    expect(screen.getByRole('button', { name: '데이터 삭제 후 새 커리어' })).toBe(document.activeElement);
+    await user.tab();
+    expect(closeButton).toBe(document.activeElement);
+  });
+
+  it('cancels an in-progress retirement confirmation with Escape', async () => {
+    const user = userEvent.setup();
+    const { onReset, onRetire } = renderControls();
+    const trigger = screen.getByRole('button', { name: '커리어 관리' });
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('button', { name: '선수 은퇴' }));
+    await user.keyboard('{Escape}');
+
+    expect(onRetire).not.toHaveBeenCalled();
+    expect(onReset).not.toHaveBeenCalled();
+    await waitFor(() => expect(trigger).toBe(document.activeElement));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
   it('requires a second action before deleting the career data', async () => {
     const user = userEvent.setup();
     const { onReset } = renderControls();

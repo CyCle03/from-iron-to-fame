@@ -1,8 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { createGame } from './game';
 import { createSeededRandom } from './random';
-import { simulateTournament } from './tournament';
+import { simulateTournament, TOURNAMENT_DIFFICULTY_BASELINE, TOURNAMENT_DIFFICULTY } from './tournament';
 describe('tournament engine', () => {
+  it('raises opponent strength without changing the simulation seed', () => {
+    const game = createGame('테스트', '골드', '일반 유저', '유키');
+    const baseline = simulateTournament(
+      game,
+      'masters',
+      createSeededRandom(2026),
+      TOURNAMENT_DIFFICULTY_BASELINE,
+    );
+    const candidate = simulateTournament(game, 'masters', createSeededRandom(2026), TOURNAMENT_DIFFICULTY);
+    expect(candidate.playerPlace).toBeGreaterThanOrEqual(baseline.playerPlace);
+  });
   it('enforces the two-pick cap in KEL simulation', () => {
     const r = simulateTournament(createGame('테스트', '이터니티', '일반 유저', '아야'), 'kel');
     const picks = r.rounds.reduce<Record<string, number>>(

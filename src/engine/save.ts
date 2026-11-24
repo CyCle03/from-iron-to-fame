@@ -8,6 +8,7 @@ import {
   ranks,
   roleExperiments,
   roleForExperiment,
+  validateGameState,
   type Background,
   type CompetitionRecord,
   type Game,
@@ -39,6 +40,14 @@ const STAT_KEYS = new Set<StatKey>([
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const finiteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
+
+const boundedInteger = (value: unknown, min: number, max: number, fallback: number) =>
+  finiteNumber(value) ? Math.min(max, Math.max(min, Math.round(value))) : fallback;
+
+const nonNegativeInteger = (value: unknown, fallback: number) =>
+  finiteNumber(value) ? Math.max(0, Math.round(value)) : fallback;
 
 const stringArray = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
@@ -96,7 +105,12 @@ export function migrateGameSave(raw: unknown): Game | null {
     trainingFocus.length === 2 ? trainingFocus : DEFAULT_FOCUS,
   );
 
-  const savedPool = stringArray(raw.experimentPool).filter((name) => characterSet.has(name));
+  const savedStats = isRecord(raw.stats) ? raw.stats : {};
+  const stats = Object.fromEntries(
+    [...STAT_KEYS].map((key) => [key, boundedInteger(savedStats[key], 0, 100, baseline.stats[key])]),
+  ) as Game['stats'];
+
+  const savedPool = [...new Set(stringArray(raw.experimentPool).filter((name) => characterSet.has(name)))];
   const experimentPool = [main, ...savedPool.filter((name) => name !== main)];
   for (const candidate of roleExperiments[role]) {
     if (experimentPool.length >= 3) break;
@@ -104,24 +118,34 @@ export function migrateGameSave(raw: unknown): Game | null {
   }
 
   const savedMastery = isRecord(raw.mastery) ? raw.mastery : {};
-  const mastery = {
-    ...baseline.mastery,
-    ...Object.fromEntries(
-      Object.entries(savedMastery).filter(
-        (entry): entry is [string, number] => characterSet.has(entry[0]) && typeof entry[1] === 'number',
-      ),
-    ),
-  };
+  const mastery: Record<string, number> = { ...baseline.mastery };
+  for (const [name, value] of Object.entries(savedMastery)) {
+    if (characterSet.has(name) && finiteNumber(value)) mastery[name] = boundedInteger(value, 0, 100, 0);
+  }
   for (const [index, name] of experimentPool.entries()) {
     mastery[name] ??= index === 0 ? 28 : 12;
   }
 
   const teammateExperiments = stringArray(raw.teammateExperiments).filter((name) => characterSet.has(name));
+  const teammateRoles =
+    Array.isArray(raw.teammateRoles) &&
+    raw.teammateRoles.length === teammateExperiments.length &&
+    raw.teammateRoles.every((role) => typeof role === 'string' && Object.hasOwn(roleExperiments, role))
+      ? (raw.teammateRoles as Role[])
+      : teammateExperiments.map((name) => roleForExperiment(name) ?? '근거리 딜러');
   const savedMembers = Array.isArray(raw.teamMembers) ? raw.teamMembers : [];
-  const teamMembers = savedMembers.filter(
-    (member): member is TeamMember =>
-      isRecord(member) && typeof member.experiment === 'string' && characterSet.has(member.experiment),
-  );
+  const importedMembers = savedMembers
+    .filter(
+      (member): member is TeamMember =>
+        isRecord(member) && typeof member.experiment === 'string' && characterSet.has(member.experiment),
+    )
+    .map((member) => ({ ...member, starter: member.starter === true }));
+  const teamMembers =
+    importedMembers.length >= 2
+      ? importedMembers.filter((member) => member.starter).length === 2
+        ? importedMembers
+        : importedMembers.map((member, index) => ({ ...member, starter: index < 2 }))
+      : baseline.teamMembers;
   const season =
     typeof raw.season === 'number' && Number.isFinite(raw.season) ? Math.max(11, Math.floor(raw.season)) : 11;
   const teamName = typeof raw.teamName === 'string' ? raw.teamName : null;
@@ -149,9 +173,9 @@ export function migrateGameSave(raw: unknown): Game | null {
       } as Game['lastSeasonSummary'])
     : null;
   const competitionHistory = competitionRecords(raw.competitionHistory);
-  const savedFame = typeof raw.fame === 'number' ? Math.max(0, Math.round(raw.fame)) : 0;
+  const savedFame = nonNegativeInteger(raw.fame, 0);
 
-  return {
+  const game: Game = {
     ...baseline,
     ...(raw as Partial<Game>),
     version: CURRENT_SAVE_VERSION,
@@ -161,6 +185,19 @@ export function migrateGameSave(raw: unknown): Game | null {
     role,
     main,
     season,
+    rp: nonNegativeInteger(raw.rp, baseline.rp),
+    credits: nonNegativeInteger(raw.credits, baseline.credits),
+    week: boundedInteger(raw.week, 1, 12, baseline.week),
+    stats,
+    fatigue: boundedInteger(raw.fatigue, 0, 100, baseline.fatigue),
+    morale: boundedInteger(raw.morale, 0, 100, baseline.morale),
+    actionPoints: nonNegativeInteger(raw.actionPoints, baseline.actionPoints),
+    mastersPoints: nonNegativeInteger(raw.mastersPoints, baseline.mastersPoints),
+    mastersPhase: boundedInteger(raw.mastersPhase, 0, 3, baseline.mastersPhase),
+    kelStage: boundedInteger(raw.kelStage, 0, 7, baseline.kelStage),
+    seasonCupEntries: boundedInteger(raw.seasonCupEntries, 0, 2, baseline.seasonCupEntries),
+    communityCups: nonNegativeInteger(raw.communityCups, baseline.communityCups),
+    trophies: nonNegativeInteger(raw.trophies, baseline.trophies),
     trainingFocus: trainingFocus.length === 2 ? trainingFocus : DEFAULT_FOCUS,
     lastSeasonPlan:
       typeof raw.lastSeasonPlan === 'string' && ACTIONS.has(raw.lastSeasonPlan)
@@ -171,8 +208,8 @@ export function migrateGameSave(raw: unknown): Game | null {
     experimentPool: experimentPool.slice(0, 3),
     mastery,
     teammateExperiments,
-    teammateRoles: teammateExperiments.map((name) => roleForExperiment(name) ?? '근거리 딜러'),
-    teamMembers: teamMembers.length ? teamMembers : baseline.teamMembers,
+    teammateRoles,
+    teamMembers,
     teamName,
     teamHistory: stringArray(raw.teamHistory).length
       ? stringArray(raw.teamHistory)
@@ -190,9 +227,8 @@ export function migrateGameSave(raw: unknown): Game | null {
       : raw.hallOfFame === true
         ? ['히어로즈', '아너스']
         : [],
-    starsSelections:
-      typeof raw.starsSelections === 'number' ? Math.max(0, Math.floor(raw.starsSelections)) : 0,
-    lastStarsSeason: typeof raw.lastStarsSeason === 'number' ? Math.floor(raw.lastStarsSeason) : null,
+    starsSelections: nonNegativeInteger(raw.starsSelections, 0),
+    lastStarsSeason: finiteNumber(raw.lastStarsSeason) ? Math.floor(raw.lastStarsSeason) : null,
     equipment: stringArray(raw.equipment),
     history: stringArray(raw.history).length ? stringArray(raw.history) : baseline.history,
     notices: stringArray(raw.notices).length ? stringArray(raw.notices) : baseline.notices,
@@ -205,6 +241,8 @@ export function migrateGameSave(raw: unknown): Game | null {
       : createMastersSeason(season, teamName),
     seasonMeta: isRecord(raw.seasonMeta) ? (raw.seasonMeta as Game['seasonMeta']) : createSeasonMeta(season),
   };
+
+  return validateGameState(game).length === 0 ? game : null;
 }
 
 export const serializeGameSave = (game: Game) => JSON.stringify(game, null, 2);

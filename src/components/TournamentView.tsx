@@ -4,6 +4,8 @@ import {
   canJoinKel,
   canPromoteTeamToKel,
   seasonQualificationRp,
+  kelSelectionRequirementLabel,
+  kelTeamPromotionRequirementLabel,
 } from '../engine/careerRules';
 import type { TournamentResult } from '../engine/tournament';
 
@@ -62,14 +64,11 @@ export function TournamentView({ game, result, onChange }: TournamentViewProps) 
         </button>
         <button disabled={!canPromoteTeamToKel(game)} onClick={() => onChange(promoteTeamToKel(game))}>
           <b>팀 전체 KEL 승격</b>
-          <small>아마추어 팀 · 인지도 60 · CP 600</small>
+          <small>아마추어 팀 · {kelTeamPromotionRequirementLabel()}</small>
         </button>
-        <button
-          disabled={!canJoinKel(game) || game.careerLeague === 'KEL'}
-          onClick={() => onChange(joinKel(game))}
-        >
+        <button disabled={!canJoinKel(game)} onClick={() => onChange(joinKel(game))}>
           <b>KEL 4인 로스터 합류</b>
-          <small>인지도 50 · 마스터즈 CP 400</small>
+          <small>{kelSelectionRequirementLabel()}</small>
         </button>
       </div>
       <h2>자동 참가 결과</h2>
@@ -97,6 +96,11 @@ export function TournamentView({ game, result, onChange }: TournamentViewProps) 
             내 최고 순위 <b>{result.playerPlace}위</b> · 획득 서킷 포인트 <b>{result.circuitPoints}</b>
           </p>
           <p>{result.note}</p>
+          <p>
+            마지막 라운드 전력 보정 · 메타 {result.modifiers.meta.toFixed(1)} · 실험체 숙련도{' '}
+            {result.modifiers.mastery.toFixed(1)} · 로스터 {result.modifiers.roster.toFixed(1)}
+          </p>
+          <small>전력에 더해진 보정값입니다. 최종 순위는 경기 난수와 상대 전력에도 영향을 받습니다.</small>
           <table>
             <thead>
               <tr>

@@ -80,6 +80,7 @@ flowchart TB
 ```
 
 - `src/application/advanceCareerSeason.ts`: 참가 자격 확인 → 공식 대회 자동 진행 → 시즌 결산을 하나의 유스케이스로 조정한다.
+- `src/application/careerAchievements.ts`: 상태 전후의 신규 대회·수상 기록을 결과→수상→이정표 순서로 정리한다. 연출 큐는 UI 세션에만 존재하고 기록 저장과 분리되어, 건너뛰기나 새로고침이 기록을 변경하지 않는다.
 - `src/engine/game.ts`: 커리어 상태와 원자적인 상태 전이를 제공한다.
 - `src/engine/career.ts`: 통산 집계·은퇴·명예의 전당 규칙을 담당한다.
 - `src/engine/careerRules.ts`: 대회·팀 진입 조건과 다음 목표를 계산하는 순수 정책이다.
@@ -92,6 +93,7 @@ flowchart TB
 - `src/engine/save.ts`: 저장 데이터 검증·마이그레이션·기본값 보완을 담당한다.
 - `src/components/*`: 정책을 계산하지 않고 상태와 유스케이스 결과를 표현한다.
 - `src/hooks/useCareerGame.ts`: 브라우저 저장 수명주기와 UI 상태 연결만 맡는다.
+- `src/hooks/useModalDialog.ts`: 저장·시즌 결산·성취 모달의 포커스 순환·복귀와 스크롤 잠금을 공유한다.
 
 ## 객체지향과 함수형 경계
 

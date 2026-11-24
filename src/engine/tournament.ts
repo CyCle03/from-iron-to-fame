@@ -19,6 +19,8 @@ export type TournamentResult = {
   note: string;
 };
 const pool = characters;
+export const TOURNAMENT_DIFFICULTY_BASELINE = 0;
+export const TOURNAMENT_DIFFICULTY = 5;
 const clamp = (n: number) => Math.max(1, Math.min(8, Math.round(n)));
 const modifiers = (g: Game, pick: string) => {
   const roster = (g.teamMembers ?? []).filter((member) => member.starter);
@@ -56,6 +58,7 @@ export function simulateTournament(
   g: Game,
   kind: TournamentKind,
   random: RandomSource = Math.random,
+  difficulty: number = TOURNAMENT_DIFFICULTY,
 ): TournamentResult {
   const rounds: TournamentRound[] = [];
   const used: Record<string, number> = {};
@@ -75,7 +78,7 @@ export function simulateTournament(
       .sort((a, b) => (g.mastery[b] ?? 0) - (g.mastery[a] ?? 0));
     const pick = trained[0] ?? fallback;
     if (kind === 'kel') used[pick] = (used[pick] ?? 0) + 1;
-    const place = clamp(9 - (power(g, pick) + (random() - 0.5) * 30) / 13);
+    const place = clamp(9 - (power(g, pick) + (random() - 0.5) * 30 - difficulty) / 13);
     const eligible = kind === 'kel' && round >= 5 && place <= checkpointCount(round);
     rounds.push({
       round,

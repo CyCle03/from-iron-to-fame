@@ -1,6 +1,25 @@
 import type { Game } from './game';
 import { COMPETITION_RP } from './competitionRules';
 
+export type CareerRequirements = {
+  readonly communityCupRp: number;
+  readonly teamFormationRp: number;
+  readonly amateurTeamFame: number;
+  readonly mastersRp: number;
+  readonly mastersFame: number;
+  readonly kelFame: number;
+  readonly kelMastersPoints: number;
+  readonly kelRecentFinalPlace: number | null;
+  readonly kelTeamPromotionFame: number;
+  readonly kelTeamPromotionMastersPoints: number;
+  readonly hallOfFameStarsFame: number;
+  readonly hallOfFameHeroesMajorTitles: number;
+  readonly hallOfFameHonorsFame: number;
+  readonly hallOfFameHonorsMajorTitles: number;
+  readonly hallOfFameHonorsMvps: number;
+  readonly hallOfFameHonorsTopTierSeasons: number;
+};
+
 export const CAREER_REQUIREMENTS = {
   communityCupRp: COMPETITION_RP.nationalAmateur,
   teamFormationRp: COMPETITION_RP.teamFormation,
@@ -9,11 +28,25 @@ export const CAREER_REQUIREMENTS = {
   mastersFame: 15,
   kelFame: 50,
   kelMastersPoints: 400,
+  kelRecentFinalPlace: 3,
+  kelTeamPromotionFame: 60,
+  kelTeamPromotionMastersPoints: 600,
   hallOfFameStarsFame: 70,
   hallOfFameHeroesMajorTitles: 3,
   hallOfFameHonorsFame: 90,
   hallOfFameHonorsMajorTitles: 5,
-} as const;
+  hallOfFameHonorsMvps: 2,
+  hallOfFameHonorsTopTierSeasons: 5,
+} as const satisfies CareerRequirements;
+
+/**
+ * 2026-10-23 이전의 KEL 조건을 재현하는 비교 기준선.
+ * 인지도와 누적 CP만 보며 최근 시즌 결승 성적은 요구하지 않는다.
+ */
+export const KEL_SELECTION_LEGACY = {
+  ...CAREER_REQUIREMENTS,
+  kelRecentFinalPlace: null,
+} as const satisfies CareerRequirements;
 
 export const seasonQualificationRp = (game: Game) => {
   const summary = game.lastSeasonSummary;
@@ -48,11 +81,59 @@ export const canJoinAmateurTeam = (game: Game) =>
   seasonQualificationRp(game) >= CAREER_REQUIREMENTS.teamFormationRp &&
   game.fame >= CAREER_REQUIREMENTS.amateurTeamFame;
 
-export const canJoinKel = (game: Game) =>
-  game.fame >= CAREER_REQUIREMENTS.kelFame && game.mastersPoints >= CAREER_REQUIREMENTS.kelMastersPoints;
+export const recentTopTierFinalPlace = (game: Game): number | null => {
+  const season = game.lastSeasonSummary?.season ?? game.season - 1;
+  if (season < 0) return null;
+  const places = game.competitionHistory
+    .filter(
+      (record) =>
+        record.season === season &&
+        record.place > 0 &&
+        (record.kind === '시즌 파이널' || (record.kind === 'KEL' && record.stage === 7)),
+    )
+    .map((record) => record.place);
+  return places.length ? Math.min(...places) : null;
+};
 
-export const canPromoteTeamToKel = (game: Game) =>
-  ['아마추어', '마스터즈'].includes(game.careerLeague) && game.fame >= 60 && game.mastersPoints >= 600;
+const meetsKelRecentFinalRequirement = (game: Game, requirements: CareerRequirements) => {
+  if (requirements.kelRecentFinalPlace === null) return true;
+  const recentFinalPlace = recentTopTierFinalPlace(game);
+  return recentFinalPlace !== null && recentFinalPlace <= requirements.kelRecentFinalPlace;
+};
+
+export const kelSelectionRequirementLabel = (requirements: CareerRequirements = CAREER_REQUIREMENTS) =>
+  [
+    `인지도 ${requirements.kelFame}`,
+    `마스터즈 CP ${requirements.kelMastersPoints}`,
+    requirements.kelRecentFinalPlace === null
+      ? null
+      : `최근 시즌 결승 TOP${requirements.kelRecentFinalPlace}`,
+  ]
+    .filter((value): value is string => value !== null)
+    .join(' · ');
+
+export const kelTeamPromotionRequirementLabel = (requirements: CareerRequirements = CAREER_REQUIREMENTS) =>
+  [
+    `인지도 ${requirements.kelTeamPromotionFame}`,
+    `마스터즈 CP ${requirements.kelTeamPromotionMastersPoints}`,
+    requirements.kelRecentFinalPlace === null
+      ? null
+      : `최근 시즌 결승 TOP${requirements.kelRecentFinalPlace}`,
+  ]
+    .filter((value): value is string => value !== null)
+    .join(' · ');
+
+export const canJoinKel = (game: Game, requirements: CareerRequirements = CAREER_REQUIREMENTS) =>
+  game.careerLeague !== 'KEL' &&
+  game.fame >= requirements.kelFame &&
+  game.mastersPoints >= requirements.kelMastersPoints &&
+  meetsKelRecentFinalRequirement(game, requirements);
+
+export const canPromoteTeamToKel = (game: Game, requirements: CareerRequirements = CAREER_REQUIREMENTS) =>
+  ['아마추어', '마스터즈'].includes(game.careerLeague) &&
+  game.fame >= requirements.kelTeamPromotionFame &&
+  game.mastersPoints >= requirements.kelTeamPromotionMastersPoints &&
+  meetsKelRecentFinalRequirement(game, requirements);
 
 export function nextCareerGoal(game: Game): { title: string; detail: string } {
   const qualificationRp = seasonQualificationRp(game);

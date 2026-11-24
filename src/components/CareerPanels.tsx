@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   acceptScoutOffer,
   careerTotals,
@@ -185,6 +186,7 @@ export function RosterPanel({ game, onChange }: GamePanelProps) {
 }
 
 export function CareerArchivePanel({ game, onChange }: GamePanelProps) {
+  const [confirmRetire, setConfirmRetire] = useState(false);
   const totals = careerTotals(game);
   return (
     <section className="panel archive-panel">
@@ -206,7 +208,22 @@ export function CareerArchivePanel({ game, onChange }: GamePanelProps) {
       </div>
       <p>팀 이력 · {game.teamHistory.join(' → ') || '무소속'}</p>
       <p>수상 · {game.awards.join(' · ') || '아직 수상 기록 없음'}</p>
-      <button onClick={() => onChange(retireCareer(game))}>현역 은퇴 및 기록 보존</button>
+      {confirmRetire ? (
+        <>
+          <p className="official-note">
+            은퇴하면 현재 커리어를 종료하고 기록 화면으로 전환합니다. 통산 기록과 수상 내역은 이 브라우저에
+            그대로 보존됩니다.
+          </p>
+          <button autoFocus onClick={() => setConfirmRetire(false)}>
+            취소
+          </button>
+          <button className="danger" onClick={() => onChange(retireCareer(game))}>
+            은퇴 확정
+          </button>
+        </>
+      ) : (
+        <button onClick={() => setConfirmRetire(true)}>현역 은퇴 및 기록 보존</button>
+      )}
     </section>
   );
 }
